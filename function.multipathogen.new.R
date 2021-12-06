@@ -4,69 +4,68 @@
 # Set of function for the co-infection script
 ##########################################################################
 #
-#
 
-exposed.time.1<-function(){
-  #shape<-1
-  #scale<-1
-  #return(rgamma(1,shape = shape,scale=scale))
-  return(2.9)
+exposed.time<-function(pathogen){
+  if (pathogen=="COVID-19"){
+    return(2.9)
+  }
+  if (pathogen=="FLU-A"){
+    return(1.1)  
+  }
+  if (pathogen=="FLU-B"){
+    return(1.1)  
+  }
+  if (pathogen=="RSV"){
+    return(2.5)  
+  }
 }
 
-exposed.time.2<-function(){
-  #shape<-1
-  #scale<-1
-  #return(rgamma(1,shape = shape,scale=scale))
-  return(1.6)
+incubation.period<-function(pathogen){
+  if (pathogen=="COVID-19"){
+    return(rlnorm(1,meanlog = log(5.2), sdlog = log(1.7)))    
+    
+  }
+  if (pathogen=="FLU-A"){
+    return(rlnorm(1,meanlog = log(1.4), sdlog = log(1.51))) 
+  }
+  if (pathogen=="FLU-B"){
+    return(rlnorm(1,meanlog = log(0.6), sdlog = log(1.51))) 
+  }
+  if (pathogen=="RSV"){
+    return(rlnorm(1,meanlog = log(4.4), sdlog = log(1.24))) 
+  }
 }
 
-
-incubation.period.1<-function(){
-  #shape<-1
-  #scale<-1
-  #return(rgamma(1,shape = shape,scale=scale))
-  return(sample(0:7,1,prob = c(0.13,0.28,0.28,0.15,0.1,0.025,0.025, 0.01)))
+infectious.period.length<-function(pathogen){
+  if (pathogen=="COVID-19"){
+    return(12.1)
+  }
+  if (pathogen=="FLU-A"){
+    return(5.14)  
+  }
+  if (pathogen=="FLU-B"){
+    return(3.7)  
+  }
+  if (pathogen=="RSV"){
+    return(9.5)  
+  }
+  
 }
 
-
-
-incubation.period.2<-function(IPL){
-  #shape<-1
-  #scale<-1
-  #return(rgamma(1,shape = shape,scale=scale))
-#  if (IPL==1){
-    return(0)
-#  }
-#  if (IPL==2){
-#    return(sample(c(0,1),1, prob = c(0.5,0.5)))
-#  }
-#  if (IPL==4){
-#    return(sample(c(0,1,2,3),1, prob = c(0.25,0.25,0.25,0.25)))
-#  }
+InfMeasure<-function(t,pathogen){
+  if (pathogen=="COVID-19"){
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)) )
+  }
+  if (pathogen=="FLU-A"){
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(7,shape = 3.5,rate = 1.15)) )
+  }
+  if (pathogen=="FLU-B"){
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(7,shape = 3.5,rate = 1.15)) )
+  }
+  if (pathogen=="RSV"){
+    return(dgamma(t,shape = 15, rate = 2.6)/ (pgamma(12,shape = 15,rate = 2.6)) )
+  }
 }
-
-
-infectious.period.1<-function(){
-  mu<-7
-  return(mu)
-}
-
-infectious.period.2<-function(IPL){
-  mu<-IPL
-  return(mu)
-}
-
-
-InfMeasure.1<-function(t){
-  return(dgamma(t,shape = 2, rate = 0.65)/ (pgamma(7,shape = 2,rate = 0.65)) )
-  #return(rgammatr(1,A=2,B=0.65,range = c(0,7)))
-  #return(1/7)
-}
-
-InfMeasure.2<-function(t,IPL){
-  return(1/IPL)
-}
-
 
 long.inter.term.1<-function(t,inf.type,lli.k){
   #return(k.asint*(1-exp(-0.02*t)))
@@ -77,7 +76,6 @@ long.inter.term.2<-function(t,inf.type){
   #return(k.asint*(1-exp(-0.02*t)))
   return(1)
 }
-
 
 
 #INPUT PARAMETERS:
@@ -103,7 +101,7 @@ long.inter.term.2<-function(t,inf.type){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,IPL,lli.k){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,IPL,lli.k, pathogen.1,pathogen.2){
   
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
@@ -157,13 +155,13 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
     first<-j
     status.matrix.1[first,1] <- 1 
     status.matrix.1[first,2] <- 0
-    status.matrix.1[first,5] <- current.time+exposed.time.1()
-    status.matrix.1[first,7]<-status.matrix.1[first,5]+infectious.period.1()
+    status.matrix.1[first,5] <- current.time+exposed.time(pathogen = pathogen.1)
+    status.matrix.1[first,7]<-status.matrix.1[first,5]+infectious.period(pathogen=pathogen.1)
     recovery.vector.1[first]<-status.matrix.1[first,7]
     if (runif(1)<rho.1){ #if symptomatic
       transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
       transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
-      status.matrix.1[first,6]<-status.matrix.1[first,5]+incubation.period.1()
+      status.matrix.1[first,6]<-status.matrix.1[first,5]+incubation.period(pathogen=pathogen.1)
       homequarantine.day.1[first]<-status.matrix.1[first,6]
       time.events<-rbind(time.events,c(current.time,1.1,first))
     }else{
@@ -279,20 +277,20 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       
       ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
-      acc.rate.1<-InfMeasure.1(t=current.time-status.matrix.1[infector,5])*short.inter*long.inter*q
+      acc.rate.1<-InfMeasure(t= (ifelse(current.time>status.matrix.1[infector,5],current.time-status.matrix.1[infector,5],0)),pathogen = pathogen.1)*short.inter*long.inter*q
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1[infector,1]!=1){acc.rate.1<-0}
       if (acc.rate.1>1){err<-err+1}
       if (status.matrix.1[infectee,1]==0 & runif(1)<acc.rate.1){
         status.matrix.1[infectee,1] <- 1 
         status.matrix.1[infectee,2] <- current.time
         status.matrix.1[infectee,3] <- infector
-        status.matrix.1[infectee,5] <- current.time+exposed.time.1()
-        status.matrix.1[infectee,7]<-status.matrix.1[infectee,5]+infectious.period.1()
+        status.matrix.1[infectee,5] <- current.time+exposed.time(pathogen=pathogen.1)
+        status.matrix.1[infectee,7]<-status.matrix.1[infectee,5]+infectious.period.length(pathogen=pathogen.1)
         recovery.vector.1[infectee]<-status.matrix.1[infectee,7]
         if (runif(1)<rho.1){ #if symptomatic
           transmission.parameters$q1h[infectee]<-inf.path.1.h #A single q parameter for everyone
           transmission.parameters$q1g[infectee]<-inf.path.1.g #A single q parameter for everyone
-          status.matrix.1[infectee,6]<-status.matrix.1[infectee,5]+incubation.period.1()
+          status.matrix.1[infectee,6]<-status.matrix.1[infectee,5]+incubation.period(pathogen=pathogen.1)
           homequarantine.day.1[infectee]<-status.matrix.1[infectee,6]
           status.matrix.1[infectee,4]<-1
           time.events<-rbind(time.events,c(current.time,1.1,infectee))
@@ -325,20 +323,20 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         long.inter<-1
       }
       ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
-      acc.rate.2<-InfMeasure.2(t=current.time-status.matrix.2[infector,5],IPL=IPL)*short.inter*long.inter*q
+      acc.rate.2<-InfMeasure(t= (ifelse(current.time>status.matrix.2[infector,5],current.time-status.matrix.2[infector,5],0)),pathogen = pathogen.2)*short.inter*long.inter*q
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.2[infector,1]!=1){acc.rate.2<-0}
       if (acc.rate.2>1){err<-err+1}
       if (status.matrix.2[infectee,1]==0 & runif(1)<acc.rate.2){
         status.matrix.2[infectee,1] <- 1 
         status.matrix.2[infectee,2] <- current.time
         status.matrix.2[infectee,3] <- infector
-        status.matrix.2[infectee,5] <- current.time+exposed.time.2()
-        status.matrix.2[infectee,7]<-status.matrix.2[infectee,5]+infectious.period.2(IPL=IPL)
+        status.matrix.2[infectee,5] <- current.time+exposed.time(pathogen=pathogen.2)
+        status.matrix.2[infectee,7]<-status.matrix.2[infectee,5]+infectious.period.length(pathogen=pathogen.2)
         recovery.vector.2[infectee]<-status.matrix.2[infectee,7]
         if (runif(1)<rho.2){ #if symptomatic
           transmission.parameters$q2h[infectee]<-inf.path.2.h #A single q parameter for everyone
           transmission.parameters$q2g[infectee]<-inf.path.2.g #A single q parameter for everyone
-          status.matrix.2[infectee,6]<-status.matrix.2[infectee,5]+incubation.period.2(IPL=IPL)
+          status.matrix.2[infectee,6]<-status.matrix.2[infectee,5]+incubation.period(pathogen=pathogen.2)
           homequarantine.day.2[infectee]<-status.matrix.2[infectee,6]
           status.matrix.2[infectee,4]<-1
           time.events<-rbind(time.events,c(current.time,2.1,infectee))
@@ -472,14 +470,14 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         first<-j
         status.matrix.2[first,1] <- 1 
         status.matrix.2[first,2] <- current.time
-        status.matrix.2[first,5] <- current.time+exposed.time.2()
-        status.matrix.2[first,7]<-status.matrix.2[first,5]+infectious.period.2(IPL=IPL)
+        status.matrix.2[first,5] <- current.time+exposed.time(pathogen=pathogen.2)
+        status.matrix.2[first,7]<-status.matrix.2[first,5]+infectious.period.length(pathogen=pathogen.2)
         recovery.vector.2[first]<-status.matrix.2[first,7]
         if (runif(1)<rho.2){ #if symptomatic
           transmission.parameters$q2h[first]<-inf.path.2.h #A single q parameter for everyone
           transmission.parameters$q2g[first]<-inf.path.2.g #A single q parameter for everyone
           status.matrix.2[first,4]<-1
-          status.matrix.2[first,6]<-status.matrix.2[first,5]+incubation.period.2(IPL=IPL)
+          status.matrix.2[first,6]<-status.matrix.2[first,5]+incubation.period(pathogen=pathogen.2)
           homequarantine.day.2[first]<-status.matrix.2[first,6]
           time.events<-rbind(time.events,c(current.time,2.1,first))
         }else{

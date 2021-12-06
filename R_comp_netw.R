@@ -17,7 +17,6 @@ R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h){
 }  
   h.n<-m.n/m #proportion of household of a specific size
   mu.h<-sum(h.n*(1:length(h.n)))
-  
     
   #divide network in sizes
   for (j in 1:nSim){
@@ -93,9 +92,19 @@ R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim){
   beta.h<-ratio_hhgl*beta.g
   beta.g.tempm<-0
   beta.g.tempM<-10
-  R.temp<-R0.computation.StaticNetw(HH.network = HH.network, beta.g = beta.g, beta.h = beta.h, nSim = nSim)
+  R.temp<-NULL
+  for (i in 1:nSim){
+    temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
+    R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1))
+  }
+  R.temp<-mean(R.temp)
   while (abs(mean(R.temp)-R.rif)>tol){
-    R.temp<-R0.computation.StaticNetw(HH.network = HH.network, beta.g = beta.g, beta.h = beta.h, nSim = nSim)
+    R.temp<-NULL
+    for (i in 1:nSim){
+      temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
+      R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1))
+    }
+    R.temp<-mean(R.temp)
     if (mean(R.temp)>R.rif){
       beta.g.tempM<-beta.g
       beta.g<-runif(1,min = beta.g.tempm,max = beta.g)
@@ -110,9 +119,6 @@ R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim){
   transm.prms<-data.frame("beta.g"=beta.g, "beta.h"=beta.h)
   return(transm.prms)
 }
-
-
-
 
 R0.comp.asy<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,IPL){
   beta.g<-1
@@ -135,4 +141,19 @@ R0.comp.asy<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,IPL){
   }
   transm.prms<-data.frame("beta.g"=beta.g, "beta.h"=beta.h)
   return(transm.prms)
+}
+
+
+avg.lambda.within<-function(HH.networks){
+  lamb.with<-NULL
+  for (i in 1:length(HH.networks)){
+    temp.net<-HH.networks[[i]]
+    vn<-temp.net  %v% "vertex.names"
+    temp.lh<-NULL
+    for (j in 1:length(vn)){
+      temp.lh<-c(temp.lh, length(get.neighborhood(temp.net,j)))
+    }
+    lamb.with<-c(lamb.with,mean(temp.lh))
+  }
+  return(mean(lamb.with))
 }

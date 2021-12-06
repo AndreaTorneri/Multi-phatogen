@@ -28,20 +28,25 @@ R.1= as.numeric(args[13]) # short-term interaction parameter: acquiring 1 while 
 cat(",R.1=",R.1)
 R.2= as.numeric(args[14]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",R.2=",R.2)
-IPL= as.numeric(args[15]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",IPL=",IPL)
-lli.k= as.numeric(args[16]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+lli.k= as.numeric(args[15]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",lli.k=",lli.k)
+pathogen.1= as.character(args[16]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",pathogen.1=",pathogen.1)
+pathogen.2= as.character(args[17]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",pathogen.2=",pathogen.2)
+
 
 
 
 #Input parameters - fixed
 library(ergm)
 library(RGeode)
-load("HH_complete.RData")
-HH.network<-HH_complete
-lambda.h<-3.18 #(computed as the average number of links individuals have within households)
-Net<-"HH_Eva"
+#load("HH_complete.RData")
+load("sim_basis_complete_n_1000.RData")
+
+HH.networks<-HH_sims
+lambda.h<-2.9 #(computed as the average number of links individuals have within households)
+#Net<-"HH_Eva"
 
 #ERGM.EGO
 #Networks<-readRDS("~/Documents/Work/PhD/Co-infection/Script/sim_EgoHHcombined_basis_complete_n_10.rds")
@@ -57,35 +62,32 @@ Net<-"HH_Eva"
 #set.vertex.attribute(HH.network, "hh_size", value = hh_size)
 #avg.ct<-mean(n.link)
 #lambda.h<-avg.ct
-
-
 lambda.g<-8.29
 
 #SettingInfectivityParameters
 # direct computation
 source("R_comp_netw.R")
-ratio_hhgl<-1.31/lambda.g*lambda.h
+ratio_hhgl<-lambda.h/lambda.g
 R.rif<-R.1
 nSim<-100
 tol<-0.05
 nSeed<-3082021
 set.seed(nSeed)
-trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.network, nSim = nSim, tol=tol,R.rif = R.rif )
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif )
 
 #load data
 inf.path.1.h<-trs.prms$beta.h/lambda.h
 inf.path.1.g<-trs.prms$beta.g/lambda.g
 
-
 R.rif<-R.2
-trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.network, nSim = nSim, tol=tol,R.rif = R.rif )
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif )
 
 inf.path.2.h<-trs.prms$beta.h/lambda.h
 inf.path.2.g<-trs.prms$beta.g/lambda.g
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
-nSim<-2000
+nSim<-2500
 epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)
@@ -95,10 +97,11 @@ print(nm)
 
 for (i in 1:nSim){
   print(i)
-  epi.outbreak[[i]]<-sim.multipathogen(HH.network = HH.network, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, IPL=IPL, lli.k=lli.k)
+  temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
+  epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, IPL=IPL, lli.k=lli.k, pathogen.1=pathogen.1, pathogen.2=pathogen.2)
   }
 
-scen<-"BSL"
+scen<-paste(pathogen.1,"_&_",pathogen.2,sep ="")
 
 name<-paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_t2",t2,"_sigma12_",sigma12,"_sigma21_",sigma21,"_alpha1",alpha.as.1,"_alpha2",alpha.as.2,"_rho1",rho.1,"_rho2",rho.2,"_IPL",IPL,"_lli",lli.k,"_Net",Net,"_.RData", sep = "")
 setwd(out)
