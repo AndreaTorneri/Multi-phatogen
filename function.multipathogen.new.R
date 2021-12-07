@@ -101,7 +101,7 @@ long.inter.term.2<-function(t,inf.type){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,IPL,lli.k, pathogen.1,pathogen.2){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.k, pathogen.1,pathogen.2){
   
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
@@ -156,7 +156,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
     status.matrix.1[first,1] <- 1 
     status.matrix.1[first,2] <- 0
     status.matrix.1[first,5] <- current.time+exposed.time(pathogen = pathogen.1)
-    status.matrix.1[first,7]<-status.matrix.1[first,5]+infectious.period(pathogen=pathogen.1)
+    status.matrix.1[first,7]<-status.matrix.1[first,5]+infectious.period.length(pathogen=pathogen.1)
     recovery.vector.1[first]<-status.matrix.1[first,7]
     if (runif(1)<rho.1){ #if symptomatic
       transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
