@@ -44,7 +44,7 @@ load("sim_basis_complete_n_1000.RData")
 
 HH.networks<-HH_sim
 lambda.h<-2.9 #(computed as the average number of links individuals have within households)
-Net<-"HH_Eva_ERGM"
+Net<-"HH_Eva_ERGM_qh8.27qg"
 
 #ERGM.EGO
 #Networks<-readRDS("~/Documents/Work/PhD/Co-infection/Script/sim_EgoHHcombined_basis_complete_n_10.rds")
@@ -65,20 +65,20 @@ lambda.g<-8.29
 #SettingInfectivityParameters
 # direct computation
 source("R_comp_netw.R")
-ratio_hhgl<-lambda.h/lambda.g
+ratio_hhgl<-8.27*lambda.h/lambda.g
 R.rif<-R.1
 nSim<-100
 tol<-0.05
 nSeed<-3082021
 set.seed(nSeed)
-trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif,prob.asym=(1-rho.1),asymp.rel.inf=alpha.as.1)
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif,prob.asym=(1-rho.1),asymp.rel.inf=alpha.as.1,lambda.h = lambda.h)
 
 #load data
 inf.path.1.h<-trs.prms$beta.h/lambda.h
 inf.path.1.g<-trs.prms$beta.g/lambda.g
 
 R.rif<-R.2
-trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.2),asymp.rel.inf=alpha.as.2 )
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.2),asymp.rel.inf=alpha.as.2,lambda.h = lambda.h)
 
 inf.path.2.h<-trs.prms$beta.h/lambda.h
 inf.path.2.g<-trs.prms$beta.g/lambda.g

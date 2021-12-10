@@ -54,13 +54,13 @@ infectious.period.length<-function(pathogen){
 
 InfMeasure<-function(t,pathogen){
   if (pathogen=="COVID-19"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)) )
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)*0.98))
   }
   if (pathogen=="FLU-A"){
-    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(7,shape = 3.5,rate = 1.15)) )
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)*0.92))
   }
   if (pathogen=="FLU-B"){
-    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(7,shape = 3.5,rate = 1.15)) )
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)*0.83))
   }
   if (pathogen=="RSV"){
     return(dgamma(t,shape = 15, rate = 2.6)/ (pgamma(12,shape = 15,rate = 2.6)) )
@@ -131,7 +131,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   transmission.parameters<-data.frame("id"=1:n,"q1h"=rep(NA,n),"q1g"=rep(NA,n),"q2h"=rep(NA,n),"q2g"=rep(NA,n), "contact_rate_within"=rep(NA,n),"contact_rate_between"=lambda.g, "susceptibility"=rep(1,n))   #matrix containing the proposed time of the next contact (first colum) and the contact individual (second column)
   
   for (j in 1:n){
-    transmission.parameters$contact_rate_within[j]<-length(get.neighborhood(HH.network,j))
+    ifelse(length(get.neighborhood(HH.network,j))>0,transmission.parameters$contact_rate_within[j]<-length(get.neighborhood(HH.network,j)),transmission.parameters$contact_rate_within[j]<-1/exp(100)) 
   }
   
   #Proportion of immune

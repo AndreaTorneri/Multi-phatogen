@@ -5,7 +5,7 @@
 
 
 
-R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf){
+R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h){
   mu<-1
   hh.id<-HH.network %v% "hh_id"
   hh.size<-HH.network %v% "hh_size"
@@ -25,13 +25,15 @@ R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asy
       AR[[s]]<-0  
     }
     n.asympt<-0
+    q.h<-beta.h/lambda.h
       for (w in unique(hh.id)){
         #print(w)
-        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=beta.h)
+        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0)
         #index case
         for (r in hh.data$id){
+          ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))*q.h),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
           if (runif(1)<prob.asym){
-            hh.data$betah[r]<-beta.h*asymp.rel.inf
+            hh.data$betah[r]<-hh.data$betah[r]*asymp.rel.inf
             n.asympt<-n.asympt+1
           }
         }
@@ -94,7 +96,7 @@ R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asy
   return(R0)
 }
 
-R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf){
+R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.h){
   beta.g<-1
   beta.h<-ratio_hhgl*beta.g
   beta.g.tempm<-0
@@ -102,14 +104,14 @@ R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf){
   R.temp<-NULL
   for (i in 1:nSim){
     temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
-    R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf))
+    R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf,lambda.h = lambda.h))
   }
   R.temp<-mean(R.temp)
   while (abs(mean(R.temp)-R.rif)>tol){
     R.temp<-NULL
     for (i in 1:nSim){
       temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
-      R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf))
+      R.temp<-c(R.temp,R0.computation.StaticNetw(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf,lambda.h = lambda.h))
     }
     R.temp<-mean(R.temp)
     if (mean(R.temp)>R.rif){
