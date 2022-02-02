@@ -15,8 +15,15 @@ R.2= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while h
 cat(",R.2=",R.2)
 ratio.qhqg= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",ratio_qhqg=",ratio_qhqg)
+rho.1= as.numeric(args[9]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",rho.1=",rho.1)
+rho.2= as.numeric(args[10]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",rho.2=",rho.2)
+alpha.as.1= as.numeric(args[11]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",alpha.as.1=",alpha.as.1)
+alpha.as.2= as.numeric(args[12]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",alpha.as.2=",alpha.as.2)
 
-ratio_hhgl
 
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
@@ -41,14 +48,14 @@ nSim<-100
 tol<-0.05
 nSeed<-3082021
 set.seed(nSeed)
-trs.prms.path<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif )
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.1),asymp.rel.inf=alpha.as.1,lambda.h = lambda.h)
 
 #load data
 inf.path.1.h<-trs.prms$beta.h/lambda.h
 inf.path.1.g<-trs.prms$beta.g/lambda.g
 
 R.rif<-R.2
-trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif )
+trs.prms<-R0.comp(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.2),asymp.rel.inf=alpha.as.2,lambda.h = lambda.h)
 
 inf.path.2.h<-trs.prms$beta.h/lambda.h
 inf.path.2.g<-trs.prms$beta.g/lambda.g
