@@ -196,4 +196,3 @@ creat.synth.netw<-function(n.vertex,n.networks,density_by_hh_size){
   return(HH.netw)
 }
 
-

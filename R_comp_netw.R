@@ -1,10 +1,6 @@
 # Function to compute the value of the reproduction number in a 2-level household mixing. 
 #Constant infectious period
 
-
-
-
-
 R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h){
   mu<-1
   hh.id<-HH.network %v% "hh_id"
@@ -129,7 +125,6 @@ R0.comp<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,l
   return(transm.prms)
 }
 
-
 avg.lambda.within<-function(HH.networks){
   lamb.with<-NULL
   for (i in 1:length(HH.networks)){
@@ -143,3 +138,4 @@ avg.lambda.within<-function(HH.networks){
   }
   return(mean(lamb.with))
 }
+
