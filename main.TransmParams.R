@@ -25,6 +25,8 @@ alpha.as.2= as.numeric(args[12]) # short-term interaction parameter: acquiring 1
 cat(",alpha.as.2=",alpha.as.2)
 
 
+
+
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
   HH.networks<-HH_sim
@@ -42,6 +44,7 @@ lambda.h<-3.34 #average number of daily within household (Mossong et al. 2008 - 
 lambda.g<-8.29 #average number of daily contacts at a community level (Mossong et al. 2008 - Belgium)
 
 source("R_comp_netw.R")
+library("network")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R.1
 nSim<-100
