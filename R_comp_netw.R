@@ -88,6 +88,7 @@ R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asy
     
     if (n.asympt==n){
       R0[j]<-(beta.g*asymp.rel.inf)*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
+    }
     if (n.asympt==0){
       R0[j]<-(beta.g)*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
     }
