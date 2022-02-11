@@ -14,7 +14,7 @@ cat(",R=",R)
 ratio.qhqg= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",ratio.qhqg=",ratio.qhqg)
 rho= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",rho=",rho.1)
+cat(",rho=",rho)
 alpha= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",alpha=",alpha)
 
