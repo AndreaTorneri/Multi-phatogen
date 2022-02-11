@@ -9,32 +9,26 @@ n.vertex = as.numeric(args[4]) #time at which pathogen 2 is insert in the popula
 cat(",n.vertex=",n.vertex)
 n.networks = as.numeric(args[5]) #time at which pathogen 2 is insert in the population
 cat(",n.networks=",n.networks)
-R.1= as.numeric(args[6]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",R.1=",R.1)
-R.2= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",R.2=",R.2)
-ratio.qhqg= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+R= as.numeric(args[6]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",R=",R)
+ratio.qhqg= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",ratio.qhqg=",ratio.qhqg)
-rho.1= as.numeric(args[9]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",rho.1=",rho.1)
-rho.2= as.numeric(args[10]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",rho.2=",rho.2)
-alpha.as.1= as.numeric(args[11]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",alpha.as.1=",alpha.as.1)
-alpha.as.2= as.numeric(args[12]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",alpha.as.2=",alpha.as.2)
+rho= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",rho=",rho.1)
+alpha= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",alpha=",alpha)
 
 
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
   HH.networks<-HH_sim
-  name.s<-paste("TransParam_ERGMNetworks", "_R1",R.1,"_R2",R.2,"_ratioqhqg",ratio.qhqg ,".RData",sep = "")
+  name.s<-paste("TransParam_ERGMNetworks", "_R",R,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
   
 }
 if (netw=="Synth"){
   name<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name)
-  name.s<-paste("TransParam_SynthNetworks","_nVertex",n.vertex,"_nNetw",n.networks, "_R1",R.1,"_R2",R.2,"_ratioqhqg",ratio.qhqg ,".RData",sep = "")
+  name.s<-paste("TransParam_SynthNetworks","_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,".RData",sep = "")
   
 }
 
@@ -46,25 +40,18 @@ library("network")
 
 source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
-R.rif<-R.1
+R.rif<-R
 nSim<-100
 tol<-0.05
 nSeed<-3082021
 set.seed(nSeed)
-trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.1),asymp.rel.inf=alpha.as.1,lambda.h = lambda.h)
+trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
 
 #load data
 inf.path.1.h<-trs.prms$beta.h/lambda.h
 inf.path.1.g<-trs.prms$beta.g/lambda.g
 
-R.rif<-R.2
-trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho.2),asymp.rel.inf=alpha.as.2,lambda.h = lambda.h)
-
-inf.path.2.h<-trs.prms$beta.h/lambda.h
-inf.path.2.g<-trs.prms$beta.g/lambda.g
-
-
-save(inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, file = name.s)
+save(inf.path.1.h,inf.path.1.g, file = name.s)
 
 
 
