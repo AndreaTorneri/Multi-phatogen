@@ -13,9 +13,9 @@ R= as.numeric(args[6]) # short-term interaction parameter: acquiring 1 while hav
 cat(",R=",R)
 ratio.qhqg= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",ratio.qhqg=",ratio.qhqg)
-rho= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+rho= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",rho=",rho)
-alpha= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+alpha= as.numeric(args[9]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",alpha=",alpha)
 
 
@@ -48,10 +48,10 @@ set.seed(nSeed)
 trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
 
 #load data
-inf.path.1.h<-trs.prms$beta.h/lambda.h
-inf.path.1.g<-trs.prms$beta.g/lambda.g
+inf.path.h<-trs.prms$beta.h/lambda.h
+inf.path.g<-trs.prms$beta.g/lambda.g
 
-save(inf.path.1.h,inf.path.1.g, file = name.s)
+save(inf.path.h,inf.path.g, file = name.s)
 
 
 

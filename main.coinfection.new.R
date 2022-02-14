@@ -56,16 +56,28 @@ library(RGeode)
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
   HH.networks<-HH_sim
-  name.s<-paste("TransParam_ERGMNetworks", "_R1",R.1,"_R2",R.2,"_ratioqhqg",ratio.qhqg ,".RData",sep = "")
+  name.s<-paste("TransParam_ERGMNetworks", "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  load(name.s)
+  inf.path.1.h<-inf.path.h
+  inf.path.1.g<-inf.path.g
+  name.s<-paste("TransParam_ERGMNetworks", "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  load(name.s)
+  inf.path.2.h<-inf.path.h
+  inf.path.2.g<-inf.path.g
   
 }
 if (netw=="Synth"){
   name<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name)
-  name.s<-paste("TransParam_SynthNetworks","_nVertex",n.vertex,"_nNetw",n.networks, "_R1",R.1,"_R2",R.2,"_ratioqhqg",ratio.qhqg ,".RData",sep = "")
-  
+  name.s<-paste("TransParam_SynthNetworks", "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  load(name.s)
+  inf.path.1.h<-inf.path.h
+  inf.path.1.g<-inf.path.g
+  name.s<-paste("TransParam_SynthNetworks", "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  load(name.s)
+  inf.path.2.h<-inf.path.h
+  inf.path.2.g<-inf.path.g
 }
-load(name.s)
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
