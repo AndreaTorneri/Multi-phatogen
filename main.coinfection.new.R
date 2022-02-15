@@ -35,7 +35,7 @@ cat(",R.1=",R.1)
 R.2= as.numeric(args[17]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",R.2=",R.2)
 ratio.qhqg= as.numeric(args[18]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
-cat(",ratio_qhqg=",ratio_qhqg)
+cat(",ratio.qhqg=",ratio.qhqg)
 lli.1= as.numeric(args[19]) # long-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",lli.1=",lli.1)
 lli.2= as.numeric(args[20]) # long-term interaction parameter: acquiring 1 while having 2 (this value can)
@@ -44,7 +44,7 @@ pathogen.1= as.character(args[21]) # short-term interaction parameter: acquiring
 cat(",pathogen.1=",pathogen.1)
 pathogen.2= as.character(args[22]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",pathogen.2=",pathogen.2)
-contact.reduction= as.character(args[23]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+contact.reduction= as.numeric(args[23]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",contact.reduction=",contact.reduction)
 
 
@@ -56,24 +56,21 @@ library(RGeode)
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
   HH.networks<-HH_sim
-  name.s<-paste("TransParam_ERGMNetworks", "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TransParam_ERGMNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho.1,"_alpha",alpha.as.1,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
-  name.s<-paste("TransParam_ERGMNetworks", "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TransParam_ERGMNetworks_nVertex","_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho.2,"_alpha",alpha.as.2,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
-  
 }
 if (netw=="Synth"){
-  name<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
-  load(name)
-  name.s<-paste("TransParam_SynthNetworks", "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TransParam_SynthNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho.1,"_alpha",alpha.as.1,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
-  name.s<-paste("TransParam_SynthNetworks", "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TransParam_SynthNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho.2,"_alpha",alpha.as.2,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
@@ -86,7 +83,7 @@ epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)
 
-nm<-paste("t2_",t2, "_sigma12_",sigma12,"_sigma21_",sigma21,"_qh1_",inf.path.1.h,"_qg1_",inf.path.1.g,"_qh2_",inf.path.2.h,"_qg2_",inf.path.2.g, "_rho1_",rho.1,"_rho2_",rho.2,"_alpha1_",alpha.as.1,"_alpha2_",alpha.as.2,"_Path1",pathogen.1,"_Path2",pathogen.2,"_lli.k",lli.k, sep = "")
+nm<-paste("t2_",t2, "_sigma12_",sigma12,"_sigma21_",sigma21,"_qh1_",inf.path.1.h,"_qg1_",inf.path.1.g,"_qh2_",inf.path.2.h,"_qg2_",inf.path.2.g, "_rho1_",rho.1,"_rho2_",rho.2,"_alpha1_",alpha.as.1,"_alpha2_",alpha.as.2,"_Path1",pathogen.1,"_Path2",pathogen.2,"_lli.1",lli.1,"_lli2",lli.2, sep = "")
 print(nm)
 
 for (i in 1:nSim){
@@ -96,7 +93,7 @@ for (i in 1:nSim){
 }
 scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen.1,"_&_",pathogen.2,sep ="")
 
-name<-paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_t2",t2,"_sigma12_",sigma12,"_sigma21_",sigma21,"_alpha1",alpha.as.1,"_alpha2",alpha.as.2,"_rho1",rho.1,"_rho2",rho.2,"_lli",lli.k,"_Net",Net,"_CtcRed",contact.reduction,"_.RData", sep = "")
+name<-paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_t2",t2,"_sigma12_",sigma12,"_sigma21_",sigma21,"_alpha1",alpha.as.1,"_alpha2",alpha.as.2,"_rho1",rho.1,"_rho2",rho.2,"_lli1",lli.1,"_lli2",lli.2,"_Net",Net,"_CtcRed",contact.reduction,"_.RData", sep = "")
 setwd(out)
 save(epi.outbreak, file = name)
 
