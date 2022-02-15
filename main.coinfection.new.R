@@ -66,6 +66,8 @@ if (netw=="ERGM"){
   inf.path.2.g<-inf.path.g
 }
 if (netw=="Synth"){
+  name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
+  load(name.n)
   name.s<-paste("TransParam_SynthNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho.1,"_alpha",alpha.as.1,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
