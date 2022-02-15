@@ -78,6 +78,11 @@ if (netw=="Synth"){
   inf.path.2.g<-inf.path.g
 }
 
+
+#Mean number of daily contact at a global level (Using SOCRATES 15/02/2022 )
+lambda.g<-8.29
+
+
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
 nSim<-1000
