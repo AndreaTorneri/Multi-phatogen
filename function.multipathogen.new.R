@@ -121,7 +121,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   
   #Proportion of immune
   if (prop.immune>0){
-    status.matrix[sample(1:n,round(prop.immune*n)),1]<--2
+    status.matrix.1[sample(1:n,round(prop.immune*n)),1]<--2
   }
   
   homequarantine.day.1<-rep(Inf,n)
