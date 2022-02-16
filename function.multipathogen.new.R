@@ -136,7 +136,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   first.cases<-sample(which(status.matrix.1[,1]==0),nSeeds.1)
   
   for (j in first.cases){
-    print(j)
     first<-j
     status.matrix.1$infected[first] <- 1 
     status.matrix.1$time.of.infection[first] <- 0
@@ -255,7 +254,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         short.inter<-1
       }
       if (status.matrix.2[infectee,1]<0){
-        long.inter<-long.inter.term.2(t=status.matrix.2[infectee,7],inf.type=status.matrix.2[infectee,1])
+        long.inter<-long.inter.term.2(t=status.matrix.2$Recovery[infectee],inf.type=status.matrix.2$infected[infectee], lli = lli.2)
       }else{
         long.inter<-1
       }
@@ -300,7 +299,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         short.inter<-1
       }
       if (status.matrix.1$infected[infectee]<0){
-        long.inter<-long.inter.term.1(t=status.matrix.1[infectee,7],inf.type=status.matrix.1[infectee,1],lli.k = lli.k)
+        long.inter<-long.inter.term.1(t=status.matrix.1$Recovery[infectee],inf.type=status.matrix.1$infected[infectee],lli = lli.1)
       }else{
         long.inter<-1
       }
@@ -318,7 +317,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q2g[infectee]<-inf.path.2.g #A single q parameter for everyone
           status.matrix.2$TimeSymptomOnset[infectee]<-current.time+incubation.period(pathogen=pathogen.2)
           homequarantine.day.2[infectee]<-status.matrix.2$TimeSymptomOnset[infectee]
-          status.matrix.2[infectee,4]<-1
+          status.matrix.2$severity[infectee]<-1
           time.events<-rbind(time.events,c(current.time,2.1,infectee))
         }else{
           transmission.parameters$q2g[infectee]<-inf.path.2.g*alpha.as.2 #A single q parameter for everyone
@@ -462,7 +461,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }else{
           transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.1 #A single q parameter for everyone
           transmission.parameters$q2g[first]<-inf.path.2.g*alpha.as.1 #A single q parameter for everyone
-          status.matrix.2$severity[first,4]<-2
+          status.matrix.2$severity[first]<-2
           time.events<-rbind(time.events,c(current.time,2.0,first))
         }
         if (infectives[first]==0){
