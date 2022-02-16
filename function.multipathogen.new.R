@@ -136,7 +136,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   first.cases<-sample(which(status.matrix.1[,1]==0),nSeeds.1)
   
   for (j in first.cases){
-    print(j)
     first<-j
     status.matrix.1$infected[first] <- 1 
     status.matrix.1$time.of.infection[first] <- 0
