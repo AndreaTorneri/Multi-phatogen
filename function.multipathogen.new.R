@@ -279,7 +279,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q1g[infectee]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
           transmission.parameters$q1h[infectee]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
           status.matrix.1$severity[infectee]<-2
-          time.events<-rbind(time.events,c(current.time,1.0,infectee))
+          time.events<-rbind(time.events,c(current.time,1.2,infectee))
         }
         if (infectives[infectee]==0){
           infectives[infectee]<-1
@@ -462,7 +462,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.1 #A single q parameter for everyone
           transmission.parameters$q2g[first]<-inf.path.2.g*alpha.as.1 #A single q parameter for everyone
           status.matrix.2$severity[first]<-2
-          time.events<-rbind(time.events,c(current.time,2.0,first))
+          time.events<-rbind(time.events,c(current.time,2.2,first))
         }
         if (infectives[first]==0){
           infectives[first]<-1
@@ -482,16 +482,16 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   dimnames(time.events)<-list(NULL,timev.name)
   
   first.cases.1<-which(status.matrix.1$time.of.infection==0)
+  temp.sec.cases<-NULL
   for (o in first.cases.1){
-    temp.sec.cases<-NULL
-    ifelse(length(which(status.matrix.1$infector ==o)>0),temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.1$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
+    ifelse(length(which(status.matrix.1$infector==o))>0, temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.1$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
   }
   Rt1<-mean(temp.sec.cases)
   
-  first.cases.2<-which(status.matrix.2$time.of.infection==0)
+  first.cases.2<-which(status.matrix.2$time.of.infection==t2)
+  temp.sec.cases<-NULL
   for (o in first.cases.2){
-    temp.sec.cases<-NULL
-    ifelse(length(which(status.matrix.2$infector==o)>0),temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.2$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
+    ifelse(length(which(status.matrix.2$infector==o))>0, temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.2$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
   }
   Rt2<-mean(temp.sec.cases)
   C1<-nSeeds.1
@@ -502,12 +502,12 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   
   for (i in 1:last.day){
     temp.time<-setdiff(which(time.events[,1]>i),which(time.events[,1]>i+1))
-    temp.inf.1<-c(which(time.events[temp.time,2]==1.0),which(time.events[temp.time,2]==1.1))
-    temp.inf.2<-c(which(time.events[temp.time,2]==2.0),which(time.events[temp.time,2]==2.1))
+    temp.inf.1<-c(which(time.events[temp.time,2]==1.1),which(time.events[temp.time,2]==1.2))
+    temp.inf.2<-c(which(time.events[temp.time,2]==2.1),which(time.events[temp.time,2]==2.2))
     
     temp.time.1<-setdiff(1:length(time.events[,1]),which(time.events[,1]>i+1))
-    C1<- c(C1,length((which(time.events[temp.time.1,2]==1.0)))+length((which(time.events[temp.time.1,2]==1.1)))-length((which(time.events[temp.time.1,2]==-1))))
-    C2<- c(C2,length((which(time.events[temp.time.1,2]==2.0)))+length((which(time.events[temp.time.1,2]==2.1)))-length((which(time.events[temp.time.1,2]==-2))))
+    C1<- c(C1,length((which(time.events[temp.time.1,2]==1.1)))+length((which(time.events[temp.time.1,2]==1.2)))-length((which(time.events[temp.time.1,2]==-1))))
+    C2<- c(C2,length((which(time.events[temp.time.1,2]==2.1)))+length((which(time.events[temp.time.1,2]==2.2)))-length((which(time.events[temp.time.1,2]==-2))))
     Y1<- c(Y1,length(temp.inf.1))
     Y2<-c(Y2,length(temp.inf.2))
     
@@ -535,7 +535,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   epi.details<-data.frame("Days"=0:last.day, "Incidence1"=Y1,"Incidence2"=Y2, "Prevalence1"=C1,"Prevalence2"=C2,"Rt1"=Rt1,"Rt2"=Rt2)
   FinalSize<-data.frame("FinalSize1"=length(which(status.matrix.1$infected==-1)),"FinalSize2"=length(which(status.matrix.2$infected==-1)))
   PeakIncidence<-data.frame("PeakIncidence1"=max(epi.details$Incidence1),"TimePeakIncidence1"=which(epi.details$Incidence1==max(epi.details$Incidence1))[1],"PeakIncidence2"=max(epi.details$Incidence2),"TimePeakIncidence2"=which(epi.details$Incidence2==max(epi.details$Incidence2))[1] )
-  PeakPrevalence<-data.frame("PeakPrevalence1"=max(epi.details$Prevalence1),"TimePeakPrevalence1"=which(epi.details$Prevalence1==max(epi.details$Prevalence))[1],"PeakPrevalence2"=max(epi.details$Prevalence2),"TimePeakPrevalence2"=which(epi.details$Prevalence2==max(epi.details$Prevalence2))[1] )
+  PeakPrevalence<-data.frame("PeakPrevalence1"=max(epi.details$Prevalence1),"TimePeakPrevalence1"=which(epi.details$Prevalence1==max(epi.details$Prevalence1))[1],"PeakPrevalence2"=max(epi.details$Prevalence2),"TimePeakPrevalence2"=which(epi.details$Prevalence2==max(epi.details$Prevalence2))[1] )
   return(list(time.events=time.events, status.matrix.1=status.matrix.1, status.matrix.2=status.matrix.2,epi.details=epi.details, FinalSize=FinalSize, PeakIncidence=PeakIncidence, PeakPrevalence=PeakPrevalence))
 }
 
