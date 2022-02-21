@@ -36,13 +36,13 @@ infectious.period.length<-function(pathogen){
 
 InfMeasure<-function(t,pathogen){
   if (pathogen=="COVID-19"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)*0.98))
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)))
   }
   if (pathogen=="FLU-A"){
-    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)*0.92))
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
   }
   if (pathogen=="FLU-B"){
-    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)*0.83))
+    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
   }
   if (pathogen=="RSV"){
     return(dgamma(t,shape = 15, rate = 2.6)/ (pgamma(12,shape = 15,rate = 2.6)) )
