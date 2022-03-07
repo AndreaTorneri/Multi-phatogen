@@ -85,7 +85,7 @@ lambda.g<-8.29
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
-nSim<-500
+nSim<-100
 epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)

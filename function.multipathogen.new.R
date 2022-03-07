@@ -86,7 +86,6 @@ long.inter.term.2<-function(t,inf.type,lli){
 sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction){
   
   
-  
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
   
