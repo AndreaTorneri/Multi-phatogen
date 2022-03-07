@@ -49,15 +49,196 @@ InfMeasure<-function(t,pathogen){
   }
 }
 
-long.inter.term.1<-function(t,inf.type,lli){
-  #return(k.asint*(1-exp(-0.02*t)))
-  return(lli)
+
+#InteractionsTerms
+# pathogen 1: Delta Variant
+# pathogen 2: Omicron Variant
+
+#long-inter 1: effect of being recovered from 1, in the probability of acquiring 2
+long.inter.term.1<-function(t,status.matrix,infectee){
+  #assumption: booster+ Delta infection = same effect as booster (Table 3 booster dose, Omicron :BNT162b2 - Andrews et al. NEJM 2022)
+  time.since.inf<-t-status.matrix$time.of.infection[infectee]
+  if (status.matrix$Immunity[infectee]==1){ 
+    if (time.since.inf<14){
+      value<-(1-0.669)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.672)
+    }
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.55)
+    }
+    if (time.since.inf>=63){
+      value<-(1-0.457)
+    }
+  }
+  #assumption: Delta infection = same effect as 2-doses vaccine (Table 3  2 doses, Omicron :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==0){
+    if (time.since.inf<14){ # asssumption: same protection as the booster dose in the first week
+      value<-(1-0.669)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.655)
+    }
+    
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.487)
+    }
+    if (time.since.inf>=63 & time.since.inf <98){
+      value<-(1-0.301)
+    }
+    if (time.since.inf>=98 & time.since.inf <133){
+      value<-(1-0.154)
+    }
+    if (time.since.inf>=133 & time.since.inf <168){
+      value<-(1-0.115)
+    }
+    if (time.since.inf>=168){
+      value<-(1-0.088)
+    }
+    
+  }
+  return(value)
+}
+long.inter.term.2<-function(t,status.matrix,infectee){
+  time.since.inf<-t-status.matrix$time.of.infection[infectee]
+  #assumption: booster+Omicron infection = same effect as a booster (Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==1){
+    if (time.since.inf<14){
+      value<-(1-0.923)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.951)
+    }
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.918)
+    }
+    if (time.since.inf>=63){
+      value<-(1-0.899)
+    }
+  }
+  #assumption: Omicron infection = same effect as 2-doses vaccine (Table 3  2 doses, Omicron :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==0){
+    if (time.since.inf<14){
+      value<-(1-0.669)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.655)
+    }
+    
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.487)
+    }
+    if (time.since.inf>=63 & time.since.inf <98){
+      value<-(1-0.301)
+    }
+    if (time.since.inf>=98 & time.since.inf <133){
+      value<-(1-0.154)
+    }
+    if (time.since.inf>=133 & time.since.inf <168){
+      value<-(1-0.115)
+    }
+    if (time.since.inf>=168){
+      value<-(1-0.088)
+    }
+    
+  }
+  return(value)
 }
 
-long.inter.term.2<-function(t,inf.type,lli){
-  #return(k.asint*(1-exp(-0.02*t)))
-  return(lli)
+re.inf.1<-function(t,status.matrix,infectee){
+  time.since.inf<-t-status.matrix$time.of.infection[infectee]
+  #(Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==1){
+    if (time.since.inf<14){
+      value<-(1-0.923)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.951)
+    }
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.918)
+    }
+    if (time.since.inf>=63){
+      value<-(1-0.899)
+    }
+  }
+  #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==0){
+    if (time.since.inf<14){
+      value<-0
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.909)
+    }
+    
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.855)
+    }
+    if (time.since.inf>=63 & time.since.inf <98){
+      value<-(1-0.787)
+    }
+    if (time.since.inf>=98 & time.since.inf <133){
+      value<-(1-0.744)
+    }
+    if (time.since.inf>=133 & time.since.inf <168){
+      value<-(1-0.674)
+    }
+    if (time.since.inf>=168){
+      value<-(1-0.627)
+    }
+    
+  }
+  return(value)
 }
+
+re.inf.2<-function(t,status.matrix,infectee){
+  #Assumption: booster+ Omicron infection creates the same immunity as booster + delta infection (Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+  time.since.inf<-t-status.matrix$time.of.infection[infectee]
+  if (status.matrix$Immunity[infectee]==1){
+    if (time.since.inf<14){
+      value<-(1-0.923)
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.951)
+    }
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.918)
+    }
+    if (time.since.inf>=63){
+      value<-(1-0.899)
+    }
+  }
+  #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+  if (status.matrix$Immunity[infectee]==0){
+    if (time.since.inf<14){
+      value<-0
+    }
+    if (time.since.inf>=14 & time.since.inf <28){
+      value<-(1-0.909)
+    }
+    
+    if (time.since.inf>=28 & time.since.inf <63){
+      value<-(1-0.855)
+    }
+    if (time.since.inf>=63 & time.since.inf <98){
+      value<-(1-0.787)
+    }
+    if (time.since.inf>=98 & time.since.inf <133){
+      value<-(1-0.744)
+    }
+    if (time.since.inf>=133 & time.since.inf <168){
+      value<-(1-0.674)
+    }
+    if (time.since.inf>=168){
+      value<-(1-0.627)
+    }
+    
+  }
+  return(value)
+  
+}
+
 
 
 #INPUT PARAMETERS:
@@ -94,6 +275,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
                               infector          = NA,        # 3
                               severity          = 0,         # 4 1 Symptomatic 2 Asymptomatic
                               TimeSymptomOnset  = Inf,       # 5
+                              Immunity          = 0,         # 0 no immunity, 1 vaccinated
                               Recovery          = Inf)
   
   status.matrix.2 <-status.matrix.1
@@ -120,8 +302,10 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   
   #Proportion of immune
   if (prop.immune>0){
-    status.matrix.1[sample(1:n,round(prop.immune*n)),1]<--2
+    status.matrix.1$Immunity[sample(1:n,round(prop.immune*n))]<-1
+    status.matrix.2$Immunity<-status.matrix.1$Immunity
   }
+  
   
   homequarantine.day.1<-rep(Inf,n)
   homequarantine.day.2<-rep(Inf,n)
@@ -246,23 +430,28 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           ctc<-"g"
         }
       }
-      # compute the long and short interaction terms for pathogen.1
-      if (status.matrix.2[infectee,1]==1){
+      
+      # compute short interaction terms for pathogen.1 (having pathogen 2)
+      if (status.matrix.2$infected[infectee]==1){
         short.inter<-sigma12
       }else{
         short.inter<-1
       }
-      if (status.matrix.2[infectee,1]<0){
-        long.inter<-long.inter.term.2(t=status.matrix.2$Recovery[infectee],inf.type=status.matrix.2$infected[infectee], lli = lli.2)
+      # compute long interaction terms for pathogen.1 (recovered from pathogen 2)
+      if (status.matrix.2$infected[infectee]==-1 & lli.2==1){
+        long.inter<-long.inter.term.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee)
       }else{
         long.inter<-1
       }
       
+      #re-infection term
+      re.inf<-ifelse(status.matrix.1$infected[infectee]==0,1,re.inf.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee))
+      
       ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
-      acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q
+      acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q*re.inf
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1$infected[infector]!=1){acc.rate.1<-0}
       if (acc.rate.1>1){err<-err+1}
-      if (status.matrix.1$infected[infectee]==0 & runif(1)<acc.rate.1){
+      if (runif(1)<acc.rate.1){
         status.matrix.1$infected[infectee] <- 1 
         status.matrix.1$time.of.infection[infectee] <- current.time
         status.matrix.1$infector[infectee] <- infector
@@ -291,22 +480,25 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       
       
       # compute the long and short interaction terms for pathogen.2
-      
       if (status.matrix.1$infected[infectee]==1){
         short.inter<-sigma21
       }else{
         short.inter<-1
       }
-      if (status.matrix.1$infected[infectee]<0){
-        long.inter<-long.inter.term.1(t=status.matrix.1$Recovery[infectee],inf.type=status.matrix.1$infected[infectee],lli = lli.1)
+      if (status.matrix.1$infected[infectee]==-1 & lli.1==1){
+        long.inter<-long.inter.term.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee)
       }else{
         long.inter<-1
       }
+      
+      #re-infection term
+      re.inf<-ifelse(status.matrix.2$infected[infectee]==0,1,re.inf.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee))
+      
       ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
       acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.2$infected[infector]!=1){acc.rate.2<-0}
       if (acc.rate.2>1){err<-err+1}
-      if (status.matrix.2$infected[infectee]==0 & runif(1)<acc.rate.2){
+      if (runif(1)<acc.rate.2){
         status.matrix.2$infected[infectee] <- 1 
         status.matrix.2$time.of.infection[infectee] <- current.time
         status.matrix.2$infector[infectee] <- infector
