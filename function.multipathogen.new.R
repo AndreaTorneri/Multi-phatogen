@@ -526,7 +526,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
     }
     
-    
     if (next.evts=="HomeQuarantine"){
       current.time<-events$HomeQuarantine
       quarantined.individuals<-which(homequarantine.day.overall==current.time)
@@ -552,7 +551,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         transmission.parameters$contact_rate_within[temp.ind]<-transmission.parameters$contact_rate_within[temp.ind]*contact.reduction
       }
     }
-    
     
     if (next.evts=="Recovery"){
       current.time<-events$Recovery
@@ -631,7 +629,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
       }
     }
-    
     
     if (next.evts=="NewPathogen"){
       current.time<-events$NewPathogen
