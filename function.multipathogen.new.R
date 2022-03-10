@@ -100,6 +100,7 @@ long.inter.term.1<-function(t,status.matrix,infectee){
   }
   return(value)
 }
+
 long.inter.term.2<-function(t,status.matrix,infectee){
   time.since.inf<-t-status.matrix$time.of.infection[infectee]
   #assumption: booster+Omicron infection = same effect as a booster (Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
@@ -146,98 +147,129 @@ long.inter.term.2<-function(t,status.matrix,infectee){
   return(value)
 }
 
-re.inf.1<-function(t,status.matrix,infectee){
-  time.since.inf<-t-status.matrix$time.of.infection[infectee]
-  #(Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-  if (status.matrix$Immunity[infectee]==1){
-    if (time.since.inf<14){
-      value<-(1-0.923)
+re.inf.1<-function(t,status.matrix,infectee,pathogen){
+  value<-0
+  if (pathogen=="COVID-19" & status.matrix$infecte[infectee]!=1){
+    time.since.inf<-t-status.matrix$time.of.infection[infectee]
+    #(Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+    if (status.matrix$Immunity[infectee]==1){
+      if (time.since.inf<14){
+        value<-0
+      }
+      if (time.since.inf>=14 & time.since.inf <28){
+        value<-(1-0.951)
+      }
+      if (time.since.inf>=28 & time.since.inf <63){
+        value<-(1-0.918)
+      }
+      if (time.since.inf>=63){
+        value<-(1-0.899)
+      }
     }
-    if (time.since.inf>=14 & time.since.inf <28){
-      value<-(1-0.951)
-    }
-    if (time.since.inf>=28 & time.since.inf <63){
-      value<-(1-0.918)
-    }
-    if (time.since.inf>=63){
-      value<-(1-0.899)
+    #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+    if (status.matrix$Immunity[infectee]==0){
+      if (time.since.inf<14){
+        value<-0
+      }
+      if (time.since.inf>=14 & time.since.inf <28){
+        value<-(1-0.909)
+      }
+      
+      if (time.since.inf>=28 & time.since.inf <63){
+        value<-(1-0.855)
+      }
+      if (time.since.inf>=63 & time.since.inf <98){
+        value<-(1-0.787)
+      }
+      if (time.since.inf>=98 & time.since.inf <133){
+        value<-(1-0.744)
+      }
+      if (time.since.inf>=133 & time.since.inf <168){
+        value<-(1-0.674)
+      }
+      if (time.since.inf>=168){
+        value<-(1-0.627)
+      }
     }
   }
-  #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-  if (status.matrix$Immunity[infectee]==0){
-    if (time.since.inf<14){
-      value<-0
-    }
-    if (time.since.inf>=14 & time.since.inf <28){
-      value<-(1-0.909)
-    }
-    
-    if (time.since.inf>=28 & time.since.inf <63){
-      value<-(1-0.855)
-    }
-    if (time.since.inf>=63 & time.since.inf <98){
-      value<-(1-0.787)
-    }
-    if (time.since.inf>=98 & time.since.inf <133){
-      value<-(1-0.744)
-    }
-    if (time.since.inf>=133 & time.since.inf <168){
-      value<-(1-0.674)
-    }
-    if (time.since.inf>=168){
-      value<-(1-0.627)
-    }
-    
+  if (pathogen=="FLU-A" & status.matrix$infecte[infectee]!=1){
+    value<-0
   }
   return(value)
 }
 
-re.inf.2<-function(t,status.matrix,infectee){
+re.inf.2<-function(t,status.matrix,infectee,pathogen){
   #Assumption: booster+ Omicron infection creates the same immunity as booster + delta infection (Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-  time.since.inf<-t-status.matrix$time.of.infection[infectee]
-  if (status.matrix$Immunity[infectee]==1){
-    if (time.since.inf<14){
-      value<-(1-0.923)
-    }
-    if (time.since.inf>=14 & time.since.inf <28){
-      value<-(1-0.951)
-    }
-    if (time.since.inf>=28 & time.since.inf <63){
-      value<-(1-0.918)
-    }
-    if (time.since.inf>=63){
-      value<-(1-0.899)
-    }
+  value<-0
+  if (pathogen=="COVID-19" & status.matrix$infecte[infectee]!=1){
+      time.since.inf<-t-status.matrix$time.of.infection[infectee]
+      if (status.matrix$Immunity[infectee]==1){
+        if (time.since.inf<14){
+          value<-(1-0.923)
+        }
+        if (time.since.inf>=14 & time.since.inf <28){
+          value<-(1-0.951)
+        }
+        if (time.since.inf>=28 & time.since.inf <63){
+          value<-(1-0.918)
+        }
+        if (time.since.inf>=63){
+          value<-(1-0.899)
+        }
+      }
+      #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
+      if (status.matrix$Immunity[infectee]==0){
+        if (time.since.inf<14){
+          value<-0
+        }
+        if (time.since.inf>=14 & time.since.inf <28){
+          value<-(1-0.909)
+        }
+        
+        if (time.since.inf>=28 & time.since.inf <63){
+          value<-(1-0.855)
+        }
+        if (time.since.inf>=63 & time.since.inf <98){
+          value<-(1-0.787)
+        }
+        if (time.since.inf>=98 & time.since.inf <133){
+          value<-(1-0.744)
+        }
+        if (time.since.inf>=133 & time.since.inf <168){
+          value<-(1-0.674)
+        }
+        if (time.since.inf>=168){
+          value<-(1-0.627)
+        }
+        
+      }
+      
   }
-  #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-  if (status.matrix$Immunity[infectee]==0){
-    if (time.since.inf<14){
-      value<-0
-    }
-    if (time.since.inf>=14 & time.since.inf <28){
-      value<-(1-0.909)
-    }
-    
-    if (time.since.inf>=28 & time.since.inf <63){
-      value<-(1-0.855)
-    }
-    if (time.since.inf>=63 & time.since.inf <98){
-      value<-(1-0.787)
-    }
-    if (time.since.inf>=98 & time.since.inf <133){
-      value<-(1-0.744)
-    }
-    if (time.since.inf>=133 & time.since.inf <168){
-      value<-(1-0.674)
-    }
-    if (time.since.inf>=168){
-      value<-(1-0.627)
-    }
-    
+  if (pathogen=="FLU-A" & status.matrix$infecte[infectee]!=1){
+    value<-0
   }
   return(value)
-  
 }
+
+
+#Computing summary measures
+# Rt
+comp.RT<-function(status.matrix,individual,Rt){
+  infectees<-which(status.matrix$infector==individual)
+  Rt.temp<-0
+  if (length(infectees)>0){
+    for (i1 in 1:length(infectees)){
+      if (status.matrix$time.of.infection[infectees[i1]]>status.matrix$time.of.infection[individual]){
+        Rt.temp<-Rt.temp+1
+      }
+    }
+  }
+  Rt<-rbind(status.matrix$time.of.infection[individual],Rt.temp)
+  return(Rt)
+}
+
+
+
 
 
 
@@ -279,7 +311,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
                               Recovery          = Inf)
   
   status.matrix.2 <-status.matrix.1
-  
   
   recovery.vector.1<-rep(Inf,n) #vector giving the recovery times
   recovery.vector.2<-rep(Inf,n) #vector giving the recovery times
@@ -346,6 +377,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   indiv.prop.ctc<-0
   recovered<-0
   err<-0
+  Rt1<-matrix(data = NA, nrow = 1, ncol = 2)
+  Rt2<-matrix(data = NA, nrow = 1, ncol = 2)
   
   #When only the first pathogen is present
   while((sum(infectives))>0 | current.time<t2){ #while there are still infectives
@@ -445,7 +478,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       
       #re-infection term
-      re.inf<-ifelse(status.matrix.1$infected[infectee]==0,1,re.inf.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee))
+      re.inf<-ifelse(status.matrix.1$infected[infectee]==0,1,re.inf.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee,pathogen = pathogen.1))
       
       ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
       acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q*re.inf
@@ -492,10 +525,10 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       
       #re-infection term
-      re.inf<-ifelse(status.matrix.2$infected[infectee]==0,1,re.inf.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee))
+      re.inf<-ifelse(status.matrix.2$infected[infectee]==0,1,re.inf.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee,pathogen = pathogen.2))
       
       ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
-      acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q
+      acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q*re.inf
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.2$infected[infector]!=1){acc.rate.2<-0}
       if (acc.rate.2>1){err<-err+1}
       if (runif(1)<acc.rate.2){
@@ -558,7 +591,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       for (recovered in temp.recovered){
         if (recovered!= n & recovered!=n*2){
           if (recovered > n){
-            recovered<- recovered %% n        
+            recovered<- recovered %% n
+            Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
             status.matrix.2$infected[recovered]<--1
             status.matrix.2$Recovery[recovered]<-Inf
             time.events<-rbind(time.events,c(current.time,-2,recovered))
@@ -574,6 +608,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
               }
             }
           }else{
+            Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
             status.matrix.1$infected[recovered]<--1
             status.matrix.1$Recovery[recovered]<-Inf
             time.events<-rbind(time.events,c(current.time,-1,recovered))
@@ -591,7 +626,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           }
         }else{
           if (recovered == 2*n){
-            recovered<- n        
+            recovered<- n
+            Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
             status.matrix.2$infected[recovered]<--1
             status.matrix.2$Recovery[recovered]<-Inf
             time.events<-rbind(time.events,c(current.time,-2,recovered))
@@ -607,6 +643,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
               }
             }
           }else{
+            Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
             status.matrix.1$infected[recovered]<--1
             status.matrix.1$Recovery[recovered]<-Inf
             time.events<-rbind(time.events,c(current.time,-1,recovered))
@@ -669,19 +706,6 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   timev.name<-c("time","event","who")
   dimnames(time.events)<-list(NULL,timev.name)
   
-  first.cases.1<-which(status.matrix.1$time.of.infection==0)
-  temp.sec.cases<-NULL
-  for (o in first.cases.1){
-    ifelse(length(which(status.matrix.1$infector==o))>0, temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.1$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
-  }
-  Rt1<-mean(temp.sec.cases)
-  
-  first.cases.2<-which(status.matrix.2$time.of.infection==t2)
-  temp.sec.cases<-NULL
-  for (o in first.cases.2){
-    ifelse(length(which(status.matrix.2$infector==o))>0, temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.2$infector==o))),temp.sec.cases<-c(temp.sec.cases,0))
-  }
-  Rt2<-mean(temp.sec.cases)
   C1<-nSeeds.1
   C2<-nSeeds.2
   Y1<-nSeeds.1
@@ -698,30 +722,13 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
     C2<- c(C2,length((which(time.events[temp.time.1,2]==2.1)))+length((which(time.events[temp.time.1,2]==2.2)))-length((which(time.events[temp.time.1,2]==-2))))
     Y1<- c(Y1,length(temp.inf.1))
     Y2<-c(Y2,length(temp.inf.2))
-    
-    if (length(temp.inf.1)>0){
-      newly.infected<-time.events[temp.time[temp.inf.1],3]
-      temp.sec.cases<-NULL
-      for (k in newly.infected) {
-        ifelse(length(which(status.matrix.1$infector==k)>0),temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.1$infector==k))),temp.sec.cases<-c(temp.sec.cases,0))
-      }
-      Rt1<-c(Rt1,mean(temp.sec.cases))
-    }else{
-      Rt1<-c(Rt1,NA)
-    }
-    if (length(temp.inf.2)>0){
-      newly.infected<-time.events[temp.time[temp.inf.2],3]
-      temp.sec.cases<-NULL
-      for (k in newly.infected) {
-        ifelse(length(which(status.matrix.2$infector==k)>0),temp.sec.cases<-c(temp.sec.cases,length(which(status.matrix.2$infector==k))),temp.sec.cases<-c(temp.sec.cases,0))
-      }
-      Rt2<-c(Rt2,mean(temp.sec.cases))
-    }else{
-      Rt2<-c(Rt2,NA)
-    }
   }
+  
+  Fs1<-length(which(time.events[,2]==1.1))+length(which(time.events[,2]==1.2))
+  Fs2<-length(which(time.events[,2]==2.1))+length(which(time.events[,2]==2.2))
+  
   epi.details<-data.frame("Days"=0:last.day, "Incidence1"=Y1,"Incidence2"=Y2, "Prevalence1"=C1,"Prevalence2"=C2,"Rt1"=Rt1,"Rt2"=Rt2)
-  FinalSize<-data.frame("FinalSize1"=length(which(status.matrix.1$infected==-1)),"FinalSize2"=length(which(status.matrix.2$infected==-1)))
+  FinalSize<-data.frame("FinalSize1"=Fs1,"FinalSize2"=Fs2)
   PeakIncidence<-data.frame("PeakIncidence1"=max(epi.details$Incidence1),"TimePeakIncidence1"=which(epi.details$Incidence1==max(epi.details$Incidence1))[1],"PeakIncidence2"=max(epi.details$Incidence2),"TimePeakIncidence2"=which(epi.details$Incidence2==max(epi.details$Incidence2))[1] )
   PeakPrevalence<-data.frame("PeakPrevalence1"=max(epi.details$Prevalence1),"TimePeakPrevalence1"=which(epi.details$Prevalence1==max(epi.details$Prevalence1))[1],"PeakPrevalence2"=max(epi.details$Prevalence2),"TimePeakPrevalence2"=which(epi.details$Prevalence2==max(epi.details$Prevalence2))[1] )
   return(list(time.events=time.events, status.matrix.1=status.matrix.1, status.matrix.2=status.matrix.2,epi.details=epi.details, FinalSize=FinalSize, PeakIncidence=PeakIncidence, PeakPrevalence=PeakPrevalence))
