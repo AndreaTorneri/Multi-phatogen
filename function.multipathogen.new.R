@@ -595,6 +595,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
             status.matrix.2$infected[recovered]<--1
             status.matrix.2$Recovery[recovered]<-Inf
+            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-2,recovered))
             if (status.matrix.1$infected[recovered]!=1){
               infectives[recovered]<-0
@@ -611,6 +612,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
             status.matrix.1$infected[recovered]<--1
             status.matrix.1$Recovery[recovered]<-Inf
+            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-1,recovered))
             if (status.matrix.2$infected[recovered]!=1){
               infectives[recovered]<-0
@@ -630,6 +632,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
             status.matrix.2$infected[recovered]<--1
             status.matrix.2$Recovery[recovered]<-Inf
+            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-2,recovered))
             if (status.matrix.1$infected[recovered]!=1){
               infectives[recovered]<-0
@@ -646,6 +649,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
             status.matrix.1$infected[recovered]<--1
             status.matrix.1$Recovery[recovered]<-Inf
+            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-1,recovered))
             if (status.matrix.2$infected[recovered]!=1){
               infectives[recovered]<-0
