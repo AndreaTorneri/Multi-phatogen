@@ -296,7 +296,7 @@ comp.RT<-function(status.matrix,individual,Rt){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop){
   
   
   n<-network.size(HH.network)
@@ -381,7 +381,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   Rt2<-matrix(data = NA, nrow = 1, ncol = 2)
   
   #When only the first pathogen is present
-  while((sum(infectives))>0 | current.time<t2){ #while there are still infectives
+  while((sum(infectives)>0 & current.time<t.stop) | current.time<t2){ #while there are still infectives
     #Phase 1: individuals that has to, propose a new social contac
     for (i in which(index.contact.within==1) ){ # for all the individuals that has to propose a global contact
       contact.time.within$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate_within[i])+current.time# I generate the next interarrival time for individual i
