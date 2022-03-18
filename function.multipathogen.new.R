@@ -147,109 +147,165 @@ long.inter.term.2<-function(t,status.matrix,infectee){
   return(value)
 }
 
-re.inf.1<-function(t,status.matrix,infectee,pathogen){
-  value<-0
-  if (pathogen=="COVID-19" & status.matrix$infecte[infectee]!=1){
-    time.since.inf<-t-status.matrix$time.of.infection[infectee]
-    #(Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-    if (status.matrix$Immunity[infectee]==1){
-      if (time.since.inf<14){
-        value<-0
-      }
-      if (time.since.inf>=14 & time.since.inf <28){
-        value<-(1-0.951)
-      }
-      if (time.since.inf>=28 & time.since.inf <63){
-        value<-(1-0.918)
-      }
-      if (time.since.inf>=63){
-        value<-(1-0.899)
+
+Immlev.1<-function(t,status.matrix,infectee,pathogen){
+  if (status.matrix$infected[infectee]==1){
+    return(0)
+  }else{
+    if (pathogen == "COVID-19"){
+      if (status.matrix$infected[infectee]==0){
+        if (status.matrix$Immunity[infectee]==1){
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (time.since.inf<14){
+            value<-0
+          }
+          if (time.since.inf>=14 & time.since.inf <28){
+            value<-(1-0.951)
+          }
+          if (time.since.inf>=28 & time.since.inf <63){
+            value<-(1-0.918)
+          }
+          if (time.since.inf>=63){
+            value<-(1-0.899)
+          }
+        }else{
+          return(1)
+        }
+      }else{
+        if (status.matrix$Immunity[infectee]==1){
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (time.since.inf<14){
+            value<-0
+          }
+          if (time.since.inf>=14 & time.since.inf <28){
+            value<-(1-0.951)
+          }
+          if (time.since.inf>=28 & time.since.inf <63){
+            value<-(1-0.918)
+          }
+          if (time.since.inf>=63){
+            value<-(1-0.899)
+          }
+        }else{
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (time.since.inf<14){
+            value<-0
+          }
+          if (time.since.inf>=14 & time.since.inf <28){
+            value<-(1-0.909)
+          }
+          if (time.since.inf>=28 & time.since.inf <63){
+            value<-(1-0.855)
+          }
+          if (time.since.inf>=63 & time.since.inf <98){
+            value<-(1-0.787)
+          }
+          if (time.since.inf>=98 & time.since.inf <133){
+            value<-(1-0.744)
+          }
+          if (time.since.inf>=133 & time.since.inf <168){
+            value<-(1-0.674)
+          }
+          if (time.since.inf>=168){
+            value<-(1-0.627)
+          }
+        }
       }
     }
-    #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-    if (status.matrix$Immunity[infectee]==0){
-      if (time.since.inf<14){
-        value<-0
-      }
-      if (time.since.inf>=14 & time.since.inf <28){
-        value<-(1-0.909)
-      }
-      
-      if (time.since.inf>=28 & time.since.inf <63){
-        value<-(1-0.855)
-      }
-      if (time.since.inf>=63 & time.since.inf <98){
-        value<-(1-0.787)
-      }
-      if (time.since.inf>=98 & time.since.inf <133){
-        value<-(1-0.744)
-      }
-      if (time.since.inf>=133 & time.since.inf <168){
-        value<-(1-0.674)
-      }
-      if (time.since.inf>=168){
-        value<-(1-0.627)
+    if (pathogen == "FLU-A"){
+      if (status.matrix$infected[infectee]==0){
+        if (status.matrix$Immunity[infectee]==1){
+          return(1-0.7)
+        }else{
+          return(1)
+        }
+      }else{
+        return(0)
       }
     }
   }
-  if (pathogen=="FLU-A" & status.matrix$infecte[infectee]!=1){
-    value<-0
-  }
-  return(value)
 }
 
-re.inf.2<-function(t,status.matrix,infectee,pathogen){
-  #Assumption: booster+ Omicron infection creates the same immunity as booster + delta infection (Table 3 booster dose, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-  value<-0
-  if (pathogen=="COVID-19" & status.matrix$infecte[infectee]!=1){
-      time.since.inf<-t-status.matrix$time.of.infection[infectee]
-      if (status.matrix$Immunity[infectee]==1){
-        if (time.since.inf<14){
-          value<-(1-0.923)
+Immlev.2<-function(t,status.matrix,infectee,pathogen){
+  if (status.matrix$infected[infectee]==1){
+    return(0)
+  }else{
+    if (pathogen == "COVID-19"){
+      if (status.matrix$infected[infectee]==0){
+        if (status.matrix$Immunity[infectee]==1){
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (status.matrix$Immunity[infectee]==1){ 
+            if (time.since.inf<14){
+              value<-(1-0.669)
+            }
+            if (time.since.inf>=14 & time.since.inf <28){
+              value<-(1-0.672)
+            }
+            if (time.since.inf>=28 & time.since.inf <63){
+              value<-(1-0.55)
+            }
+            if (time.since.inf>=63){
+              value<-(1-0.457)
+            }
+          }
+        }else{
+          return(1)
         }
-        if (time.since.inf>=14 & time.since.inf <28){
-          value<-(1-0.951)
-        }
-        if (time.since.inf>=28 & time.since.inf <63){
-          value<-(1-0.918)
-        }
-        if (time.since.inf>=63){
-          value<-(1-0.899)
+      }else{
+        if (status.matrix$Immunity[infectee]==1){
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (time.since.inf<14){
+            value<-0
+          }
+          if (time.since.inf>=14 & time.since.inf <28){
+            value<-(1-0.951)
+          }
+          if (time.since.inf>=28 & time.since.inf <63){
+            value<-(1-0.918)
+          }
+          if (time.since.inf>=63){
+            value<-(1-0.899)
+          }
+        }else{
+          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          if (time.since.inf<14){
+            value<-0
+          }
+          if (time.since.inf>=14 & time.since.inf <28){
+            value<-(1-0.909)
+          }
+          if (time.since.inf>=28 & time.since.inf <63){
+            value<-(1-0.855)
+          }
+          if (time.since.inf>=63 & time.since.inf <98){
+            value<-(1-0.787)
+          }
+          if (time.since.inf>=98 & time.since.inf <133){
+            value<-(1-0.744)
+          }
+          if (time.since.inf>=133 & time.since.inf <168){
+            value<-(1-0.674)
+          }
+          if (time.since.inf>=168){
+            value<-(1-0.627)
+          }
         }
       }
-      #(Table 3 2 doses, Delta :BNT162b2 - Andrews et al. NEJM 2022)
-      if (status.matrix$Immunity[infectee]==0){
-        if (time.since.inf<14){
-          value<-0
+    }
+    if (pathogen == "FLU-A"){
+      if (status.matrix$infected[infectee]==0){
+        if (status.matrix$Immunity[infectee]==1){
+          return(1-0.7)
+        }else{
+          return(1)
         }
-        if (time.since.inf>=14 & time.since.inf <28){
-          value<-(1-0.909)
-        }
-        
-        if (time.since.inf>=28 & time.since.inf <63){
-          value<-(1-0.855)
-        }
-        if (time.since.inf>=63 & time.since.inf <98){
-          value<-(1-0.787)
-        }
-        if (time.since.inf>=98 & time.since.inf <133){
-          value<-(1-0.744)
-        }
-        if (time.since.inf>=133 & time.since.inf <168){
-          value<-(1-0.674)
-        }
-        if (time.since.inf>=168){
-          value<-(1-0.627)
-        }
-        
+      }else{
+        return(0)
       }
-      
+    }
   }
-  if (pathogen=="FLU-A" & status.matrix$infecte[infectee]!=1){
-    value<-0
-  }
-  return(value)
 }
+
 
 
 #Computing summary measures
@@ -299,6 +355,7 @@ comp.RT<-function(status.matrix,individual,Rt){
 sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop){
   
   
+  
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
   
@@ -333,7 +390,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   
   #Proportion of immune
   if (prop.immune>0){
-    status.matrix.1$Immunity[sample(1:n,round(prop.immune*n))]<-1
+    immuned.individuals<-sample(1:n,round(prop.immune*n))
+    status.matrix.1$Immunity[immuned.individuals]<-1
     status.matrix.2$Immunity<-status.matrix.1$Immunity
   }
   
@@ -478,8 +536,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       
       #re-infection term
-      re.inf<-ifelse(status.matrix.1$infected[infectee]==0,1,re.inf.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee,pathogen = pathogen.1))
-      
+      re.inf<-Immlev.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee,pathogen = pathogen.1)
       ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
       acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q*re.inf
       if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1$infected[infector]!=1){acc.rate.1<-0}
@@ -525,7 +582,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       
       #re-infection term
-      re.inf<-ifelse(status.matrix.2$infected[infectee]==0,1,re.inf.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee,pathogen = pathogen.2))
+      re.inf<-Immlev.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee,pathogen = pathogen.2)
       
       ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
       acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q*re.inf
