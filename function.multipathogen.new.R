@@ -150,12 +150,12 @@ long.inter.term.2<-function(t,status.matrix,infectee){
 
 Immlev.1<-function(t,status.matrix,infectee,pathogen){
   if (status.matrix$infected[infectee]==1){
-    return(0)
+    value<-0
   }else{
     if (pathogen == "COVID-19"){
       if (status.matrix$infected[infectee]==0){
         if (status.matrix$Immunity[infectee]==1){
-          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          time.since.inf<-t
           if (time.since.inf<14){
             value<-0
           }
@@ -169,7 +169,7 @@ Immlev.1<-function(t,status.matrix,infectee,pathogen){
             value<-(1-0.899)
           }
         }else{
-          return(1)
+          value<-1
         }
       }else{
         if (status.matrix$Immunity[infectee]==1){
@@ -215,25 +215,26 @@ Immlev.1<-function(t,status.matrix,infectee,pathogen){
     if (pathogen == "FLU-A"){
       if (status.matrix$infected[infectee]==0){
         if (status.matrix$Immunity[infectee]==1){
-          return(1-0.7)
+          value<-(1-0.7)
         }else{
-          return(1)
+          value<-1
         }
       }else{
-        return(0)
+        value<-0
       }
     }
   }
+  return(value)
 }
 
 Immlev.2<-function(t,status.matrix,infectee,pathogen){
   if (status.matrix$infected[infectee]==1){
-    return(0)
+    value<-0
   }else{
     if (pathogen == "COVID-19"){
       if (status.matrix$infected[infectee]==0){
         if (status.matrix$Immunity[infectee]==1){
-          time.since.inf<-t-status.matrix$time.of.infection[infectee]
+          time.since.inf<-t
           if (status.matrix$Immunity[infectee]==1){ 
             if (time.since.inf<14){
               value<-(1-0.669)
@@ -249,7 +250,7 @@ Immlev.2<-function(t,status.matrix,infectee,pathogen){
             }
           }
         }else{
-          return(1)
+          value<-1
         }
       }else{
         if (status.matrix$Immunity[infectee]==1){
@@ -295,15 +296,16 @@ Immlev.2<-function(t,status.matrix,infectee,pathogen){
     if (pathogen == "FLU-A"){
       if (status.matrix$infected[infectee]==0){
         if (status.matrix$Immunity[infectee]==1){
-          return(1-0.7)
+          value<-1-0.7
         }else{
-          return(1)
+          value<-1
         }
       }else{
-        return(0)
+        value<-0
       }
     }
   }
+  return(value)
 }
 
 
