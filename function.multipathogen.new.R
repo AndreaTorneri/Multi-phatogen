@@ -351,7 +351,8 @@ comp.RT<-function(status.matrix,individual,Rt){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2){
+  
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
   
@@ -415,7 +416,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
       transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
       status.matrix.1$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.1)
+      if(runif(1)<bc.1){
       homequarantine.day.1[first]<-status.matrix.1$TimeSymptomOnset[first]
+      }
       status.matrix.1$severity[first]<-1
       time.events<-rbind(time.events,c(current.time,1.1,first))
     }else{
@@ -549,7 +552,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q1h[infectee]<-inf.path.1.h #A single q parameter for everyone
           transmission.parameters$q1g[infectee]<-inf.path.1.g #A single q parameter for everyone
           status.matrix.1$TimeSymptomOnset[infectee]<-current.time+incubation.period(pathogen=pathogen.1)
-          homequarantine.day.1[infectee]<-status.matrix.1$TimeSymptomOnset[infectee]
+          if (runif(1)<bc.1){
+            homequarantine.day.1[infectee]<-status.matrix.1$TimeSymptomOnset[infectee]
+          }
           status.matrix.1$severity[infectee]<-1
           time.events<-rbind(time.events,c(current.time,1.1,infectee))
         }else{
@@ -596,7 +601,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q2h[infectee]<-inf.path.2.h #A single q parameter for everyone
           transmission.parameters$q2g[infectee]<-inf.path.2.g #A single q parameter for everyone
           status.matrix.2$TimeSymptomOnset[infectee]<-current.time+incubation.period(pathogen=pathogen.2)
-          homequarantine.day.2[infectee]<-status.matrix.2$TimeSymptomOnset[infectee]
+          if (runif(1)<bc.2){
+            homequarantine.day.2[infectee]<-status.matrix.2$TimeSymptomOnset[infectee]
+          }
           status.matrix.2$severity[infectee]<-1
           time.events<-rbind(time.events,c(current.time,2.1,infectee))
         }else{
@@ -741,7 +748,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q2g[first]<-inf.path.2.g #A single q parameter for everyone
           status.matrix.2$severity[first]<-1
           status.matrix.2$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
+          if (runif(1)<bc.2){
+            homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
+          }
           time.events<-rbind(time.events,c(current.time,2.1,first))
         }else{
           transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.2 #A single q parameter for everyone
@@ -763,9 +772,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       current.time<-events$NewSeeding1
       events$NewSeeding1<-current.time+t.seed
       not.infected<-which(status.matrix.1$infected!=1)
-      if (nSeeds.1>not.infected){
-        break()
-      }
+      if (nSeeds.1<length(not.infected)){
       first.cases<-sample(not.infected,nSeeds.1)
       for (j in first.cases){
         first<-j
@@ -777,7 +784,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
           status.matrix.1$severity[first]<-1
           status.matrix.1$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          homequarantine.day.1[first]<-status.matrix.1$TimeSymptomOnset[first]
+          if (runif(1)<bc.1){
+            homequarantine.day.1[first]<-status.matrix.1$TimeSymptomOnset[first]
+          }
           time.events<-rbind(time.events,c(current.time,1.1,first))
         }else{
           transmission.parameters$q1h[first]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
@@ -793,15 +802,14 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           }
         }
       }
+      }
     }
     
     if (next.evts=="NewSeeding2"){
       current.time<-events$NewSeeding1
       events$NewSeeding2<-current.time+t.seed
       not.infected<-which(status.matrix.2$infected!=1)
-      if (nSeeds.2>not.infected){
-        break()
-      }
+      if (nSeeds.2<length(not.infected)){
       first.cases<-sample(not.infected,nSeeds.2)
       for (j in first.cases){
         first<-j
@@ -813,7 +821,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           transmission.parameters$q2g[first]<-inf.path.2.g #A single q parameter for everyone
           status.matrix.2$severity[first]<-1
           status.matrix.2$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
+          if (runif(1)<bc.2){
+            homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
+          }
           time.events<-rbind(time.events,c(current.time,2.1,first))
         }else{
           transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.2 #A single q parameter for everyone
@@ -828,6 +838,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
           }
         }
+      }
       }
     }
   }
