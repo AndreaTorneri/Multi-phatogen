@@ -54,6 +54,16 @@ bc.1= as.numeric(args[26]) # short-term interaction parameter: acquiring 1 while
 cat(",bc.1=",bc.1)
 bc.2= as.numeric(args[27]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",bc.2=",bc.2)
+reinf= as.numeric(args[28]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",reinf=",reinf)
+typeIC= as.numeric(args[29]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",typeIC=",typeIC)
+contact.reduction.TP= as.numeric(args[30]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",contact.reduction.TP=",contact.reduction.TP)
+bc.1.TP= as.numeric(args[31]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",bc.1.TP=",bc.1.TP)
+bc.2.TP= as.numeric(args[32]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",bc.2.TP=",bc.2.TP)
 
 
 
@@ -77,11 +87,11 @@ if (netw=="ERGM"){
 if (netw=="Synth"){
   name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name.n)
-  name.s<-paste("TransParam_SynthNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg, "_rho",rho.1,"_alpha",alpha.as.1,".RData",sep = "")
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
-  name.s<-paste("TransParam_SynthNetworks_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg, "_rho",rho.2,"_alpha",alpha.as.2,".RData",sep = "")
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
@@ -93,7 +103,7 @@ lambda.g<-8.29
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
-nSim<-200
+nSim<-20
 epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)
@@ -104,7 +114,7 @@ print(nm)
 for (i in 1:nSim){
   print(i)
   temp.HH.netw<-HH.networks[[sample(1:length(HH.networks),1)]]
-  epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, lli.1=lli.1,lli.2=lli.2, pathogen.1=pathogen.1, pathogen.2=pathogen.2, contact.reduction=contact.reduction, t.stop=t.stop, t.seed=t.seed, bc.1=bc.1, bc.2=bc.2)
+  epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, lli.1=lli.1,lli.2=lli.2, pathogen.1=pathogen.1, pathogen.2=pathogen.2, contact.reduction=contact.reduction, t.stop=t.stop, t.seed=t.seed, bc.1=bc.1, bc.2=bc.2, reinf=reinf, typeIC=typeIC)
 }
 scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen.1,"_&_",pathogen.2,sep ="")
 

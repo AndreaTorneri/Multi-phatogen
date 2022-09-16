@@ -17,18 +17,25 @@ rho= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while h
 cat(",rho=",rho)
 alpha= as.numeric(args[9]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",alpha=",alpha)
+pathogen= args[10] # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",pathogen=",pathogen)
+ctc.dec= as.numeric(args[11]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",ctc.dec=",ctc.dec)
+compl= as.numeric(args[12]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",compl=",compl)
 
 
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
   HH.networks<-HH_sim
-  name.s<-paste("TransParam_ERGMNetworks", "_R",R,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TP_ERGM", "_R",R,"_ratioqhqg",ratio.qhqg, "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",ctc.dec,"_comp",compl ,".RData",sep = "")
   
 }
+
 if (netw=="Synth"){
   name<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name)
-  name.s<-paste("TransParam_SynthNetworks","_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,".RData",sep = "")
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",ctc.dec,"_comp",compl,".RData",sep = "")
   
 }
 
@@ -45,7 +52,9 @@ nSim<-100
 tol<-0.05
 nSeed<-3082021
 set.seed(nSeed)
-trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
+#trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
+trs.prms<-R0.comp.Inf(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
+
 
 #load data
 inf.path.h<-trs.prms$beta.h/lambda.h
