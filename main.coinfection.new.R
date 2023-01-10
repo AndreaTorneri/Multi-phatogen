@@ -87,11 +87,15 @@ if (netw=="ERGM"){
 if (netw=="Synth"){
   name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name.n)
-  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.1,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
+  pathogen.TP<-pathogen.1
+  if (pathogen.1=="DELTA" | pathogen.1=="OMICRON"){ pathogen.TP<-"COVID-19" }
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
-  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg , "_rho",rho.2,"_alpha",alpha.as.2,"_pathogen",pathogen.2,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
+  pathogen.TP<-pathogen.2
+  if (pathogen.2=="DELTA" | pathogen.2=="OMICRON"){ pathogen.TP<-"COVID-19" }
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg , "_rho",rho.2,"_alpha",alpha.as.2,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
