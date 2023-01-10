@@ -87,11 +87,11 @@ if (netw=="ERGM"){
 if (netw=="Synth"){
   name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name.n)
-  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
-  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
+  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg , "_rho",rho,"_alpha",alpha,"_pathogen",pathogen,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
