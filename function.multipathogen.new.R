@@ -61,11 +61,8 @@ InfMeasure<-function(t,pathogen){
   }
 }
 
-
-
 VaccineEffectiveness<-function(t,typeIC){
   #Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022
-  
   if (typeIC==1){
     return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887))
   }
@@ -75,8 +72,6 @@ VaccineEffectiveness<-function(t,typeIC){
   if (typeIC==3){
     return(7568.209*dlnorm(t,meanlog = 4.599, sdlog = 1.118))
   }
-  
-  
 }
 
 VE.flu<-function(){
@@ -145,11 +140,110 @@ LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,inf
           }
         }  
       }
-      
       if (status.matrix.v1$infected[infectee]==-1){
         value<-VE.COVID
       }
     }
+  }
+  return(value)
+}
+
+
+LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC){ #pathogen.v1 is the infection the infectee might catch
+  value<-1
+  
+  if (reinf==0){
+    if (status.matrix.v1$infected[infectee]!=0){
+      value<-0
+    }
+    if (status.matrix.v1$infected[infectee]==0 & status.matrix.v2$infected[infectee]==-1){
+      value<-lli
+    }
+  }else{
+    if (pathogen.v1 =="FLU-A"){ # For FLU we assume that re-infection is possible only for a vaccine-induced immunity
+      if (status.matrix.v1$Immunity[infectee]==1){
+        if (status.matrix.v1$infected[infectee]==0){
+          value<-VE.flu()
+        }else{
+          value<-0
+        }
+      }else{
+        if (status.matrix.v1$infected[infectee]==0){
+          value<-1
+        }else{
+          value<-0
+        }
+      }
+    }     
+    if (pathogen.v1 =="COVID-19"){
+      if (status.matrix.v1$Immunity[infectee]==1){
+        if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+          value<-VE.COVID()
+        }else{
+          value<-0
+        }
+      }else{
+        value<-0
+        if (status.matrix.v1$infected[infectee]==0){
+          value<-1
+        }
+        if (status.matrix.v1$infected[infectee]==-1){
+          value<-VE.COVID()
+        }
+      }
+    }     
+    
+    if (pathogen.v1 =="DELTA"){
+      if (status.matrix.v1$Immunity[infectee]==1){
+        if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+          value<-VE.COVID()
+        }else{
+          value<-0
+        }
+      }else{
+        value<-0
+        if (status.matrix.v1$infected[infectee]==0){
+          if (status.matrix.v2$infected[infectee]==-1){
+            value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+          }else{
+            value<-1
+          }
+        }
+        if (status.matrix.v1$infected[infectee]==-1){
+          value<-VE.COVID()
+        }
+      }
+    }     
+    
+    if (pathogen.v1 =="OMICRON"){
+      
+      if (status.matrix.v1$Immunity[infectee]==1){
+        value<-0
+        if (status.matrix.v1$infected[infectee]==0){
+          if (status.matrix.v2$infected[infectee]==-1){
+            value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+          }else{
+            value<-VaccineEffectiveness(t=0,typeIC = typeIC)
+          }
+        }
+        if (status.matrix.v1$infected[infectee]==-1){
+            value<-VE.COVID()
+        }
+      }else{
+        value<-0
+        if (status.matrix.v1$infected[infectee]==0){
+          if (status.matrix.v2$infected[infectee]==-1){
+            value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+          }else{
+            value<-1
+          }
+        }
+        if (status.matrix.v1$infected[infectee]==-1){
+          value<-VE.COVID()
+        }
+      }
+    }     
+    
   }
   return(value)
 }
@@ -374,6 +468,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
       }
       
+      
+      
       #Infection with pathogen 1
       if (status.matrix.1$infected[infector]==1 & (status.matrix.1$infected[infectee]==0 | (status.matrix.1$infected[infectee]==-1 & reinf==1))){
         # compute short interaction terms for pathogen.1 (having pathogen 2)
@@ -382,16 +478,24 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }else{
           short.inter<-1
         }
-        # compute long interaction terms for pathogen.1 (recovered from pathogen 2)
-        if (status.matrix.2$infected[infectee]==-1 & short.inter==1){
+        
+        
+        long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC)
+        
+        
+        # compute long interaction terms for pathogen.1 (recovered from pathogen 2 and/or already contracted pathogen 1)
+       # if (status.matrix.2$infected[infectee]==-1 & short.inter==1){
           # long.inter<-long.inter.term.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee)
-          long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC)
-        }else{
-          long.inter<-1
-        }
+      #    long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC)
+      #  }else{
+      #    long.inter<-1
+      #  }
         
         
         #re-infection term
+        
+        
+        
         #re.inf<-Immlev.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee,pathogen = pathogen.1)
         ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
         acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q
@@ -428,17 +532,19 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         
       }
       
+      
+      #Infection with pathogen 2
       if (status.matrix.2$infected[infector]==1 & (status.matrix.2$infected[infectee]==0 | (status.matrix.2$infected[infectee]==-1 & reinf==1))){
         if (status.matrix.1$infected[infectee]==1){
           short.inter<-sigma21
         }else{
           short.inter<-1
         }
-        if (status.matrix.1$infected[infectee]==-1 & short.inter==1){
+       # if (status.matrix.1$infected[infectee]==-1 & short.inter==1){
           long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC)
-        }else{
-          long.inter<-1
-        }
+      #  }else{
+      #    long.inter<-1
+      #  }
         
         #re-infection term
         #re.inf<-Immlev.2(t=current.time,status.matrix = status.matrix.2,infectee = infectee,pathogen = pathogen.2)
