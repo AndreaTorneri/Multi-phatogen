@@ -280,22 +280,14 @@ R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.
       if (n.asympt!=n & n.asympt!=0){
         R0[j]<-(((beta.g*meanIP*compl+beta.g*mu*(1-compl))*n/(n- n.asympt))+ (beta.g*mu*asymp.rel.inf*n.asympt/n))*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
       }  
-      
-      
-      
-      
-      
     }
-    
-    
-    
     print(j)
   }
   return(R0)
 }
 
 R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.h,pathogen,ctc.dec,compl){
-  
+  mu<-infectious.period.length(pathogen = pathogen)
   beta.g<-1
   beta.h<-ratio_hhgl*beta.g
   beta.g.tempm<-0
@@ -324,7 +316,7 @@ R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.i
     }
     print(c(R.rif,mean(R.temp),abs(mean(R.temp)-R.rif)))
   }
-  transm.prms<-data.frame("beta.g"=beta.g, "beta.h"=beta.h)
+  transm.prms<-data.frame("beta.g"=beta.g*mu, "beta.h"=beta.h)
   return(transm.prms)
 }
 
