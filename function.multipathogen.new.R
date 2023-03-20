@@ -5,10 +5,12 @@
 
 incubation.period<-function(pathogen){
   if (pathogen=="COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){
-    return(rlnorm(1,meanlog = log(5.2), sdlog = log(1.7)))    
+    #return(rlnorm(1,meanlog = log(5.2), sdlog = log(1.7)))
+    return(5.288462)
   }
   if (pathogen=="FLU-A"){
-    return(rlnorm(1,meanlog = log(1.4), sdlog = log(1.51))) 
+    #return(rlnorm(1,meanlog = log(1.4), sdlog = log(1.51))) 
+    return(2.173913)
   }
   if (pathogen=="RSV"){
     return(rlnorm(1,meanlog = log(4.4), sdlog = log(1.24))) 
