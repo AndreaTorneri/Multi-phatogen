@@ -66,7 +66,6 @@ bc.2.TP= as.numeric(args[32]) # short-term interaction parameter: acquiring 1 wh
 cat(",bc.2.TP=",bc.2.TP)
 
 
-
 #Input parameters - fixed
 library(ergm)
 library(RGeode)
@@ -88,7 +87,7 @@ if (netw=="Synth"){
   name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
   load(name.n)
   pathogen.TP<-pathogen.1
-  if (pathogen.1=="DELTA" | pathogen.1=="OMICRON"){ pathogen.TP<-"COVID-19" }
+ if (pathogen.1=="DELTA" | pathogen.1=="OMICRON"){ pathogen.TP<-"COVID-19" }
   name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
@@ -107,7 +106,7 @@ lambda.g<-8.29
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
-nSim<-50
+nSim<-150
 epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)
