@@ -39,6 +39,7 @@ if (netw=="Synth"){
   
 }
 
+
 lambda.h<-3.34 #average number of daily within household (Mossong et al. 2008 - Belgium)
 lambda.g<-8.29 #average number of daily contacts at a community level (Mossong et al. 2008 - Belgium)
 
