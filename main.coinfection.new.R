@@ -88,12 +88,15 @@ if (netw=="Synth"){
   load(name.n)
   pathogen.TP<-pathogen.1
  if (pathogen.1=="DELTA" | pathogen.1=="OMICRON"){ pathogen.TP<-"COVID-19" }
+ if (pathogen.1=="XP" | pathogen.1=="XA"){ pathogen.TP<-"XS" }
+  
   name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
   pathogen.TP<-pathogen.2
   if (pathogen.2=="DELTA" | pathogen.2=="OMICRON"){ pathogen.TP<-"COVID-19" }
+  if (pathogen.2=="XP" | pathogen.2=="XA"){ pathogen.TP<-"XS" }
   name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.2,"_ratioqhqg",ratio.qhqg , "_rho",rho.2,"_alpha",alpha.as.2,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.2.TP,".RData",sep = "")
   load(name.s)
   inf.path.2.h<-inf.path.h
@@ -106,7 +109,7 @@ lambda.g<-8.29
 
 #Compute the reproduction number related to the selected network. 
 source("function.multipathogen.new.R")
-nSim<-50
+nSim<-100
 epi.outbreak<-list()
 nSeed<-1062021
 set.seed(nSeed)
