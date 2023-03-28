@@ -267,7 +267,7 @@ R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.
         R0[j]<-(beta.g*mu)*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
       }
       if (n.asympt!=n & n.asympt!=0){
-        R0[j]<-((beta.g*mu*n/(n- n.asympt))+ (beta.g*mu*asymp.rel.inf*n.asympt/n))*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
+        R0[j]<-((beta.g*mu*(n- n.asympt)/n)+ (beta.g*mu*asymp.rel.inf*n.asympt/n))*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
       }  
       
     }else{
@@ -278,7 +278,7 @@ R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.
         R0[j]<-(beta.g*meanIP*compl+beta.g*mu*(1-compl)) *(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
       }
       if (n.asympt!=n & n.asympt!=0){
-        R0[j]<-(((beta.g*meanIP*compl+beta.g*mu*(1-compl))*n/(n- n.asympt))+ (beta.g*mu*asymp.rel.inf*n.asympt/n))*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
+        R0[j]<-(((beta.g*meanIP*compl+beta.g*mu*(1-compl))*(n- n.asympt)/n)+ (beta.g*mu*asymp.rel.inf*n.asympt/n))*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
       }  
     }
     print(j)
