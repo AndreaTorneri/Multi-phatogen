@@ -49,7 +49,7 @@ library("network")
 source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R
-nSim<-100
+nSim<-200
 tol<-0.01
 nSeed<-3082021
 set.seed(nSeed)

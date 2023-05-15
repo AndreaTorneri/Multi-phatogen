@@ -149,8 +149,6 @@ avg.lambda.within<-function(HH.networks){
   return(mean(lamb.with))
 }
 
-
-
 R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h,pathogen,ctc.dec,compl){
   mu<-infectious.period.length(pathogen = pathogen)
   meanIP<-mean.ip(pathogen = pathogen)
@@ -320,8 +318,6 @@ R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.i
   return(transm.prms)
 }
 
-
-
 Comp.R0<-function(HH.network,nSim,transm.prms,prob.asym,asymp.rel.in,pathogen,ctc.dec,compl){
   beta.g<-transm.prms$beta.g
   beta.h<-transm.prms$beta.h
@@ -332,10 +328,6 @@ Comp.R0<-function(HH.network,nSim,transm.prms,prob.asym,asymp.rel.in,pathogen,ct
   }
   return(R.temp)
 }
-
-
-
-
 
 incubation.period<-function(pathogen){
   if (pathogen=="COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){
@@ -357,7 +349,6 @@ incubation.period<-function(pathogen){
     return(3)
   }
 }
-
 
 mean.ip<-function(pathogen){
   if (pathogen=="COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){

@@ -43,7 +43,7 @@ infectious.period.length<-function(pathogen){
 
 InfMeasure<-function(t,pathogen){
   if (pathogen=="COVID-19" | pathogen=="DELTA" | pathogen=="OMICRON"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)))
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 12,rate = 2.08)))
   }
   if (pathogen=="FLU-A"){
     return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
@@ -172,6 +172,9 @@ LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,inf
       }else{
         if (status.matrix.v1$infected[infectee]==0){
           value<-1
+          if (status.matrix.v2$infected[infectee]==-1){
+            value<-lli
+          }
         }else{
           value<-0
         }
@@ -188,6 +191,9 @@ LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,inf
         value<-0
         if (status.matrix.v1$infected[infectee]==0){
           value<-1
+          if (status.matrix.v2$infected[infectee]==-1){
+            value<-lli
+          }
         }
         if (status.matrix.v1$infected[infectee]==-1){
           value<-VE.COVID()
@@ -298,6 +304,7 @@ comp.RT<-function(status.matrix,individual,Rt){
 #
 
 sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC){
+  
   
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
