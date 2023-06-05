@@ -45,7 +45,6 @@ lambda.g<-8.29 #average number of daily contacts at a community level (Mossong e
 
 library("network")
 
-
 source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R
