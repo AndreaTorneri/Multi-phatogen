@@ -10,7 +10,7 @@ incubation.period<-function(pathogen){
   }
   if (pathogen=="FLU-A"){
     #return(rlnorm(1,meanlog = log(1.4), sdlog = log(1.51))) 
-    return(2.173913+1)
+    return(2)
   }
   if (pathogen=="RSV"){
     return(rlnorm(1,meanlog = log(4.4), sdlog = log(1.24))) 
@@ -31,7 +31,7 @@ infectious.period.length<-function(pathogen){
     return(15)
   }
   if (pathogen=="FLU-A"){
-    return(6.25)  
+    return(8)  
   }
   if (pathogen=="FLU-B"){
     return(4.8)  

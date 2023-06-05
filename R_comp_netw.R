@@ -352,10 +352,10 @@ incubation.period<-function(pathogen){
 
 mean.ip<-function(pathogen){
   if (pathogen=="COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){
-    return(5.98)    
+    return(5.288462)    
   }
   if (pathogen=="FLU-A"){
-    return(1.52) 
+    return(2) 
   }
   if (pathogen == "XP"){
     return(1)
@@ -374,7 +374,7 @@ infectious.period.length<-function(pathogen){
     return(15)
   }
   if (pathogen=="FLU-A"){
-    return(6.25)  
+    return(8)  
   }
   if (pathogen=="FLU-B"){
     return(4.8)  
