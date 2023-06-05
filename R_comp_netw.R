@@ -386,10 +386,25 @@ infectious.period.length<-function(pathogen){
 
 InfMeasure<-function(t,pathogen){
   if (pathogen=="COVID-19" | pathogen=="DELTA" | pathogen=="OMICRON"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 2,rate = 2.08)))
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 12,rate = 2.08)))
   }
   if (pathogen=="FLU-A"){
-    return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
+    # Setting infectiousness measure according to Carrat et al. (2008) for H1N1
+    #VL<-data.frame(x=0:8,y=c(0,1.75,3,2.5,1.8,1.25,0.75,0.5,0)) 
+    #vl.flu<-nlsLM(y~a*dgamma(x=x,shape = s1,scale = sc1),start = list(a=10,s1=1.5,sc1=1.5),data = VL, weights = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,1))
+    #prms<-vl.flu$m$getPars()
+    #print(prms)
+    #plot(seq(0,8,0.1),prms[1]*dgamma(x=seq(0,8,0.1),shape = prms[2],scale = prms[3]),ylim = c(0,3.1))
+    #points(VL, col="red")
+    #f.vl<-function(t){
+    #  return(prms[1]*dgamma(t,shape = prms[2],scale = prms[3]))
+    #}
+    #k<-integrate(f.vl,lower = 0,upper = 8)
+    #prms[1]/ k$value
+    return(1.014939*dgamma(t,shape = 3.2930139,scale = 0.9533298))
+    
+    
+    #return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
   }
   if (pathogen=="FLU-B"){
     return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
