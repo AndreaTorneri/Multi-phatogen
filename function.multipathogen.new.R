@@ -411,7 +411,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   while((sum(infectives)>0 & current.time<t.stop) | current.time<t2){ #while there are still infectives
     #Phase 1: individuals that has to, propose a new social contac
     for (i in which(index.contact.within==1) ){ # for all the individuals that has to propose a global contact
-      contact.time.within$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate_within[i])+current.time# I generate the next interarrival time for individual i
+      contact.time.within$pr.ctc[i]<-ifelse(transmission.parameters$contact_rate_within[i]!=0,rexp(1,transmission.parameters$contact_rate_within[i])+current.time,Inf)# I generate the next interarrival time for individual i
       index.contact.within[i]<-0
     }
     

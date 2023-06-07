@@ -49,7 +49,7 @@ source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R
 nSim<-200
-tol<-0.01
+tol<-0.01*R.rif #tolerance is 1% of the target value
 nSeed<-3082021
 set.seed(nSeed)
 #trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
