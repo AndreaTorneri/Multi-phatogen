@@ -198,17 +198,25 @@ LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,inf
     }     
     if (pathogen.v1 =="COVID-19"){
       if (status.matrix.v1$Immunity[infectee]==1){
-        if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+        value<-0
+       if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
           value<-VE.COVID()
-        }else{
-          value<-0
-        }
+       }
+      #  if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+      #    value<-VE.COVID()
+      #  }else{
+      #    value<-0
+      #  }
+        
       }else{
         value<-0
         if (status.matrix.v1$infected[infectee]==0){
           value<-1
           if (status.matrix.v2$infected[infectee]==-1){
             value<-lli
+          }
+          if (status.matrix.v2$Immunity[infectee]==1){ #heterologous effect vaccination
+            value<-(1-0.297) #Tayar et al. 2023
           }
         }
         if (status.matrix.v1$infected[infectee]==-1){
@@ -357,9 +365,16 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   
   #Proportion of immune
   if (prop.immune>0){
-    immuned.individuals<-sample(1:n,round(prop.immune*n))
-    status.matrix.1$Immunity[immuned.individuals]<-1
-    status.matrix.2$Immunity<-status.matrix.1$Immunity
+    if (pathogen.1=="DELTA" & pathogen.2=="OMICRON"){
+      immuned.individuals<-sample(1:n,round(prop.immune*n))
+      status.matrix.1$Immunity[immuned.individuals]<-1
+      status.matrix.2$Immunity<-status.matrix.1$Immunity
+    }else{
+      immuned.individuals<-sample(1:n,round(prop.immune*n))
+      status.matrix.1$Immunity[immuned.individuals]<-1
+      immuned.individuals<-sample(1:n,round(prop.immune*n))
+      status.matrix.2$Immunity[immuned.individuals]<-1
+    }
   }
   
   
