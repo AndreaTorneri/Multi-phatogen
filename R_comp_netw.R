@@ -149,6 +149,7 @@ avg.lambda.within<-function(HH.networks){
   return(mean(lamb.with))
 }
 
+
 R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h,pathogen,ctc.dec,compl){
   mu<-infectious.period.length(pathogen = pathogen)
   meanIP<-mean.ip(pathogen = pathogen)
@@ -284,10 +285,13 @@ R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.
   return(R0)
 }
 
+
+
+
 R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.h,pathogen,ctc.dec,compl){
   mu<-infectious.period.length(pathogen = pathogen)
   beta.g<-1
-  beta.h<-ratio_hhgl*beta.g
+  beta.h<-ratio_hhgl*beta.g*mu
   beta.g.tempm<-0
   beta.g.tempM<-10
   R.temp<-NULL
@@ -306,11 +310,11 @@ R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.i
     if (mean(R.temp)>R.rif){
       beta.g.tempM<-beta.g
       beta.g<-runif(1,min = beta.g.tempm,max = beta.g)
-      beta.h<-beta.g*ratio_hhgl
+      beta.h<-beta.g*ratio_hhgl*mu
     }else{
       beta.g.tempm<-beta.g
       beta.g<-runif(1,min = beta.g, max = beta.g.tempM)
-      beta.h<-beta.g*ratio_hhgl
+      beta.h<-beta.g*ratio_hhgl*mu
     }
     print(c(R.rif,mean(R.temp),abs(mean(R.temp)-R.rif)))
   }
