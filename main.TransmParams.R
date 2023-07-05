@@ -53,7 +53,7 @@ tol<-0.01*R.rif #tolerance is 1% of the target value
 nSeed<-3082021
 set.seed(nSeed)
 #trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
-trs.prms<-R0.comp.Inf(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
+trs.prms<-R0.comp.Inf(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
 
 
 #load data
