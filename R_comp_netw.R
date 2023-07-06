@@ -290,10 +290,10 @@ R0.computation.Inf<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.
 
 R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.h,pathogen,ctc.dec,compl){
   mu<-infectious.period.length(pathogen = pathogen)
-  beta.g<-1
+  beta.g<-1/mu
   beta.h<-ratio_hhgl*beta.g*mu
   beta.g.tempm<-0
-  beta.g.tempM<-10
+  beta.g.tempM<-2
   R.temp<-NULL
   for (i in 1:nSim){
     temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
