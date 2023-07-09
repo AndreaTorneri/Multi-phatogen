@@ -293,13 +293,14 @@ R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.i
   beta.g<-1/mu
   beta.h<-ratio_hhgl*beta.g*mu
   beta.g.tempm<-0
-  beta.g.tempM<-0.8
+  beta.g.tempM<-1
   R.temp<-NULL
   for (i in 1:nSim){
     temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
     R.temp<-c(R.temp,R0.computation.Inf(HH.network = temp.HH.netw, beta.g = beta.g, beta.h = beta.h, nSim = 1,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf,lambda.h = lambda.h,pathogen = pathogen,ctc.dec = ctc.dec, compl = compl))
   }
   R.temp<-mean(R.temp)
+  print(c(R.rif,mean(R.temp),abs(mean(R.temp)-R.rif)))
   while (abs(mean(R.temp)-R.rif)>tol){
     R.temp<-NULL
     for (i in 1:nSim){
