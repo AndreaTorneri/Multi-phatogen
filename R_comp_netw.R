@@ -293,7 +293,7 @@ R0.comp.Inf<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.i
   beta.g<-1/mu
   beta.h<-ratio_hhgl*beta.g*mu
   beta.g.tempm<-0
-  beta.g.tempM<-0.75
+  beta.g.tempM<-0.8
   R.temp<-NULL
   for (i in 1:nSim){
     temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
