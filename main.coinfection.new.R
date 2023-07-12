@@ -64,6 +64,10 @@ bc.1.TP= as.numeric(args[31]) # short-term interaction parameter: acquiring 1 wh
 cat(",bc.1.TP=",bc.1.TP)
 bc.2.TP= as.numeric(args[32]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
 cat(",bc.2.TP=",bc.2.TP)
+het.vac= as.numeric(args[33]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+cat(",het.vac=",het.vac)
+
+
 
 
 #Input parameters - fixed
@@ -120,7 +124,7 @@ print(nm)
 for (i in 1:nSim){
   print(i)
   temp.HH.netw<-HH.networks[[sample(1:length(HH.networks),1)]]
-  epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, lli.1=lli.1,lli.2=lli.2, pathogen.1=pathogen.1, pathogen.2=pathogen.2, contact.reduction=contact.reduction, t.stop=t.stop, t.seed=t.seed, bc.1=bc.1, bc.2=bc.2, reinf=reinf, typeIC=typeIC)
+  epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, lli.1=lli.1,lli.2=lli.2, pathogen.1=pathogen.1, pathogen.2=pathogen.2, contact.reduction=contact.reduction, t.stop=t.stop, t.seed=t.seed, bc.1=bc.1, bc.2=bc.2, reinf=reinf, typeIC=typeIC, het.vac=het.vac)
 }
 scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen.1,"_&_",pathogen.2,sep ="")
 

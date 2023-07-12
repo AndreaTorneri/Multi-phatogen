@@ -167,7 +167,7 @@ VE.COVID<- function() {
 # }
 
 
-LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC){ #pathogen.v1 is the infection the infectee might catch
+LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC,het.vac){ #pathogen.v1 is the infection the infectee might catch
   value<-1
   
   if (reinf==0){
@@ -215,7 +215,7 @@ LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,inf
           if (status.matrix.v2$infected[infectee]==-1){
             value<-lli
           }
-          if (status.matrix.v2$Immunity[infectee]==1){ #heterologous effect vaccination
+          if (status.matrix.v2$Immunity[infectee]==1 & het.vac==1){ #heterologous effect vaccination
             value<-(1-0.297) #Tayar et al. 2023
           }
         }
@@ -327,7 +327,7 @@ comp.RT<-function(status.matrix,individual,Rt){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC, het.vac=het.vac){
   
   
   n<-network.size(HH.network)
@@ -520,7 +520,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
         
         
-        long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC)
+        long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
         
         
         # compute long interaction terms for pathogen.1 (recovered from pathogen 2 and/or already contracted pathogen 1)
@@ -581,7 +581,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           short.inter<-1
         }
        # if (status.matrix.1$infected[infectee]==-1 & short.inter==1){
-          long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC)
+          long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
       #  }else{
       #    long.inter<-1
       #  }
