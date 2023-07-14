@@ -420,7 +420,7 @@ R0.computation.Inf.new<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.in
 
 R0.comp.Inf.new<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.g,pathogen,ctc.dec,compl){
   mu<-infectious.period.length(pathogen = pathogen)
-  q.g<-runif(1,0,1)
+  q.g<-0.2 # initial point
   q.h<-ratio_hhgl*q.g
   q.g.tempm<-0
   q.g.tempM<-1
