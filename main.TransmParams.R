@@ -48,17 +48,19 @@ library("network")
 source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R
-nSim<-300
-tol<-0.005*R.rif #tolerance is 0.5% of the target value
+nSim<-200
+tol<-0.01*R.rif #tolerance is 0.5% of the target value
 nSeed<-3082021
 set.seed(nSeed)
-#trs.prms<-R0.comp(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h)
-trs.prms<-R0.comp.Inf(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
+#trs.prms<-R0.comp.Inf(ratio_hhgl=ratio_hhgl, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.h = lambda.h,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
+
+trs.prms.1<-R0.comp.Inf.new(ratio_hhgl=ratio.qhqg, HH.network = HH.networks, nSim = nSim, tol=tol,R.rif = R.rif, prob.asym=(1-rho),asymp.rel.inf=alpha,lambda.g = lambda.g,pathogen=pathogen,ctc.dec=ctc.dec,compl=compl)
 
 
 #load data
-inf.path.h<-trs.prms$beta.h/lambda.h
-inf.path.g<-trs.prms$beta.g/lambda.g
+inf.path.h<-trs.prms.1$beta.h
+inf.path.g<-trs.prms.1$q.g
+
 
 save(inf.path.h,inf.path.g, file = name.s)
 
