@@ -403,7 +403,7 @@ R0.computation.Inf.new<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.in
   if (pathogen=="XS"){
     mass.bef.symptm<-0.5
   }
-  if (pathogen=="XB"){
+  if (pathogen=="XP"){
     mass.bef.symptm<-0.125
   }
   if (pathogen=="FLU-A"){
