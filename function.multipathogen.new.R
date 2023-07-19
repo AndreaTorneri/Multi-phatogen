@@ -633,12 +633,19 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         if (k != n & k!= 2*n) {
           temp.ind<- k %% n          
         }else{
-          temp.ind<-n
+          if (k==n){
+            homequarantine.day.1[n]<-Inf
+            stop.quarantine[n]<-status.matrix.1$Recovery[n]
+          }else{
+            homequarantine.day.2[n]<-Inf
+            stop.quarantine[n]<-status.matrix.2$Recovery[n]
+          }
         }
         if (k>n){
           homequarantine.day.2[temp.ind]<-Inf
           stop.quarantine[temp.ind]<-status.matrix.2$Recovery[temp.ind]
-        }else{
+        }
+        if (k<n){
           homequarantine.day.1[temp.ind]<-Inf
           stop.quarantine[temp.ind]<-status.matrix.1$Recovery[temp.ind]
         }
