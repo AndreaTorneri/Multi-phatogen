@@ -647,7 +647,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
         homequarantine[temp.ind]<-1
         contact.time.between$pr.ctc[temp.ind]<-NA
+        contact.time.within$pr.ctc[temp.ind]<-NA
         index.contact.between[temp.ind]<-0
+        index.contact.within[temp.ind]<-1
         transmission.parameters$contact_rate_within[temp.ind]<-transmission.parameters$contact_rate_within[temp.ind]*contact.reduction
       }
     }

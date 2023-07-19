@@ -311,12 +311,12 @@ R0.computation.Inf.new<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.in
     }
     for (w in unique(hh.id)){
     if (min(hh.size[which(hh.id==w)])>1){
-      hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf)
+      hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf, "IM"=q.h)
       #index case
       for (r in hh.data$id){
-        ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))*q.h),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
+        ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
         if (runif(1)<prob.asym){
-          hh.data$betah[r]<-hh.data$betah[r]*asymp.rel.inf
+          hh.data$betah[r]<-hh.data$IM[r]*asymp.rel.inf
         }
       }
       primary<-sample(1:length(hh.data$members),1)
@@ -354,7 +354,7 @@ R0.computation.Inf.new<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.in
           current.time<-events$NextCtc
           infector<-which(contact.time$pr.ctc ==current.time)
           infectee<-hh.data$id[which(hh.data$members==contact.time$pr.infectee[infector])]
-          if (hh.data$status[infectee]==0 & runif(1)<InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen)){
+          if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen)*hh.data$IM[infector])){
             hh.data$status[infectee]<-1
             hh.data$recovery[infectee]<-current.time+mu
             hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
@@ -413,7 +413,11 @@ R0.computation.Inf.new<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.in
     mass.bef.symptm<-0.4207456
   }
   R0[j]<-((beta.g*mass.bef.symptm*compl+beta.g*(1-compl))*(1-prob.asym)+ beta.g*asymp.rel.inf*prob.asym)*(sum(ar*(h.n)*(1:max(unique(hh.size)))))/mu.h
-    print(j)
+
+      print(j)
+    
+    
+    
   }
   return(R0)
 }
