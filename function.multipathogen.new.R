@@ -640,6 +640,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
             homequarantine.day.2[n]<-Inf
             stop.quarantine[n]<-status.matrix.2$Recovery[n]
           }
+          temp.ind<-n
         }
         if (k>n){
           homequarantine.day.2[temp.ind]<-Inf
