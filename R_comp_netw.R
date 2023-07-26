@@ -497,7 +497,7 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
         if(runif(1)<compl){
           hh.data$SO[primary]<-current.time+incubation.period(pathogen = pathogen)
         }
-        hh.data$IM[primary]<-hh.data$IM[primary]*asymp.rel.inf
+        hh.data$IM[primary]<-hh.data$IM[primary]
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
