@@ -388,16 +388,16 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
     }
     for (w in unique(hh.id)){
       if (min(hh.size[which(hh.id==w)])>1){
-        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf, "IM"=q.h)
+        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf)
         #index case
         for (r in hh.data$id){
-          ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
+          ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))*q.h),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
         }
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
-        hh.data$IM[primary]<-hh.data$IM[primary]*asymp.rel.inf
+        hh.data$betah[primary]<-hh.data$betah[primary]*asymp.rel.inf
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -428,11 +428,11 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
             current.time<-events$NextCtc
             infector<-which(contact.time$pr.ctc ==current.time)
             infectee<-hh.data$id[which(hh.data$members==contact.time$pr.infectee[infector])]
-            if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen)*hh.data$IM[infector])){
+            if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
               if (runif(1)<prob.asym){
-                hh.data$IM[infectee]<-hh.data$IM[infectee]*asymp.rel.inf
+                hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
@@ -483,10 +483,10 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
     }
     for (w in unique(hh.id)){
       if (min(hh.size[which(hh.id==w)])>1){
-        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf, "IM"=q.h)
+        hh.data<-data.frame("members"= which(hh.id==w),"id"=1:length(which(hh.id==w)),"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=0, "SO"=Inf, "ToI"=Inf)
         #index case
         for (r in hh.data$id){
-          ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
+          ifelse(length(get.neighborhood(HH.network, hh.data$members[r]))>0,hh.data$betah[r]<-(length(get.neighborhood(HH.network, hh.data$members[r]))*q.h),hh.data$betah[r]<-1/rexp(1,1/exp(100))) 
         }
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
@@ -525,11 +525,11 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
             current.time<-events$NextCtc
             infector<-which(contact.time$pr.ctc ==current.time)
             infectee<-hh.data$id[which(hh.data$members==contact.time$pr.infectee[infector])]
-            if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen)*hh.data$IM[infector])){
+            if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
               if (runif(1)<prob.asym){
-                hh.data$IM[infectee]<-hh.data$IM[infectee]*asymp.rel.inf
+                hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
@@ -594,9 +594,6 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
     
     R0[j]<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
     print(j)
-    
-    
-    
   }
   
   
