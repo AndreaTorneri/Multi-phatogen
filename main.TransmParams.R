@@ -48,7 +48,7 @@ library("network")
 source("R_comp_netw.R")
 ratio_hhgl<-lambda.h/lambda.g*ratio.qhqg
 R.rif<-R
-nSim<-100
+nSim<-150
 tol<-0.01*R.rif #tolerance is 0.5% of the target value
 nSeed<-3082021
 set.seed(nSeed)

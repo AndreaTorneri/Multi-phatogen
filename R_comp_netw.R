@@ -909,7 +909,7 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
             
       beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
       beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
-      beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (0.5*mass.bef.symptm+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
+      beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (mass.bef.symptm/2+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(mass.bef.symptm/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(mass.bef.symptm/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(mass.bef.symptm/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(mass.bef.symptm/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(mass.bef.symptm/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
       
             
       m.aa<-FsH.a*beta.g.a*prob.asym
@@ -918,9 +918,9 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
       m.sa<-FsH.s*beta.g.s*prob.asym
       m.ss<-FsH.s*beta.g.s*(1-prob.asym)*(1-compl)
       m.ssc<-FsH.s*beta.g.s*(1-prob.asym)*compl
-      m.sca<-FsH.sc*beta.g.s*prob.asym
-      m.scs<-FsH.sc*beta.g.s*(1-prob.asym)*(1-compl)
-      m.scsc<-FsH.sc*beta.g.s*(1-prob.asym)*compl
+      m.sca<-FsH.sc*beta.g.sc*prob.asym
+      m.scs<-FsH.sc*beta.g.sc*(1-prob.asym)*(1-compl)
+      m.scsc<-FsH.sc*beta.g.sc*(1-prob.asym)*compl
     
       R0.M<-matrix(c(m.aa,m.sa,m.sca,m.as,m.ss,m.scs,m.asc,m.ssc,m.scsc), nrow = 3, ncol = 3)
       R0[j]<-Re(eigen(R0.M)$values[1])
