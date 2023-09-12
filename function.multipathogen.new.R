@@ -48,7 +48,7 @@ InfMeasure<-function(t,pathogen){
   if (pathogen=="FLU-A"){
     # Setting infectiousness measure according to Carrat et al. (2008) for H1N1
     #VL<-data.frame(x=0:8,y=c(0,1.75,3,2.5,1.8,1.25,0.75,0.5,0)) 
-    #vl.flu<-nlsLM(y~a*dgamma(x=x,shape = s1,scale = sc1),start = list(a=10,s1=1.5,sc1=1.5),data = VL, weights = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,1))
+    #vl.flu<-nlsLM(y~a*dgamma(x=x,shape = s1,scale = sc1),start = list(a=10,s1=1.5,sc1=1.5),data = VL, weights = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,100))
     #prms<-vl.flu$m$getPars()
     #print(prms)
     #plot(seq(0,8,0.1),prms[1]*dgamma(x=seq(0,8,0.1),shape = prms[2],scale = prms[3]),ylim = c(0,3.1))
@@ -58,7 +58,7 @@ InfMeasure<-function(t,pathogen){
     #}
     #k<-integrate(f.vl,lower = 0,upper = 8)
     #prms[1]/ k$value
-    return(1.014939*dgamma(t,shape = 3.2930139,scale = 0.9533298))
+    return(1.001592*dgamma(t,shape = 4.604016,scale = 0.5922317))
     
     
     #return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
@@ -101,7 +101,8 @@ VE.COVID<- function() {
 }
 
 
-# LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC){ #pathogen.v1 is the infection the infectee might catch
+
+# LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC,het.vac){ #pathogen.v1 is the infection the infectee might catch
 #   value<-1
 #   
 #   if (reinf==0){
@@ -112,175 +113,131 @@ VE.COVID<- function() {
 #       value<-lli
 #     }
 #   }else{
-#     if ((pathogen.v1 =="FLU-A")){ # For FLU we assume that re-infection is possible only for a vaccine-induced immunity
-#       if (status.matrix.v1$infected[infectee]==0 & status.matrix.v1$Immunity[infectee]==1){
-#         value<-VE.flu()
-#       }
-#       if (status.matrix.v1$infected[infectee]==1 | status.matrix.v1$infected[infectee]==-1){
-#         value<-0
-#       }
-#     } 
-#     if ((pathogen.v1 =="COVID-19")){
-#       if (status.matrix.v1$infected[infectee]==0 & status.matrix.v1$Immunity[infectee]==1 | status.matrix.v1$infected[infectee]==-1){
-#         value<-VE.COVID()
-#       }
-#       if (status.matrix.v1$infected[infectee]==1){
-#         value<-0
-#       }
-#     } 
-#     if (pathogen.v1 == "DELTA"){
-#       if (status.matrix.v1$infected[infectee]==0){
-#         if (status.matrix.v1$Immunity[infectee]==1){
-#             value<-VE.COVID()
-#       }else{
-#         if (status.matrix.v2$infected[infectee]==-1 ){
-#           value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+#     if (pathogen.v1 =="FLU-A"){ # For FLU we assume that re-infection is possible only for a vaccine-induced immunity
+#       if (status.matrix.v1$Immunity[infectee]==1){
+#         if (status.matrix.v1$infected[infectee]==0){
+#           value<-VE.flu()
+#         }else{
+#           value<-0
 #         }
-#       }  
-#       }
-# 
-#       if (status.matrix.v1$infected[infectee]==-1){
-#         value<-VE.COVID
-#       }
-#     }
-#     if (pathogen.v1 == "OMICRON"){
-#       if (status.matrix.v1$infected[infectee]==0){
-#         if (status.matrix.v1$Immunity[infectee]==1){
-#           if (status.matrix.v2$infected[infectee]==0){
-#             value<-VaccineEffectiveness(t=0,typeIC = typeIC)
-#           }
+#       }else{
+#         if (status.matrix.v1$infected[infectee]==0){
+#           value<-1
 #           if (status.matrix.v2$infected[infectee]==-1){
-#             value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+#             value<-lli
 #           }
 #         }else{
-#           if (status.matrix.v2$infected[infectee]==-1 ){
-#             value<-VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC)
+#           value<-0
+#         }
+#       }
+#     }     
+#     if (pathogen.v1 =="COVID-19"){
+#       if (status.matrix.v1$Immunity[infectee]==1){
+#         value<-0
+#        if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+#           value<-VE.COVID()
+#        }
+#       #  if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+#       #    value<-VE.COVID()
+#       #  }else{
+#       #    value<-0
+#       #  }
+#         
+#       }else{
+#         value<-0
+#         if (status.matrix.v1$infected[infectee]==0){
+#           value<-1
+#           if (status.matrix.v2$infected[infectee]==-1){
+#             value<-lli
 #           }
-#         }  
+#           if (status.matrix.v2$Immunity[infectee]==1 & het.vac==1){ #heterologous effect vaccination
+#             value<-(1-0.297) #Tayar et al. 2023
+#           }
+#         }
+#         if (status.matrix.v1$infected[infectee]==-1){
+#           value<-VE.COVID()
+#         }
 #       }
-#       if (status.matrix.v1$infected[infectee]==-1){
-#         value<-VE.COVID
+#     }     
+#     
+#     if (pathogen.v1 =="DELTA"){
+#       if (status.matrix.v1$Immunity[infectee]==1){
+#         if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
+#           value<-VE.COVID()
+#         }else{
+#           value<-0
+#         }
+#       }else{
+#         value<-0
+#         if (status.matrix.v1$infected[infectee]==0){
+#           if (status.matrix.v2$infected[infectee]==-1){
+#             value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
+#           }else{
+#             value<-1
+#           }
+#         }
+#         if (status.matrix.v1$infected[infectee]==-1){
+#           value<-VE.COVID()
+#         }
 #       }
-#     }
+#     }     
+#     
+#     if (pathogen.v1 =="OMICRON"){
+#       
+#       if (status.matrix.v1$Immunity[infectee]==1){
+#         value<-0
+#         if (status.matrix.v1$infected[infectee]==0){
+#           if (status.matrix.v2$infected[infectee]==-1){
+#             value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
+#           }else{
+#             value<-1-(VaccineEffectiveness(t=0,typeIC = typeIC))/100
+#           }
+#         }
+#         if (status.matrix.v1$infected[infectee]==-1){
+#             value<-VE.COVID()
+#         }
+#       }else{
+#         value<-0
+#         if (status.matrix.v1$infected[infectee]==0){
+#           if (status.matrix.v2$infected[infectee]==-1){
+#             value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
+#           }else{
+#             value<-1
+#           }
+#         }
+#         if (status.matrix.v1$infected[infectee]==-1){
+#           value<-VE.COVID()
+#         }
+#       }
+#     }     
+#     
 #   }
 #   return(value)
 # }
 
 
-LLImmlev<-function(pathogen.v1,pathogen.v2,status.matrix.v1,status.matrix.v2,infectee,lli,current.time,reinf,typeIC,het.vac){ #pathogen.v1 is the infection the infectee might catch
+
+
+
+LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm.lim){ #pathogen.v1 is the infection the infectee might catch
   value<-1
-  
-  if (reinf==0){
-    if (status.matrix.v1$infected[infectee]!=0){
-      value<-0
-    }
-    if (status.matrix.v1$infected[infectee]==0 & status.matrix.v2$infected[infectee]==-1){
-      value<-lli
-    }
-  }else{
-    if (pathogen.v1 =="FLU-A"){ # For FLU we assume that re-infection is possible only for a vaccine-induced immunity
-      if (status.matrix.v1$Immunity[infectee]==1){
-        if (status.matrix.v1$infected[infectee]==0){
-          value<-VE.flu()
-        }else{
-          value<-0
-        }
-      }else{
-        if (status.matrix.v1$infected[infectee]==0){
-          value<-1
-          if (status.matrix.v2$infected[infectee]==-1){
-            value<-lli
-          }
-        }else{
-          value<-0
-        }
+  if (status.matrix.v2$infected[infectee]==-1){
+    t.sinc.inf<-current.time-status.matrix.v2$time.of.infection[infectee]
+    if (t.sinc.inf<t.imm.lim){
+      if (typeIC==1){
+        value<-lli
       }
-    }     
-    if (pathogen.v1 =="COVID-19"){
-      if (status.matrix.v1$Immunity[infectee]==1){
-        value<-0
-       if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
-          value<-VE.COVID()
-       }
-      #  if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
-      #    value<-VE.COVID()
-      #  }else{
-      #    value<-0
-      #  }
-        
-      }else{
-        value<-0
-        if (status.matrix.v1$infected[infectee]==0){
-          value<-1
-          if (status.matrix.v2$infected[infectee]==-1){
-            value<-lli
-          }
-          if (status.matrix.v2$Immunity[infectee]==1 & het.vac==1){ #heterologous effect vaccination
-            value<-(1-0.297) #Tayar et al. 2023
-          }
-        }
-        if (status.matrix.v1$infected[infectee]==-1){
-          value<-VE.COVID()
-        }
+      if (typeIC==2){
+        value<-1-(t.sinc.inf/t.imm.lim)
       }
-    }     
-    
-    if (pathogen.v1 =="DELTA"){
-      if (status.matrix.v1$Immunity[infectee]==1){
-        if (status.matrix.v1$infected[infectee]==0 | status.matrix.v1$infected[infectee]==-1){
-          value<-VE.COVID()
-        }else{
-          value<-0
-        }
-      }else{
-        value<-0
-        if (status.matrix.v1$infected[infectee]==0){
-          if (status.matrix.v2$infected[infectee]==-1){
-            value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
-          }else{
-            value<-1
-          }
-        }
-        if (status.matrix.v1$infected[infectee]==-1){
-          value<-VE.COVID()
-        }
+      if (typeIC==3){
+        value<-0.75-(t.sinc.inf/(2*t.imm.lim))
       }
-    }     
-    
-    if (pathogen.v1 =="OMICRON"){
-      
-      if (status.matrix.v1$Immunity[infectee]==1){
-        value<-0
-        if (status.matrix.v1$infected[infectee]==0){
-          if (status.matrix.v2$infected[infectee]==-1){
-            value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
-          }else{
-            value<-1-(VaccineEffectiveness(t=0,typeIC = typeIC))/100
-          }
-        }
-        if (status.matrix.v1$infected[infectee]==-1){
-            value<-VE.COVID()
-        }
-      }else{
-        value<-0
-        if (status.matrix.v1$infected[infectee]==0){
-          if (status.matrix.v2$infected[infectee]==-1){
-            value<-1-(VaccineEffectiveness(t=status.matrix.v2$time.of.infection[infectee],typeIC = typeIC))/100
-          }else{
-            value<-1
-          }
-        }
-        if (status.matrix.v1$infected[infectee]==-1){
-          value<-VE.COVID()
-        }
-      }
-    }     
-    
+    }  
+    value<-lli
   }
   return(value)
 }
-
-
 
 
 #Computing summary measures
@@ -327,7 +284,7 @@ comp.RT<-function(status.matrix,individual,Rt){
 #               When one individual is infected, the infection time is reported (second column) as well as the infector (third column) 
 #
 
-sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC, het.vac=het.vac){
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC, het.vac, t.imm.lim){
   
   
   n<-network.size(HH.network)
@@ -520,8 +477,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
         
         
-        long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
-        
+        #long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
+        long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.2,infectee = infectee, lli = lli.2, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim )
         
         # compute long interaction terms for pathogen.1 (recovered from pathogen 2 and/or already contracted pathogen 1)
        # if (status.matrix.2$infected[infectee]==-1 & short.inter==1){
@@ -581,7 +538,9 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
           short.inter<-1
         }
        # if (status.matrix.1$infected[infectee]==-1 & short.inter==1){
-          long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
+          #long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
+          long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.1,infectee = infectee, lli = lli.1, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim )
+          
       #  }else{
       #    long.inter<-1
       #  }

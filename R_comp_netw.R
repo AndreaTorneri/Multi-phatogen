@@ -882,10 +882,6 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
         ar.sc[s]<-ifelse(length(AR[[s]])>1,mean(AR[[s]][-1]),0) 
       }
       
-      
-      
-      
-            
       FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
       FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
       FsH.sc<-((sum(ar.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
@@ -900,18 +896,15 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
         mass.bef.symptm<-0.125
       }
       if (pathogen=="FLU-A"){
-        mass.bef.symptm<-0.2885224
+        mass.bef.symptm<-0.3187491
       }
       if (pathogen=="COVID-19"){
         mass.bef.symptm<-0.4207456
       }
-      
-            
       beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
       beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
       beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (mass.bef.symptm/2+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(mass.bef.symptm/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(mass.bef.symptm/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(mass.bef.symptm/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(mass.bef.symptm/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(mass.bef.symptm/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
-      
-            
+
       m.aa<-FsH.a*beta.g.a*prob.asym
       m.as<-FsH.a*beta.g.a*(1-prob.asym)*(1-compl)
       m.asc<-FsH.a*beta.g.a*(1-prob.asym)*compl
@@ -927,13 +920,6 @@ R0.computation.Inf.bc<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf
       print(j)
     }
   }
-  
-  
-  
-  
-  
-  
-  
   return(R0)
 }
 
@@ -1057,8 +1043,7 @@ InfMeasure<-function(t,pathogen){
     #}
     #k<-integrate(f.vl,lower = 0,upper = 8)
     #prms[1]/ k$value
-    return(1.014939*dgamma(t,shape = 3.2930139,scale = 0.9533298))
-    
+    return(1.001592*dgamma(t,shape = 4.604016,scale = 0.5922317))    
     
     #return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
   }
