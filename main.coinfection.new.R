@@ -68,7 +68,8 @@ het.vac= as.numeric(args[33]) # short-term interaction parameter: acquiring 1 wh
 cat(",het.vac=",het.vac)
 t.imm.lim= as.numeric(args[34]) #
 cat(",t.imm.lim=",t.imm.lim)
-
+dec.gc=as.numeric(args[35]) #
+cat(",dec.gc=",dec.gc)
 
 
 
@@ -110,7 +111,7 @@ if (netw=="Synth"){
 }
 
 #Mean number of daily contact at a global level (Using SOCRATES 15/02/2022 )
-lambda.g<-8.29
+lambda.g<-8.29*dec.gc
 
 
 #Compute the reproduction number related to the selected network. 

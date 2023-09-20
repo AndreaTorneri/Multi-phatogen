@@ -228,13 +228,12 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
         value<-lli
       }
       if (typeIC==2){
-        value<-1-(t.sinc.inf/t.imm.lim)
+        value<-(t.sinc.inf/t.imm.lim)
       }
       if (typeIC==3){
-        value<-0.75-(t.sinc.inf/(2*t.imm.lim))
+        value<-(t.sinc.inf/(2*t.imm.lim))
       }
     }  
-    value<-lli
   }
   return(value)
 }
@@ -344,14 +343,15 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   contact.time.between<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (first colum) and the contact individual (second column)
   
   # first infected: randomly chosen in the population (among the susceptibles)
-  first.cases<-sample(which(status.matrix.1[,1]==0),nSeeds.1)
+  potential.seeds<-which(hh.size==2)
+  first.cases<-sample(potential.seeds[which(status.matrix.1[potential.seeds,1]==0)],nSeeds.1)
   
   for (j in first.cases){
     first<-j
     status.matrix.1$infected[first] <- 1 
     status.matrix.1$time.of.infection[first] <- 0
     status.matrix.1$Recovery[first]<-current.time+infectious.period.length(pathogen = pathogen.1)
-    if (runif(1)<rho.1){ #if symptomatic
+   # if (runif(1)<rho.1){ #if symptomatic #index cases are always symptomatic individuals
       transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
       transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
       status.matrix.1$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.1)
@@ -360,12 +360,13 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       }
       status.matrix.1$severity[first]<-1
       time.events<-rbind(time.events,c(current.time,1.1,first))
-    }else{
-      transmission.parameters$q1h[first]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
-      transmission.parameters$q1g[first]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
-      status.matrix.1$severity[first]<-2
-      time.events<-rbind(time.events,c(current.time,1.2,first))
-    }
+    #}
+    #else{
+    #  transmission.parameters$q1h[first]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
+    #  transmission.parameters$q1g[first]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
+    #  status.matrix.1$severity[first]<-2
+    #  time.events<-rbind(time.events,c(current.time,1.2,first))
+    #}
     infectives[first]<-1
     contact.time.within$pr.ctc[first]<-ifelse(transmission.parameters$contact_rate_within[first]!=0,rexp(1,transmission.parameters$contact_rate_within[first])+current.time,Inf)       # I generate the next interarrival time for individual i
     contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
