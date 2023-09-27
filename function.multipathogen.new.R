@@ -286,6 +286,8 @@ comp.RT<-function(status.matrix,individual,Rt){
 sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1,nSeeds.2, rho.1,rho.2,inf.path.1.h,inf.path.1.g,inf.path.2.h,inf.path.2.g, alpha.as.1,alpha.as.2,lli.1,lli.2, pathogen.1,pathogen.2, contact.reduction,t.stop,t.seed, bc.1,bc.2,reinf,typeIC, het.vac, t.imm.lim){
   
   
+  
+  
   n<-network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"
   hh.size<- HH.network %v% "hh_size"
@@ -389,7 +391,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
     }
     
     for (i in which(index.contact.between==1) ){ # for all the individuals that has to propose a global contact
-      contact.time.between$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate_between[i])+current.time# I generate the next interarrival time for individual i
+     contact.time.between$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate_between[i])+current.time# I generate the next interarrival time for individual i
       index.contact.between[i]<-0
     }
     
@@ -469,7 +471,8 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
       
       
       #Infection with pathogen 1
-      if (status.matrix.1$infected[infector]==1 & (status.matrix.1$infected[infectee]==0 | (status.matrix.1$infected[infectee]==-1 & reinf==1))){
+#      if (status.matrix.1$infected[infector]==1 & (status.matrix.1$infected[infectee]==0 | (status.matrix.1$infected[infectee]==-1 & reinf==1))){
+      if (status.matrix.1$infected[infector]==1 & status.matrix.1$infected[infectee]==0){
         # compute short interaction terms for pathogen.1 (having pathogen 2)
         if (status.matrix.2$infected[infectee]==1){
           short.inter<-sigma12
@@ -491,13 +494,11 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         
         
         #re-infection term
-        
-        
-        
+
         #re.inf<-Immlev.1(t=current.time,status.matrix = status.matrix.1,infectee = infectee,pathogen = pathogen.1)
         ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
         acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q
-        if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1$infected[infector]!=1 | status.matrix.1$infected[infectee]==1){acc.rate.1<-0}
+        if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1$infected[infectee]==1){acc.rate.1<-0}
         if (acc.rate.1>1){err<-err+1}
         if (runif(1)<acc.rate.1){
           status.matrix.1$infected[infectee] <- 1 
@@ -529,10 +530,10 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
         
       }
-      
-      
-      #Infection with pathogen 2
-      if (status.matrix.2$infected[infector]==1 & (status.matrix.2$infected[infectee]==0 | (status.matrix.2$infected[infectee]==-1 & reinf==1))){
+
+     #Infection with pathogen 2
+      #if (status.matrix.2$infected[infector]==1 & (status.matrix.2$infected[infectee]==0 | (status.matrix.2$infected[infectee]==-1 & reinf==1))){
+      if (status.matrix.2$infected[infector]==1 & status.matrix.2$infected[infectee]==0){
         if (status.matrix.1$infected[infectee]==1){
           short.inter<-sigma21
         }else{
@@ -551,7 +552,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         
         ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
         acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q
-        if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.2$infected[infector]!=1 | status.matrix.2$infected[infectee]==1){acc.rate.2<-0}
+        if ((ctc=="g" & homequarantine[infectee]==1)){acc.rate.2<-0}
         if (acc.rate.2>1){err<-err+1}
         if (runif(1)<acc.rate.2){
           status.matrix.2$infected[infectee] <- 1 
