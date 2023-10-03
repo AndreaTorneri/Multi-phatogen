@@ -269,8 +269,8 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
   if (compl==0){
     AR<-list()
     AR.as<-list()
-    tbg.as<-list()
-    tbg.s<-list()
+    TBG.as<-list()
+    TBG.s<-list()
     for (s in 1:max(unique(hh.size))) {
       AR[[s]]<-0
       AR.as[[s]]<-0
@@ -773,7 +773,7 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
  
     beta.g.a<-sum(bg.a*h.n)
     beta.g.s<-sum(bg.s*h.n)
-    beta.g.sc<-sum(bg.sc*hn)
+    beta.g.sc<-sum(bg.sc*h.n)
        
     m.aa<-FsH.a*beta.g.a*prob.asym
     m.as<-FsH.a*beta.g.a*(1-prob.asym)*(1-compl)
