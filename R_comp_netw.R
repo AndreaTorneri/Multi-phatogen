@@ -246,24 +246,48 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
   
   hh.size.considered<-2:max(hh.size)
   
+  
+  if (pathogen=="XA"){
+    mass.bef.symptm<-0.875
+  }
+  if (pathogen=="XS"){
+    mass.bef.symptm<-0.5
+  }
+  if (pathogen=="XP"){
+    mass.bef.symptm<-0.125
+  }
+  if (pathogen=="FLU-A"){
+    mass.bef.symptm<-0.3187491
+  }
+  if (pathogen=="COVID-19"){
+    mass.bef.symptm<-0.4207456
+  }
+  
+  
+  
   #divide network in sizes
   if (compl==0){
     AR<-list()
     AR.as<-list()
+    tbg.as<-list()
+    tbg.s<-list()
     for (s in 1:max(unique(hh.size))) {
       AR[[s]]<-0
       AR.as[[s]]<-0
+      TBG.as[[s]]<-0
+      TBG.s[[s]]<-0
     }
     for (j in 1:nSim){        
       for (k in hh.size.considered){
         size<-k
-        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf)
+        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf, "Type"=0)
         #index case
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
         hh.data$betah[primary]<-hh.data$betah[primary]
+        hh.data$Type[primary]<-1
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -296,11 +320,14 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
             if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
+              hh.data$Type[infectee]<-1
               if (runif(1)<prob.asym){
                 hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
+                hh.data$Type[infectee]<-2
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
+                  hh.data$Type[infectee]<-3
                 }
               }
               hh.data$ToI[infectee]<-current.time
@@ -332,17 +359,18 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
           
         }
         AR[[size]]<-c(AR[[size]],length(which(hh.data$status==-1)))
-        
-      }  
+        TBG.s[[size]]<-c(TBG.s[[size]],(beta.g*length(which(hh.data$Type==1)) + beta.g*asymp.rel.inf*length(which(hh.data$Type==2)))/length(which(hh.data$status==-1)))
+    }  
       for (k in hh.size.considered){
         size<-k
-        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf)
+        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf, "Type"=0)
         #index case
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
         hh.data$betah[primary]<-hh.data$betah[primary]*asymp.rel.inf
+        hh.data$Type[primary]<-2
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -375,11 +403,14 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
             if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
+              hh.data$Type[infectee]<-1
               if (runif(1)<prob.asym){
                 hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
+                hh.data$Type[infectee]<-2
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
+                  hh.data$Type[infectee]<-3
                 }
               }
               hh.data$ToI[infectee]<-current.time
@@ -411,7 +442,7 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
           
         }
         AR.as[[size]]<-c(AR.as[[size]],length(which(hh.data$status==-1)))
-        
+        TBG.as[[size]]<-c(TBG.as[[size]],(beta.g*length(which(hh.data$Type==1)) + beta.g*asymp.rel.inf*length(which(hh.data$Type==2)) )/length(which(hh.data$status==-1)))
       }  
       
       # sar - NA when no symptomatic infection are register
@@ -420,17 +451,23 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     # Compute average AR
     ar.s<-ar.a<-0
     ar.s[1]<-ar.a[1]<-1
+    bg.s<-bg.a<-0
+    bg.s[1]<-beta.g
+    bg.a[1]<-beta.g*asymp.rel.inf
     for (s in 2:max(unique(hh.size))){
       ar.a[s]<-ifelse(length(AR.as[[s]])>1,mean(AR.as[[s]][-1]),0)
       ar.s[s]<-ifelse(length(AR[[s]])>1,mean(AR[[s]][-1]),0)
+      bg.s[s]<-ifelse(length(TBG.s[[s]])>1,mean(TBG.s[[s]][-1]),0)
+      bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
     }
     
     FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
-    beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
+    beta.g.a<- sum(bg.a*h.n)
+    beta.g.s<- sum(bg.s*h.n)
     
+        
     m.aa<-FsH.a*beta.g.a*prob.asym
     m.as<-FsH.a*beta.g.a*(1-prob.asym)
     m.sa<-FsH.s*beta.g.s*prob.asym
@@ -442,22 +479,29 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     AR<-list()
     AR.as<-list()
     AR.sc<-list()
+    TBG.as<-list()
+    TBG.s<-list()
+    TBG.sc<-list()
     for (s in 1:max(unique(hh.size))) {
       AR[[s]]<-0
       AR.as[[s]]<-0
       AR.sc[[s]]<-0
+      TBG.as[[s]]<-0
+      TBG.s[[s]]<-0
+      TBG.sc[[s]]<-0
     }
     
     for (j in 1:nSim){        
       for (k in hh.size.considered){
         size<-k
-        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf)
+        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf, "Type"=0)
         #index case
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
         hh.data$betah[primary]<-hh.data$betah[primary]
+        hh.data$Type[primary]<-1
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -490,11 +534,14 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
             if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
+              hh.data$Type[infectee]<-1
               if (runif(1)<prob.asym){
                 hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
+                hh.data$Type[infectee]<-2
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
+                  hh.data$Type[infectee]<-3
                 }
               }
               hh.data$ToI[infectee]<-current.time
@@ -526,17 +573,18 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
           
         }
         AR[[size]]<-c(AR[[size]],length(which(hh.data$status==-1)))
-        
+        TBG.s[[size]]<-c(TBG.s[[size]],(beta.g*length(which(hh.data$Type==1)) + beta.g*asymp.rel.inf*length(which(hh.data$Type==2)) + beta.g*mass.bef.symptm*length(which(hh.data$Type==3)) )/length(which(hh.data$status==-1)) )
       }  
       for (k in hh.size.considered){
         size<-k
-        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf)
+        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf, "Type"=0)
         #index case
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
         hh.data$betah[primary]<-hh.data$betah[primary]*asymp.rel.inf
+        hh.data$Type[primary]<-2
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -569,10 +617,13 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
             if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
+              hh.data$Type[infectee]<-1
               if (runif(1)<prob.asym){
                 hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
+                hh.data$Type[infectee]<-2
               }else{
                 if(runif(1)<compl){
+                  hh.data$Type[infectee]<-3
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
                 }
               }
@@ -605,18 +656,19 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
           
         }
         AR.as[[size]]<-c(AR.as[[size]],length(which(hh.data$status==-1)))
+        TBG.as[[size]]<-c(TBG.as[[size]],(beta.g*length(which(hh.data$Type==1)) + beta.g*asymp.rel.inf*length(which(hh.data$Type==2)) + beta.g*mass.bef.symptm*length(which(hh.data$Type==3)) )/length(which(hh.data$status==-1)))
         
       }  
       for (k in hh.size.considered){
         size<-k
-        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf)
+        hh.data<-data.frame("members"= 1:size,"id"=1:size,"status"=0,"recovery"=Inf, "index.contact"=0, "betah"=(size-1)*q.h, "SO"=Inf, "ToI"=Inf, "Type"=0)
         #index case
         primary<-sample(1:length(hh.data$members),1)
         hh.data$status[primary]<-1 
         hh.data$recovery[primary]<-mu
         hh.data$index.contact[primary]<-1
         hh.data$SO[primary]<-current.time+incubation.period(pathogen = pathogen)
-        hh.data$betah[primary]<-hh.data$betah[primary]
+        hh.data$Type[primary]<-3
         hh.data$ToI[primary]<-0
         contact.time<-data.frame("id"=hh.data$members,"pr.ctc"=rep(NA,length(hh.data$members)),"pr.infectee"=rep(NA,length(hh.data$members)))   #matrix containing the proposed time of the next possible infectious contact (first colum) 
         current.time<-0
@@ -649,11 +701,14 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
             if (hh.data$status[infectee]==0 & runif(1)<(InfMeasure(t=current.time-hh.data$ToI[infector], pathogen = pathogen))){
               hh.data$status[infectee]<-1
               hh.data$recovery[infectee]<-current.time+mu
+              hh.data$Type[infectee]<-1
               if (runif(1)<prob.asym){
                 hh.data$betah[infectee]<-hh.data$betah[infectee]*asymp.rel.inf
+                hh.data$Type[infectee]<-2
               }else{
                 if(runif(1)<compl){
                   hh.data$SO[infectee]<-current.time+incubation.period(pathogen = pathogen)
+                  hh.data$Type[infectee]<-3
                 }
               }
               hh.data$ToI[infectee]<-current.time
@@ -685,6 +740,8 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
           
         }
         AR.sc[[size]]<-c(AR.sc[[size]],length(which(hh.data$status==-1)))
+        TBG.sc[[size]]<-c(TBG.sc[[size]],(beta.g*length(which(hh.data$Type==1)) + beta.g*asymp.rel.inf*length(which(hh.data$Type==2)) + beta.g*mass.bef.symptm*length(which(hh.data$Type==3)) )/length(which(hh.data$status==-1)))
+        
         
       }  
       # sar - NA when no symptomatic infection are register
@@ -693,35 +750,31 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     # Compute average AR
     ar.s<-ar.a<-ar.sc<-0
     ar.s[1]<-ar.a[1]<-ar.sc[1]<-1
+    bg.s<-bg.sc<-bg.a<-0
+    bg.s[1]<-beta.g
+    bg.a[1]<-beta.g*asymp.rel.inf
+    bg.sc[1]<-beta.g*mass.bef.symptm
     for (s in 2:max(unique(hh.size))){
       ar.a[s]<-ifelse(length(AR.as[[s]])>1,mean(AR.as[[s]][-1]),0)
       ar.s[s]<-ifelse(length(AR[[s]])>1,mean(AR[[s]][-1]),0)
       ar.sc[s]<-ifelse(length(AR.sc[[s]])>1,mean(AR.sc[[s]][-1]),0)
+      bg.s[s]<-ifelse(length(TBG.s[[s]])>1,mean(TBG.s[[s]][-1]),0)
+      bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
+      bg.sc[s]<-ifelse(length(TBG.sc[[s]])>1,mean(TBG.sc[[s]][-1]),0)
     }
     FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     FsH.sc<-((sum(ar.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     
-    if (pathogen=="XA"){
-      mass.bef.symptm<-0.875
-    }
-    if (pathogen=="XS"){
-      mass.bef.symptm<-0.5
-    }
-    if (pathogen=="XP"){
-      mass.bef.symptm<-0.125
-    }
-    if (pathogen=="FLU-A"){
-      mass.bef.symptm<-0.3187491
-    }
-    if (pathogen=="COVID-19"){
-      mass.bef.symptm<-0.4207456
-    }
-    
-    beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
-    beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
-    beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (mass.bef.symptm/2+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(mass.bef.symptm/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(mass.bef.symptm/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(mass.bef.symptm/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(mass.bef.symptm/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(mass.bef.symptm/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
-    
+
+#    beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
+#    beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
+#    beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (mass.bef.symptm/2+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(mass.bef.symptm/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(mass.bef.symptm/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(mass.bef.symptm/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(mass.bef.symptm/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(mass.bef.symptm/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
+ 
+    beta.g.a<-sum(bg.a*h.n)
+    beta.g.s<-sum(bg.s*h.n)
+    beta.g.sc<-sum(bg.sc*hn)
+       
     m.aa<-FsH.a*beta.g.a*prob.asym
     m.as<-FsH.a*beta.g.a*(1-prob.asym)*(1-compl)
     m.asc<-FsH.a*beta.g.a*(1-prob.asym)*compl
