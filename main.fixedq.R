@@ -70,6 +70,11 @@ library(RGeode)
 inf.path.1.g<-inf.path.1.h/ratio.qhqg
 inf.path.2.g<-inf.path.2.h/ratio.qhqg
 
+#load Network
+name.n<-paste("HH_Networks","_nVertex",2500,"_nNetw",100,".RData",sep = "")
+load(name.n)
+
+
   
 #Mean number of daily contact at a global level (Using SOCRATES 15/02/2022 )
 lambda.g<-8.29*dec.gc
