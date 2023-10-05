@@ -67,8 +67,8 @@ library(RGeode)
 
 
 #Transmmission parameters
-inf.path.1.g<-inf.path.h.1*ratio.qhqg
-inf.path.2.g<-inf.path.h.2*ratio.qhqg
+inf.path.1.g<-inf.path.1.h/ratio.qhqg
+inf.path.2.g<-inf.path.2.h/ratio.qhqg
 
   
 #Mean number of daily contact at a global level (Using SOCRATES 15/02/2022 )
