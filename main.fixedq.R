@@ -95,9 +95,9 @@ for (i in 1:nSim){
   epi.outbreak[[i]]<-sim.multipathogen(HH.network = temp.HH.netw, t2=t2, lambda.g = lambda.g, sigma12 = sigma12, sigma21 = sigma21, prop.immune = prop.immune, nSeeds.1 = nSeeds.1, nSeeds.2 = nSeeds.2, rho.1 = rho.1, rho.2 = rho.2, inf.path.1.h = inf.path.1.h,inf.path.1.g = inf.path.1.g, inf.path.2.h = inf.path.2.h,inf.path.2.g = inf.path.2.g, alpha.as.1=alpha.as.1,alpha.as.2=alpha.as.2, lli.1=lli.1,lli.2=lli.2, pathogen.1=pathogen.1, pathogen.2=pathogen.2, contact.reduction=contact.reduction, t.stop=t.stop, t.seed=t.seed, bc.1=bc.1, bc.2=bc.2, reinf=reinf, typeIC=typeIC, het.vac=het.vac, t.imm.lim=t.imm.lim)
 }
 
-scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen.1,"_&_",pathogen.2,sep ="")
+scen<-paste(pathogen.1,"_&_",pathogen.2,sep ="")
 
-name<-paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_qhqg",ratio.qhqg, "_t2",t2,"_sigma12_",sigma12,"_sigma21_",sigma21,"_alpha1",alpha.as.1,"_alpha2",alpha.as.2,"_rho1",rho.1,"_rho2",rho.2,"_lli1",lli.1,"_lli2",lli.2,"_Net",netw,"_CtcRed",contact.reduction,"_PImm",prop.immune,"_tSeed",t.seed, "_bc1",bc.1,"_bc2",bc.2,".RData", sep = "")
+name<-paste("MP_",scen,"_qh1",inf.path.1.h,"_qh2",inf.path.1.g,"_qhqg",ratio.qhqg, "_t2",t2,"_sigma12_",sigma12,"_sigma21_",sigma21,"_alpha1",alpha.as.1,"_alpha2",alpha.as.2,"_rho1",rho.1,"_rho2",rho.2,"_lli1",lli.1,"_lli2",lli.2,"_CtcRed",contact.reduction,"_PImm",prop.immune,"_tSeed",t.seed, "_bc1",bc.1,"_bc2",bc.2,".RData", sep = "")
 setwd(out)
 save(epi.outbreak, file = name)
 
