@@ -461,14 +461,17 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
     }
     
-    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
+    #FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    #beta.g.a<- sum(bg.a*h.n)
-    #beta.g.s<- sum(bg.s*h.n)
+    FsH.a<- sum(ar.a*h.n)
+    FsH.s<- sum(ar.s*h.n)
     
-    beta.g.a<- ((sum(bg.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    beta.g.s<- ((sum(bg.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    beta.g.a<- sum(bg.a*h.n)
+    beta.g.s<- sum(bg.s*h.n)
+    
+    #beta.g.a<- ((sum(bg.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #beta.g.s<- ((sum(bg.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     
     
         
@@ -766,22 +769,28 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
       bg.sc[s]<-ifelse(length(TBG.sc[[s]])>1,mean(TBG.sc[[s]][-1]),0)
     }
-    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    FsH.sc<-((sum(ar.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     
-
+    #FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #FsH.sc<-((sum(ar.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    
+    FsH.a<-sum(ar.a*h.n)
+    FsH.s<-sum(ar.s*h.n)
+    FsH.sc<-sum(ar.sc*h.n)
+    
+    
+    
 #    beta.g.a<- beta.g*(asymp.rel.inf*h.n[1]+ (asymp.rel.inf/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(asymp.rel.inf/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(asymp.rel.inf/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(asymp.rel.inf/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(asymp.rel.inf/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(asymp.rel.inf/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
 #    beta.g.s<- beta.g*(h.n[1]+ (1/2+(asymp.rel.inf*prob.asym+(1-prob.asym))/2)*h.n[2]+(1/3+(asymp.rel.inf*prob.asym+(1-prob.asym))/3)*h.n[3]+(1/4+(asymp.rel.inf*prob.asym+(1-prob.asym))/4)*h.n[4]+(1/5+(asymp.rel.inf*prob.asym+(1-prob.asym))/5)*h.n[5]+(1/6+(asymp.rel.inf*prob.asym+(1-prob.asym))/6)*h.n[6]+(1/7+(asymp.rel.inf*prob.asym+(1-prob.asym))/7)*h.n[7])
 #    beta.g.sc<- beta.g*(h.n[1]*mass.bef.symptm+ (mass.bef.symptm/2+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/2)*h.n[2]+(mass.bef.symptm/3+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/3)*h.n[3]+(mass.bef.symptm/4+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/4)*h.n[4]+(mass.bef.symptm/5+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/5)*h.n[5]+(mass.bef.symptm/6+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/6)*h.n[6]+(mass.bef.symptm/7+(asymp.rel.inf*prob.asym+(1-prob.asym)*(compl*mass.bef.symptm+(1-compl)))/7)*h.n[7])
  
-    # beta.g.a<-sum(bg.a*h.n)
-    # beta.g.s<-sum(bg.s*h.n)
-    # beta.g.sc<-sum(bg.sc*h.n)
+     beta.g.a<-sum(bg.a*h.n)
+     beta.g.s<-sum(bg.s*h.n)
+     beta.g.sc<-sum(bg.sc*h.n)
        
-    beta.g.a<-((sum(bg.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    beta.g.s<-((sum(bg.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    beta.g.sc<-((sum(bg.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #beta.g.a<-((sum(bg.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #beta.g.s<-((sum(bg.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    #beta.g.sc<-((sum(bg.sc*(h.n)*(1:max(unique(hh.size)))))/mu.h)
     
     
     
