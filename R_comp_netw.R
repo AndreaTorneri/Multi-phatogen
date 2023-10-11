@@ -461,17 +461,17 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
     }
     
-    #FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    #FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
+    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    FsH.a<- sum(ar.a*h.n)
-    FsH.s<- sum(ar.s*h.n)
+    #FsH.a<- sum(ar.a*h.n)
+    #FsH.s<- sum(ar.s*h.n)
     
-    beta.g.a<- sum(bg.a*h.n)
-    beta.g.s<- sum(bg.s*h.n)
+    #beta.g.a<- sum(bg.a*h.n)
+    #beta.g.s<- sum(bg.s*h.n)
     
-    #beta.g.a<- ((sum(bg.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    #beta.g.s<- ((sum(bg.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    beta.g.a<- sum(bg.a*(h.n))/mu.h
+    beta.g.s<- sum(bg.s*(h.n))/mu.h
     
     
         
