@@ -467,20 +467,23 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     #FsH.a<- sum(ar.a*h.n)
     #FsH.s<- sum(ar.s*h.n)
     
-    #beta.g.a<- sum(bg.a*h.n)
-    #beta.g.s<- sum(bg.s*h.n)
+    beta.g.a<- sum(bg.a*h.n)
+    beta.g.s<- sum(bg.s*h.n)
     
-    beta.g.a<- sum(bg.a*(h.n)*(1:max(unique(hh.size))))/mu.h
-    beta.g.s<- sum(bg.s*(h.n)*(1:max(unique(hh.size))))/mu.h
+    #beta.g.a<- sum(bg.a*(h.n)*(1:max(unique(hh.size))))/mu.h
+    #beta.g.s<- sum(bg.s*(h.n)*(1:max(unique(hh.size))))/mu.h
     
     
         
-    m.aa<-FsH.a*beta.g.a*prob.asym
-    m.as<-FsH.a*beta.g.a*(1-prob.asym)
-    m.sa<-FsH.s*beta.g.s*prob.asym
-    m.ss<-FsH.s*beta.g.s*(1-prob.asym)
+    #m.aa<-FsH.a*beta.g.a*prob.asym
+    #m.as<-FsH.a*beta.g.a*(1-prob.asym)
+    #m.sa<-FsH.s*beta.g.s*prob.asym
+    #m.ss<-FsH.s*beta.g.s*(1-prob.asym)
     
-    R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
+     RO<-FSH.a*beta.g.a*prob.asym+FSH.s*beta.g.s*prob.asym
+    
+    
+    #R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
   }else{
     
     AR<-list()
