@@ -470,8 +470,8 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     #beta.g.a<- sum(bg.a*h.n)
     #beta.g.s<- sum(bg.s*h.n)
     
-    beta.g.a<- sum(bg.a*(h.n))/mu.h
-    beta.g.s<- sum(bg.s*(h.n))/mu.h
+    beta.g.a<- sum(bg.a*(h.n)*(1:max(unique(hh.size))))/mu.h
+    beta.g.s<- sum(bg.s*(h.n)*(1:max(unique(hh.size))))/mu.h
     
     
         
