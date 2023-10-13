@@ -271,7 +271,7 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
     AR.as<-list()
     TBG.as<-list()
     TBG.s<-list()
-    for (s in 1:max(unique(hh.size))) {
+    for (s in 1:max(unique(hh.size))){
       AR[[s]]<-0
       AR.as[[s]]<-0
       TBG.as[[s]]<-0
@@ -448,6 +448,7 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       # sar - NA when no symptomatic infection are register
       
     }
+    
     # Compute average AR
     ar.s<-ar.a<-0
     ar.s[1]<-ar.a[1]<-1
@@ -461,29 +462,38 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       bg.a[s]<-ifelse(length(TBG.as[[s]])>1,mean(TBG.as[[s]][-1]),0)
     }
     
-    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
+#    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+#    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    #FsH.a<- sum(ar.a*h.n)
-    #FsH.s<- sum(ar.s*h.n)
+    FsH.aa<-((sum(bg.a*ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+    FsH.ss<-((sum(bg.s*ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    beta.g.a<- sum(bg.a*h.n)
-    beta.g.s<- sum(bg.s*h.n)
+    
+    
+   # beta.g.a<- sum(bg.a*h.n)
+   # beta.g.s<- sum(bg.s*h.n)
     
     #beta.g.a<- sum(bg.a*(h.n)*(1:max(unique(hh.size))))/mu.h
     #beta.g.s<- sum(bg.s*(h.n)*(1:max(unique(hh.size))))/mu.h
     
     
         
-    #m.aa<-FsH.a*beta.g.a*prob.asym
-    #m.as<-FsH.a*beta.g.a*(1-prob.asym)
-    #m.sa<-FsH.s*beta.g.s*prob.asym
-    #m.ss<-FsH.s*beta.g.s*(1-prob.asym)
+  #  m.aa<-FsH.a*beta.g.a*prob.asym
+  #  m.as<-FsH.a*beta.g.a*(1-prob.asym)
+  #  m.sa<-FsH.s*beta.g.s*prob.asym
+  #  m.ss<-FsH.s*beta.g.s*(1-prob.asym)
+
+    m.aa<-FsH.aa*prob.asym
+    m.as<-FsH.aa*(1-prob.asym)
+    m.sa<-FsH.ss*prob.asym
+    m.ss<-FsH.ss*(1-prob.asym)
     
-     R0<-FsH.a*beta.g.a*prob.asym+FsH.s*beta.g.s*(1-prob.asym)
+    
+        
+   #  R0<-FsH.a*beta.g.a*prob.asym+FsH.s*beta.g.s*(1-prob.asym)
     
     
-    #R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
+    R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
   }else{
     
     AR<-list()
