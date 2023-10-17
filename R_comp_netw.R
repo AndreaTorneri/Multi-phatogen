@@ -465,8 +465,8 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
 #    FsH.a<-((sum(ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
 #    FsH.s<-((sum(ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
-    FsH.aa<-((sum(bg.a*ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
-    FsH.ss<-((sum(bg.s*ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
+  #  FsH.aa<-((sum(bg.a*ar.a*(h.n)*(1:max(unique(hh.size)))))/mu.h)
+  #  FsH.ss<-((sum(bg.s*ar.s*(h.n)*(1:max(unique(hh.size)))))/mu.h)    
     
     
     
@@ -483,17 +483,32 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
   #  m.sa<-FsH.s*beta.g.s*prob.asym
   #  m.ss<-FsH.s*beta.g.s*(1-prob.asym)
 
-    m.aa<-FsH.aa*prob.asym
-    m.as<-FsH.aa*(1-prob.asym)
-    m.sa<-FsH.ss*prob.asym
-    m.ss<-FsH.ss*(1-prob.asym)
+ #   m.aa<-FsH.aa*prob.asym
+  #  m.as<-FsH.aa*(1-prob.asym)
+  #  m.sa<-FsH.ss*prob.asym
+  #  m.ss<-FsH.ss*(1-prob.asym)
     
+    
+    # Branching process approximation (Ball et al. 1997)
+    pa<-prob.asym
+    hh1.a<-c(bg.a[1]*ar.a[1]*h.n[1]*pa,bg.a[1]*ar.a[1]*h.n[1]*(1-pa),bg.a[1]*ar.a[1]*2*h.n[2]*pa,bg.a[1]*ar.a[1]*2*h.n[2]*(1-pa), bg.a[1]*ar.a[1]*3*h.n[3]*pa,bg.a[1]*ar.a[1]*3*h.n[3]*(1-pa),bg.a[1]*ar.a[1]*4*h.n[4]*pa,bg.a[1]*ar.a[1]*4*h.n[4]*(1-pa),bg.a[1]*ar.a[1]*5*h.n[5]*pa,bg.a[1]*ar.a[1]*5*h.n[5]*(1-pa),bg.a[1]*ar.a[1]*6*h.n[6]*pa,bg.a[1]*ar.a[1]*6*h.n[6]*(1-pa),bg.a[1]*ar.a[1]*7*h.n[7]*pa,bg.a[1]*ar.a[1]*7*h.n[7]*(1-pa) )
+    ngen.mat<-matrix(data=hh1.a,nrow = 1)
+    hh1.s<-c(bg.s[1]*ar.s[1]*h.n[1]*pa,bg.s[1]*ar.s[1]*h.n[1]*(1-pa),bg.s[1]*ar.s[1]*2*h.n[2]*pa,bg.s[1]*ar.s[1]*2*h.n[2]*(1-pa), bg.s[1]*ar.s[1]*3*h.n[3]*pa,bg.s[1]*ar.s[1]*3*h.n[3]*(1-pa),bg.s[1]*ar.s[1]*4*h.n[4]*pa,bg.s[1]*ar.s[1]*4*h.n[4]*(1-pa),bg.s[1]*ar.s[1]*5*h.n[5]*pa,bg.s[1]*ar.s[1]*5*h.n[5]*(1-pa),bg.s[1]*ar.s[1]*6*h.n[6]*pa,bg.s[1]*ar.s[1]*6*h.n[6]*(1-pa),bg.s[1]*ar.s[1]*7*h.n[7]*pa,bg.s[1]*ar.s[1]*7*h.n[7]*(1-pa) )
+    ngen.mat<-rbind(ngen.mat,hh1.s)
+    
+    for (bp in hh.size.considered){
+      hh1.a<-c(bg.a[bp]*ar.a[bp]*h.n[1]*pa,bg.a[bp]*ar.a[bp]*h.n[1]*(1-pa),bg.a[bp]*ar.a[bp]*2*h.n[2]*pa,bg.a[bp]*ar.a[bp]*2*h.n[2]*(1-pa), bg.a[bp]*ar.a[bp]*3*h.n[3]*pa,bg.a[bp]*ar.a[bp]*3*h.n[3]*(1-pa),bg.a[bp]*ar.a[bp]*4*h.n[4]*pa,bg.a[bp]*ar.a[bp]*4*h.n[4]*(1-pa),bg.a[bp]*ar.a[bp]*5*h.n[5]*pa,bg.a[bp]*ar.a[bp]*5*h.n[5]*(1-pa),bg.a[bp]*ar.a[bp]*6*h.n[6]*pa,bg.a[bp]*ar.a[bp]*6*h.n[6]*(1-pa),bg.a[bp]*ar.a[bp]*7*h.n[7]*pa,bg.a[bp]*ar.a[bp]*7*h.n[7]*(1-pa) )
+      ngen.mat<-rbind(ngen.mat,hh1.a)
+      hh1.s<-c(bg.s[bp]*ar.s[bp]*h.n[1]*pa,bg.s[bp]*ar.s[bp]*h.n[1]*(1-pa),bg.s[bp]*ar.s[bp]*2*h.n[2]*pa,bg.s[bp]*ar.s[bp]*2*h.n[2]*(1-pa), bg.s[bp]*ar.s[bp]*3*h.n[3]*pa,bg.s[bp]*ar.s[bp]*3*h.n[3]*(1-pa),bg.s[bp]*ar.s[bp]*4*h.n[4]*pa,bg.s[bp]*ar.s[bp]*4*h.n[4]*(1-pa),bg.s[bp]*ar.s[bp]*5*h.n[5]*pa,bg.s[bp]*ar.s[bp]*5*h.n[5]*(1-pa),bg.s[bp]*ar.s[bp]*6*h.n[6]*pa,bg.s[bp]*ar.s[bp]*6*h.n[6]*(1-pa),bg.s[bp]*ar.s[bp]*7*h.n[7]*pa,bg.s[bp]*ar.s[bp]*7*h.n[7]*(1-pa) )
+      ngen.mat<-rbind(ngen.mat,hh1.s)
+    }
+    R0<-Re(eigen(ngen.mat)$values[1])
     
         
    #  R0<-FsH.a*beta.g.a*prob.asym+FsH.s*beta.g.s*(1-prob.asym)
     
     
-    R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
+   # R0<-0.5*(m.aa+m.ss)+sqrt((((m.aa+m.ss)^2)/4)+m.as*m.sa)
   }else{
     
     AR<-list()
