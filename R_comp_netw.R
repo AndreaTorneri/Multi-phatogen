@@ -502,6 +502,7 @@ R0.computation.RM<-function(HH.network,q.g,nSim, q.h,prob.asym,asymp.rel.inf,lam
       hh1.s<-c(bg.s[bp]*ar.s[bp]*h.n[1]*pa,bg.s[bp]*ar.s[bp]*h.n[1]*(1-pa),bg.s[bp]*ar.s[bp]*2*h.n[2]*pa,bg.s[bp]*ar.s[bp]*2*h.n[2]*(1-pa), bg.s[bp]*ar.s[bp]*3*h.n[3]*pa,bg.s[bp]*ar.s[bp]*3*h.n[3]*(1-pa),bg.s[bp]*ar.s[bp]*4*h.n[4]*pa,bg.s[bp]*ar.s[bp]*4*h.n[4]*(1-pa),bg.s[bp]*ar.s[bp]*5*h.n[5]*pa,bg.s[bp]*ar.s[bp]*5*h.n[5]*(1-pa),bg.s[bp]*ar.s[bp]*6*h.n[6]*pa,bg.s[bp]*ar.s[bp]*6*h.n[6]*(1-pa),bg.s[bp]*ar.s[bp]*7*h.n[7]*pa,bg.s[bp]*ar.s[bp]*7*h.n[7]*(1-pa) )
       ngen.mat<-rbind(ngen.mat,hh1.s)
     }
+    ngen.mat<-ngen.mat*1/mu.h
     R0<-Re(eigen(ngen.mat)$values[1])
     
         
