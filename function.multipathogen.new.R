@@ -231,8 +231,7 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
         value<-(t.sinc.inf/t.imm.lim)
       }
       if (typeIC==3){
-        value<-(t.sinc.inf/(2*t.imm.lim))
-      }
+        value<-0.25+(t.sinc.inf/(2*t.imm.lim))      }
     }  
   }
   return(value)
@@ -824,9 +823,14 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
   dimnames(time.events)<-list(NULL,timev.name)
   
   C1<-nSeeds.1
-  C2<-nSeeds.2
   Y1<-nSeeds.1
+  if (t2>0){
+  C2<-0
+  Y2<-0
+  }else{
+  C2<-nSeeds.2
   Y2<-nSeeds.2
+  }
   last.day<-round(max(time.events[,1]))
   
   for (i in 1:last.day){
