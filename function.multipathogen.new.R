@@ -219,7 +219,7 @@ VE.COVID<- function() {
 
 
 
-LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm.lim){ #pathogen.v1 is the infection the infectee might catch
+LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm.lim,pathogen1){ #pathogen.v1 is the infection the infectee might catch
   value<-1
   if (status.matrix.v2$infected[infectee]==-1){
     t.sinc.inf<-current.time-status.matrix.v2$time.of.infection[infectee]
@@ -232,6 +232,14 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
       }
       if (typeIC==3){
         value<-0.25+(t.sinc.inf/(2*t.imm.lim))      }
+      if (typeIC==4){
+        if (pathogen1=="COVID-19"){
+          value<-1+lli
+        }else{
+          value<-2-t.sinc.inf/30
+        }
+      }
+
     }  
   }
   return(value)
@@ -481,7 +489,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         
         
         #long.inter<-LLImmlev(pathogen.v1 = pathogen.1, pathogen.v2 = pathogen.2, status.matrix.v1 = status.matrix.1, status.matrix.v2 =status.matrix.2, infectee = infectee,lli = lli.2, current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
-        long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.2,infectee = infectee, lli = lli.2, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim )
+        long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.2,infectee = infectee, lli = lli.2, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen.1 )
         
         # compute long interaction terms for pathogen.1 (recovered from pathogen 2 and/or already contracted pathogen 1)
        # if (status.matrix.2$infected[infectee]==-1 & short.inter==1){
@@ -540,7 +548,7 @@ sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.imm
         }
        # if (status.matrix.1$infected[infectee]==-1 & short.inter==1){
           #long.inter<-LLImmlev(pathogen.v1 = pathogen.2, pathogen.v2 = pathogen.1, status.matrix.v1 = status.matrix.2, status.matrix.v2 =status.matrix.1, infectee = infectee,lli=lli.1,current.time = current.time, reinf = reinf, typeIC = typeIC, het.vac = het.vac)
-          long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.1,infectee = infectee, lli = lli.1, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim )
+          long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.1,infectee = infectee, lli = lli.1, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen.2 )
           
       #  }else{
       #    long.inter<-1
