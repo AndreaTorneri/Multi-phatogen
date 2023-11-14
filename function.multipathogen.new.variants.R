@@ -245,7 +245,7 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
           }
         }
 
-        if (pathogen.v1 =="OMICRON"){
+        if (pathogen1 =="OMICRON"){
 
           if (status.matrix.v1$Immunity[infectee]==1){
             value<-0
