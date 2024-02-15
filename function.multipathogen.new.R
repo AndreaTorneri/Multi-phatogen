@@ -222,7 +222,8 @@ VE.COVID<- function() {
 LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm.lim,pathogen1,pathogen2){ #pathogen.v1 is the infection the infectee might catch
   value<-1
   if (status.matrix.v2$infected[infectee]==-1){
-    t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee]+infectious.period.length(pathogen = pathogen2))
+    #t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee]+infectious.period.length(pathogen = pathogen2))
+    t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee])
     if (t.sinc.inf<t.imm.lim){
       if (typeIC==1){
         value<-lli
@@ -231,7 +232,8 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
         value<-(t.sinc.inf/t.imm.lim)
       }
       if (typeIC==3){
-        value<-0.25+(t.sinc.inf/(2*t.imm.lim))      }
+        value<-0.25+(t.sinc.inf/(2*t.imm.lim))
+        }
       if (typeIC==4){
         if (pathogen1=="COVID-19"){
           value<-2-t.sinc.inf/30
