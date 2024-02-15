@@ -223,7 +223,7 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
   value<-1
   if (status.matrix.v2$infected[infectee]==-1){
     #t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee]+infectious.period.length(pathogen = pathogen2))
-    t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee])
+    t.sinc.inf<-current.time-(status.matrix.v2$time.of.infection[infectee]+infectious.period.length(pathogen = pathogen2)) #here we are assuming a constant IPL
     if (t.sinc.inf<t.imm.lim){
       if (typeIC==1){
         value<-lli
