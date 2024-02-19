@@ -28,7 +28,7 @@ incubation.period<-function(pathogen){
 
 infectious.period.length<-function(pathogen){
   if (pathogen=="COVID-19" | pathogen=="OMICRON" | pathogen=="DELTA"){
-    return(15)
+    return(12)
   }
   if (pathogen=="FLU-A"){
     return(8)  
@@ -43,7 +43,7 @@ infectious.period.length<-function(pathogen){
 
 InfMeasure<-function(t,pathogen){
   if (pathogen=="COVID-19" | pathogen=="DELTA" | pathogen=="OMICRON"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(15,shape = 12,rate = 2.08)))
+    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(12,shape = 12,rate = 2.08)))
   }
   if (pathogen=="FLU-A"){
     # Setting infectiousness measure according to Carrat et al. (2008) for H1N1
