@@ -235,34 +235,32 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
         value<-0.25+(t.sinc.inf/(2*t.imm.lim))
         }
       if (typeIC==4){
-        if (pathogen1=="COVID-19"){
+#        if (pathogen1=="COVID-19"){
           value<-2-t.sinc.inf/30
-        }else{
-          if (t.sinc.inf<10){
-            value<-(t.sinc.inf/10)
-          }
-        }
+#        }else{
+#          if (t.sinc.inf<10){
+#            value<-(t.sinc.inf/10)
+#          }
+#        }
       }
       if (typeIC==5){
-        if (pathogen1=="COVID-19"){
+#        if (pathogen1=="COVID-19"){
           value<-lli
-        }else{
-          if (t.sinc.inf<10){
-            value<-(t.sinc.inf/10)
-          }
-        }
+#        }else{
+#          if (t.sinc.inf<10){
+#           value<-(t.sinc.inf/10)
+#          }
+#        }
       }
       if (typeIC==6){
-        if (pathogen1=="COVID-19"){
+#        if (pathogen1=="COVID-19"){
           value<-1.75-t.sinc.inf/60
-        }else{
-          if (t.sinc.inf<10){
-            value<-(t.sinc.inf/10)
-          }
-        }
+#       }else{
+#          if (t.sinc.inf<10){
+#            value<-(t.sinc.inf/10)
+#          }
+#        }
       }
-      
-      
     }  
   }
   return(value)
