@@ -236,7 +236,7 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
         }
       if (typeIC==4){
 #        if (pathogen1=="COVID-19"){
-          value<-2-t.sinc.inf/10
+          value<-2.5-t.sinc.inf/10
 #        }else{
 #          if (t.sinc.inf<10){
 #            value<-(t.sinc.inf/10)
@@ -254,7 +254,7 @@ LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm
       }
       if (typeIC==6){
 #        if (pathogen1=="COVID-19"){
-          value<-1.75-t.sinc.inf/20
+          value<-3-t.sinc.inf/5
 #       }else{
 #          if (t.sinc.inf<10){
 #            value<-(t.sinc.inf/10)
