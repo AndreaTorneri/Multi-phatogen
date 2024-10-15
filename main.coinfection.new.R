@@ -4,71 +4,71 @@ out = args[1] #working directory
 cat(",out=",out)
 cores = as.numeric(args[2]) #number of cores to run in parallel
 cat(",cores=",cores)
-t2 = as.numeric(args[3]) #time at which pathogen 2 is insert in the population
+t2 = as.numeric(args[3]) #time at which pathogen 2 is introduced in the population
 cat(",t2=",t2)
-sigma12 = as.numeric(args[4]) # short-term interaction parameter: acquiring 2 while having 1 (this value can)
+sigma12 = as.numeric(args[4]) # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing)
 cat(",sigma12=",sigma12)
-sigma21 = as.numeric(args[5]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+sigma21 = as.numeric(args[5]) # short-term interaction parameter: acquiring 1 while having 2 (if >1 cooperative effect - if <1 competing)
 cat(",sigma21=",sigma21)
-prop.immune = as.numeric(args[6]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+prop.immune = as.numeric(args[6]) # proportion of immune cases (not used at the moment)
 cat(",prop.immune=",prop.immune)
-nSeeds.1= as.numeric(args[7]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+nSeeds.1= as.numeric(args[7]) # number of initial cases for path 1
 cat(",nSeeds.1=",nSeeds.1)
-nSeeds.2= as.numeric(args[8]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+nSeeds.2= as.numeric(args[8]) # number of initial cases for path 2
 cat(",nSeeds.2=",nSeeds.2)
-rho.1= as.numeric(args[9]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+rho.1= as.numeric(args[9]) # probability of being symptomatic for path 1
 cat(",rho.1=",rho.1)
-rho.2= as.numeric(args[10]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+rho.2= as.numeric(args[10]) # probability of being symptomatic for path 2
 cat(",rho.2=",rho.2)
-alpha.as.1= as.numeric(args[11]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+alpha.as.1= as.numeric(args[11]) # relative infectiousness of asymptomatic cases (pathogen1)
 cat(",alpha.as.1=",alpha.as.1)
-alpha.as.2= as.numeric(args[12]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+alpha.as.2= as.numeric(args[12]) # relative infectiousness of asymptomatic cases (pathogen2)
 cat(",alpha.as.2=",alpha.as.2)
-netw = as.character(args[13]) #time at which pathogen 2 is insert in the population
+netw = as.character(args[13]) # type of household network considered - Synthetic or ERGM
 cat(",netw=",netw)
-n.vertex = as.numeric(args[14]) #time at which pathogen 2 is insert in the population
+n.vertex = as.numeric(args[14]) # number of vertexes 
 cat(",n.vertex=",n.vertex)
-n.networks = as.numeric(args[15]) #time at which pathogen 2 is insert in the population
+n.networks = as.numeric(args[15]) # number of simulated networks
 cat(",n.networks=",n.networks)
-R.1= as.numeric(args[16]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+R.1= as.numeric(args[16]) # Reproduction number path 1 (household R*)
 cat(",R.1=",R.1)
-R.2= as.numeric(args[17]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+R.2= as.numeric(args[17]) # Reproduction number path 2 (household R*)
 cat(",R.2=",R.2)
-ratio.qhqg= as.numeric(args[18]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+ratio.qhqg= as.numeric(args[18]) # ratio transmission probability given household contact over  global contacts
 cat(",ratio.qhqg=",ratio.qhqg)
-lli.1= as.numeric(args[19]) # long-term interaction parameter: acquiring 1 while having 2 (this value can)
+lli.1= as.numeric(args[19]) # long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1 
 cat(",lli.1=",lli.1)
-lli.2= as.numeric(args[20]) # long-term interaction parameter: acquiring 1 while having 2 (this value can)
+lli.2= as.numeric(args[20]) # long-term interaction parameter: acquiring 1 while having experienced (and recovered from) 2 
 cat(",lli.2=",lli.2)
-pathogen.1= as.character(args[21]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+pathogen.1= as.character(args[21]) # character variable identifying pathogen 1
 cat(",pathogen.1=",pathogen.1)
-pathogen.2= as.character(args[22]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+pathogen.2= as.character(args[22]) # character variable identifying pathogen 2
 cat(",pathogen.2=",pathogen.2)
-contact.reduction= as.numeric(args[23]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+contact.reduction= as.numeric(args[23]) # parameter multiplying the household contact rate after home isolation
 cat(",contact.reduction=",contact.reduction)
-t.stop= as.numeric(args[24]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+t.stop= as.numeric(args[24]) # time at which simulations stop
 cat(",t.stop=",t.stop)
-t.seed= as.numeric(args[25]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+t.seed= as.numeric(args[25]) # time of additional seeding
 cat(",t.seed=",t.seed)
-bc.1= as.numeric(args[26]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+bc.1= as.numeric(args[26]) # proportion of individuals changing behavior (home isolation) after being infected with pathogen 1
 cat(",bc.1=",bc.1)
-bc.2= as.numeric(args[27]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+bc.2= as.numeric(args[27]) # proportion of individuals changing behavior (home isolation) after being infected with pathogen 2
 cat(",bc.2=",bc.2)
-reinf= as.numeric(args[28]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+reinf= as.numeric(args[28]) # Boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
 cat(",reinf=",reinf)
-typeIC= as.numeric(args[29]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+typeIC= as.numeric(args[29]) # ID for different type of waning of immunity
 cat(",typeIC=",typeIC)
-contact.reduction.TP= as.numeric(args[30]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+contact.reduction.TP= as.numeric(args[30]) # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
 cat(",contact.reduction.TP=",contact.reduction.TP)
-bc.1.TP= as.numeric(args[31]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+bc.1.TP= as.numeric(args[31]) # behavior change value (for pathogen 1) set to identify transmission rates (household and global) linked to a specific R*
 cat(",bc.1.TP=",bc.1.TP)
-bc.2.TP= as.numeric(args[32]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+bc.2.TP= as.numeric(args[32]) # behavior change value (for pathogen 2) set to identify transmission rates (household and global) linked to a specific R*
 cat(",bc.2.TP=",bc.2.TP)
-het.vac= as.numeric(args[33]) # short-term interaction parameter: acquiring 1 while having 2 (this value can)
+het.vac= as.numeric(args[33]) # Boolean for heterologous effects (1 yes 0 no) - Not used currently
 cat(",het.vac=",het.vac)
-t.imm.lim= as.numeric(args[34]) #
+t.imm.lim= as.numeric(args[34]) # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
 cat(",t.imm.lim=",t.imm.lim)
-dec.gc=as.numeric(args[35]) #
+dec.gc=as.numeric(args[35]) # Decrease in the  number of global contact rates compared to baseline
 cat(",dec.gc=",dec.gc)
 
 
@@ -76,6 +76,14 @@ cat(",dec.gc=",dec.gc)
 #Input parameters - fixed
 library(ergm)
 library(RGeode)
+
+#Two type of household networks can be loaded (ERGM (data-driven) - Synthetic (household size representative but random mixing))
+#For now considered only Synthetic networks
+# To note, the type of network together with other characteristics (e.g., R*), will give you the value of the transmission parameters for global and local contacts
+# this values can be computed with another Rscript present in the repo - mainTransmParams.
+
+
+
 
 
 if (netw=="ERGM"){
