@@ -1,0 +1,25 @@
+1. Create new synthetic networks
+
+The main script 'main.SynthNetw.R' creates and saves a list of synthetic networks. 
+It depends on the files 'CreatingSynthNetw.R' and 'DensityHHsize.RData'. 
+
+To run on a high performance cluster, the file 'CreatingNetw.pbs' can be used in combination with 'CreatingNetw.csv'. 
+
+Output: a file called 'HH.networks_nVertex_nNetw.RData'
+
+R-libraries: network
+------------------------------------------------------------------------------------------------------------------------------
+
+2. Compute the transmission parameters
+
+The main script 'main.TransmParams.R' loads a network and computes the transmission parameters.
+It depends on the file 'R_comp_netw.R' and 'HH.networks_nVertex_nNetw.RData'
+
+To run on a high performance cluster, the file 'TransmParams.slurm' can be used in combination with 'TransmParams.csv'. 
+
+Output: a file called 'TP_netw_nVertex_nNetw_R_ratioqhqg_rho_alpha_pathogen_cdec_comp.RData'
+
+R-libraries: network
+------------------------------------------------------------------------------------------------------------------------------
+
+

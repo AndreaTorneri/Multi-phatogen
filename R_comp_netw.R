@@ -1,7 +1,12 @@
+###########################################################################
+#### This script contains functions needed to compute the transmission ####
+#### parameters, given a certain network.                              ####
+###########################################################################
+
 # Function to compute the value of the reproduction number in a 2-level household mixing. 
 #Constant infectious period
 
-R0.computation.StaticNetw<-function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h){
+R0.computation.StaticNetw <- function(HH.network,beta.g,nSim, beta.h,prob.asym,asymp.rel.inf,lambda.h){
   mu<-1
   hh.id<-HH.network %v% "hh_id"
   hh.size<-HH.network %v% "hh_size"
@@ -189,41 +194,54 @@ R0.comp.Inf.bc<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.re
 
 
 
+########################################################
+#### Function used in script 'main.TransmParams.R' #####
+########################################################
 
-
-R0.comp.RM<-function(ratio_hhgl,tol,R.rif,HH.network,nSim,prob.asym,asymp.rel.inf,lambda.g,pathogen,ctc.dec,compl){
-  mu<-infectious.period.length(pathogen = pathogen)
-  q.g<-0.1 # initial point
-  q.h<-ratio_hhgl*q.g
-  q.g.tempm<-0
-  q.g.tempM<-1
-  R.temp<-NULL
+R0.comp.RM <- function(ratio_hhgl, tol, R.rif, HH.network, nSim, prob.asym, asymp.rel.inf, lambda.g, 
+                       pathogen, ctc.dec, compl){
+  mu <- infectious.period.length(pathogen = pathogen)
+  q.g <- 0.1 # initial point
+  q.h <- ratio_hhgl*q.g
+  q.g.tempm <- 0
+  q.g.tempM <- 1
+  R.temp <- NULL
+  
   for (i in 1:nSim){
     print(i)
-    temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
-    R.temp<-c(R.temp,R0.computation.RM(HH.network = temp.HH.netw,q.h = q.h, q.g = q.g, nSim = 100,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf,lambda.g = lambda.g,pathogen = pathogen,ctc.dec = ctc.dec, compl = compl))
+    temp.HH.netw <- HH.network[[sample(1:length(HH.network), 1)]]
+    R.temp <- c(R.temp, R0.computation.RM(HH.network = temp.HH.netw, q.h = q.h, q.g = q.g, nSim = 100, 
+                                          prob.asym = prob.asym, asymp.rel.inf = asymp.rel.inf,
+                                          lambda.g = lambda.g, pathogen = pathogen, ctc.dec = ctc.dec, 
+                                          compl = compl))
   }
-  R.temp<-mean(R.temp)
-  print(c(R.rif,mean(R.temp),abs(mean(R.temp)-R.rif)))
-  while (abs(mean(R.temp)-R.rif)>tol){
-    R.temp<-NULL
+  
+  R.temp <- mean(R.temp)
+  print(c(R.rif, mean(R.temp), abs(mean(R.temp) - R.rif)))
+  
+  while(abs(mean(R.temp) - R.rif) > tol){
+    R.temp <- NULL
     for (i in 1:nSim){
-      temp.HH.netw<-HH.network[[sample(1:length(HH.network),1)]]
-      R.temp<-c(R.temp,R0.computation.RM(HH.network = temp.HH.netw, q.g = q.g, q.h = q.h,nSim = 100,prob.asym=prob.asym,asymp.rel.inf=asymp.rel.inf,lambda.g = lambda.g,pathogen = pathogen,ctc.dec = ctc.dec, compl = compl))
+      temp.HH.netw <- HH.network[[sample(1:length(HH.network), 1)]]
+      R.temp <- c(R.temp,R0.computation.RM(HH.network = temp.HH.netw, q.g = q.g, q.h = q.h, nSim = 100,
+                                           prob.asym = prob.asym, asymp.rel.inf = asymp.rel.inf,
+                                           lambda.g = lambda.g, pathogen = pathogen, ctc.dec = ctc.dec, 
+                                           compl = compl))
     }
     R.temp<-mean(R.temp)
-    if (mean(R.temp)>R.rif){
-      q.g.tempM<-q.g
-      q.g<-runif(1,min = q.g.tempm,max = q.g)
-      q.h<-q.g*ratio_hhgl
+    if (mean(R.temp) > R.rif){
+      q.g.tempM <- q.g
+      q.g <- runif(1, min = q.g.tempm, max = q.g)
+      q.h <- q.g*ratio_hhgl
     }else{
-      q.g.tempm<-q.g
-      q.g<-runif(1,min = q.g, max = q.g.tempM)
-      q.h<-q.g*ratio_hhgl
+      q.g.tempm <- q.g
+      q.g <- runif(1, min = q.g, max = q.g.tempM)
+      q.h <- q.g*ratio_hhgl
     }
-    print(c(R.rif,mean(R.temp),abs(mean(R.temp)-R.rif)))
+    print(c(R.rif, mean(R.temp), abs(mean(R.temp) - R.rif)))
   }
-  transm.prms<-data.frame("q.g"=q.g, "beta.h"=q.h)
+  
+  transm.prms <- data.frame("q.g" = q.g, "beta.h" = q.h)
   return(transm.prms)
 }
 
@@ -893,14 +911,15 @@ mean.ip<-function(pathogen){
   }
 }
 
-infectious.period.length<-function(pathogen){
-  if (pathogen=="COVID-19" | pathogen=="OMICRON" | pathogen=="DELTA"){
+#### Function to determine the length of the infectious period depending on the pathogen
+infectious.period.length <- function(pathogen){
+  if (pathogen == "COVID-19" | pathogen == "OMICRON" | pathogen == "DELTA"){
     return(15)
   }
-  if (pathogen=="FLU-A"){
+  if (pathogen == "FLU-A"){
     return(8)  
   }
-  if (pathogen=="FLU-B"){
+  if (pathogen == "FLU-B"){
     return(4.8)  
   }
   if (pathogen == "XP" | pathogen == "XS" | pathogen == "XA"){
