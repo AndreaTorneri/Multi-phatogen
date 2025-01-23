@@ -1,117 +1,96 @@
+ 
+#####################################################
+#### Set of function for the co-infection script ####
+#### Including Vaccination *IN PROGRESS*         ####
+#####################################################
 
-############################################################################
-############################################################################
-### This script contains a set of functions necessary for the simulation ###
-### Called by the script 'main.coinfection.new.R'                        ###
-############################################################################
-############################################################################
-
-
-
-#####################################################################
-### This function defines the number of days before symptom onset ###
-#####################################################################
-
+### Function used to define symptom onset 
 incubation.period <- function(pathogen){
-  if(pathogen == "COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){
+  if (pathogen == "COVID-19" | pathogen == "DELTA" | pathogen== "OMICRON"){
     #return(rlnorm(1,meanlog = log(5.2), sdlog = log(1.7)))
     return(5.288462)
   }
-  if(pathogen == "FLU-A"){
+  if (pathogen == "FLU-A"){
     #return(rlnorm(1,meanlog = log(1.4), sdlog = log(1.51))) 
     return(2)
   }
-  if(pathogen == "RSV"){
-    return(rlnorm(1,meanlog = log(4.4), sdlog = log(1.24))) 
+  if (pathogen == "RSV"){
+    return(rlnorm(1, meanlog = log(4.4), sdlog = log(1.24))) 
   }
 }
 
-
-#########################################################################
-### This function defines the length of the infectious period in days ###
-#########################################################################
-
 infectious.period.length <- function(pathogen){
-  if(pathogen == "COVID-19" | pathogen == "OMICRON" | pathogen == "DELTA"){
+  if (pathogen == "COVID-19" | pathogen == "OMICRON" | pathogen == "DELTA"){
     return(12)
   }
-  if(pathogen == "FLU-A"){
+  if (pathogen == "FLU-A"){
     return(8)  
   }
 }
 
 
-#################################################################################
-### This function defines the infectiousness measure.                         ###
-### It describes how the probability of transmission varies over the course   ###
-### of infection.                                                             ###
-### It is estimated by using a viral load curve                               ###
-### (see the example for influenza using data reported in Carrat et al. 2008) ###
-#################################################################################
-
+### Infectiousness measures to describe how the probability of transmission varies over the course of 
+### an infection. Such a function is estimated by using a viral load curve (see the example for 
+### influenza using data reported in Carrat et al. (2008)
 InfMeasure <- function(t, pathogen){
+  
   if(pathogen == "COVID-19" | pathogen == "DELTA" | pathogen == "OMICRON"){
-    return(dgamma(t,shape = 12, rate = 2.08)/ (pgamma(12,shape = 12,rate = 2.08)))
+    return(dgamma(t, shape = 12, rate = 2.08)/(pgamma(12, shape = 12, rate = 2.08)))
   }
+
   if(pathogen == "FLU-A"){
     # Setting infectiousness measure according to Carrat et al. (2008) for H1N1
-    #VL<-data.frame(x=0:8,y=c(0,1.75,3,2.5,1.8,1.25,0.75,0.5,0)) 
-    #vl.flu<-nlsLM(y~a*dgamma(x=x,shape = s1,scale = sc1),start = list(a=10,s1=1.5,sc1=1.5),data = VL, weights = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,100))
-    #prms<-vl.flu$m$getPars()
-    #print(prms)
-    #plot(seq(0,8,0.1),prms[1]*dgamma(x=seq(0,8,0.1),shape = prms[2],scale = prms[3]),ylim = c(0,3.1))
-    #points(VL, col="red")
-    #f.vl<-function(t){
-    #  return(prms[1]*dgamma(t,shape = prms[2],scale = prms[3]))
-    #}
-    #k<-integrate(f.vl,lower = 0,upper = 8)
-    #prms[1]/ k$value
-    return(1.001592*dgamma(t,shape = 4.604016,scale = 0.5922317))
-    #return(dgamma(t,shape = 3.5, rate = 1.15)/ (pgamma(6.24,shape = 3.5,rate = 1.15)))
+    # VL<-data.frame(x=0:8,y=c(0,1.75,3,2.5,1.8,1.25,0.75,0.5,0)) 
+    # vl.flu<-nlsLM(y~a*dgamma(x=x,shape = s1,scale = sc1),start = list(a=10,s1=1.5,sc1=1.5),data = VL, weights = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,100))
+    # prms<-vl.flu$m$getPars()
+    # print(prms)
+    # plot(seq(0,8,0.1),prms[1]*dgamma(x=seq(0,8,0.1),shape = prms[2],scale = prms[3]),ylim = c(0,3.1))
+    # points(VL, col="red")
+    # f.vl<-function(t){
+    # return(prms[1]*dgamma(t,shape = prms[2],scale = prms[3]))
+    # }
+    # k<-integrate(f.vl,lower = 0,upper = 8)
+    # prms[1]/ k$value
+    return(1.001592 * dgamma(t, shape = 4.604016, scale = 0.5922317))
+    # return(dgamma(t,shape = 3.5, rate = 1.15)/(pgamma(6.24,shape = 3.5,rate = 1.15)))
   }
+  
   if(pathogen == "RSV"){
-    return(dgamma(t,shape = 15, rate = 2.6)/ (pgamma(12,shape = 15,rate = 2.6)) )
+    return(dgamma(t, shape = 15, rate = 2.6)/(pgamma(12, shape = 15, rate = 2.6)))
   }
 }
 
-
-#################################################################
-### This function defines the vaccine effectiveness over time ###
-#################################################################
-
+# Vaccine effectiveness is not included at the moment, but there was a plan to do so -> TBD
 VaccineEffectiveness <- function(t,typeIC){
-  #Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
-  if (typeIC==1){
+  # Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
+  if (typeIC == 1){
     return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887))
   }
-  if (typeIC==2){
+  if (typeIC == 2){
     return(4698.209*dgamma(t,shape = 2.026, scale = 32.904))
   }
-  if (typeIC==3){
+  if (typeIC == 3){
     return(7568.209*dlnorm(t,meanlog = 4.599, sdlog = 1.118))
   }
 } 
-VE.flu<-function(){
+
+VE.flu <- function(){
   return((1-0.7))
-}
+} 
+
 VE.COVID<- function() {
   return(1-0.88)
 }
 
 
 
-##################################################################
-### This function computes the susceptibility of an individual ###
-### depending on infectious history                            ###
-##################################################################
 
-LLImmlev.basic <- function(status.matrix.v2, infectee, lli, current.time, typeIC,
-                           t.imm.lim, pathogen1, pathogen2){ #pathogen.v1 is the infection the infectee might catch
-  value <- 1
-  if(status.matrix.v2$infected[infectee] == -1){
+#This function compute the susceptibility of an individual depending on infectious history
+LLImmlev.basic<-function(status.matrix.v2,infectee,lli,current.time,typeIC,t.imm.lim,pathogen1,pathogen2){ #pathogen.v1 is the infection the infectee might catch
+  value<-1
+  if (status.matrix.v2$infected[infectee]==-1){
     #t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee]+infectious.period.length(pathogen = pathogen2))
-    t.sinc.inf <- current.time - (status.matrix.v2$time.of.infection[infectee] 
-                                  + infectious.period.length(pathogen = pathogen2)) # here we are assuming a constant IPL
+    t.sinc.inf<-current.time-(status.matrix.v2$time.of.infection[infectee]+infectious.period.length(pathogen = pathogen2)) #here we are assuming a constant IPL
     if (t.sinc.inf<t.imm.lim){
       if (typeIC==1){
         value<-lli
@@ -172,73 +151,29 @@ comp.RT<-function(status.matrix,individual,Rt){
 }
 
 
-###############################################################################################
-### This function runs the simulation of the IBM.                                           
-###                                                                                          
-### Input parameters:                                                                       
-### t2:                   time at which pathogen 2 is introduced in the population          
-### sigma12:              short-term interaction parameter: acquiring 2 while having 1      
-###                       (if >1 cooperative effect - if <1 competing)                      
-### sigma21:              short-term interaction parameter: acquiring 1 while having 2      
-###                       (if >1 cooperative effect - if <1 competing) 
-### prop.immune:          proportion of immune cases (not used at the moment)
-### nSeeds.1:             number of initial cases for path 1
-### nSeeds.2:             number of initial cases for path 2
-### rho.1:                probability of being symptomatic for path 1
-### rho.2:                probability of being symptomatic for path 2
-### alpha.as.1:           relative infectiousness of asymptomatic cases (pathogen1)
-### alpha.as.2:           relative infectiousness of asymptomatic cases (pathogen2)
-### netw:                 type of household network considered - Synthetic or ERGM
-### n.vertex:             number of vertexes 
-### n.networks:           number of simulated networks
-### R.1:                  reproduction number path 1 (household R*)
-### R.2:                  reproduction number path 2 (household R*)
-### ratio.qhqg:           ratio transmission probability given household contact 
-###                       over global contacts
-### lli.1:                long-term interaction parameter: acquiring 2 while having  
-###                       experienced (and recovered from) 1 
-### lli.2:                long-term interaction parameter: acquiring 1 while having  
-###                       experienced (and recovered from) 2
-### pathogen.1:           character variable identifying pathogen 1
-### pathogen.2:           character variable identifying pathogen 2
-### contact.reduction:    parameter multiplying the household contact rate after home 
-###                       isolation
-### t.stop:               time at which simulations stop
-### t.seed:               time of additional seeding
-### bc.1:                 proportion of individuals changing behavior (home isolation) 
-###                       after being infected with pathogen 1
-### bc.2:                 proportion of individuals changing behavior (home isolation) 
-###                       after being infected with pathogen 2
-### reinf:                boolean identifying whether someone can be re-infected with 
-###                       the same pathogen (1 yes, 0 no)
-### typeIC:               ID for different type of waning of immunity
-### contact.reduction.TP: contact reduction value set to identify transmission rates 
-###                       (household and global) linked to a specific R*
-### bc.1.TP:              behavior change value (for pathogen 1) set to identify transmission 
-###                       rates (household and global) linked to a specific R*
-### bc.2.TP:              behavior change value (for pathogen 2) set to identify transmission 
-###                       rates (household and global) linked to a specific R*
-### het.vac:              boolean for heterologous effects (1 yes 0 no) - Not used currently
-### t.imm.lim:            parameter to define the length of immunity that have the same overall 
-###                       "effect" (area underneath the curve)
-### dec.gc:               decrease in the  number of global contact rates compared to baseline
 
-### Output parameters:
-### time events: three-column matrix identifying one of the following events(second column):
-###                 1.1 and infection with pathogen 1 occurs
-###                 1.2 and infection with pathogen 2 occurs
-###                 0.1 an individual recovers from an infection with pathogen 1
-###                 0.2 an individual recovers from an infection with pathogen 2
-###                     the time at which the event occur (first column) 
-###                     and the individual (third column)
-### status matrix.1/status matrix.1: matrix that represents in each row and individual, and 
-###                                  infection related characteristics 
-###############################################################################################
 
-sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1, nSeeds.2, 
-                              rho.1, rho.2, inf.path.1.h, inf.path.1.g, inf.path.2.h, inf.path.2.g, 
-                              alpha.as.1, alpha.as.2, lli.1, lli.2, pathogen.1, pathogen.2, contact.reduction,
-                              t.stop, t.seed, bc.1, bc.2, reinf, typeIC, het.vac, t.imm.lim){
+
+
+#INPUT PARAMETERS:
+# Check main.coinfection.new for a list
+
+
+
+#OUTPUT PARAMETERS
+# time events - three-column matrix identifying one of the following events(second column):
+#               1.1 and infection with pathogen 1 occurs
+#               1.2 and infection with pathogen 2 occurs
+#               0.1 an individual recovers from an infection with pathogen 1
+#               0.2 an individual recovers from an infection with pathogen 2
+#               the time at which the event occur (first column) and the individual (third column)
+# status matrix.1/status matrix.1 - Matrix that represents in each row and individual, and infection related characteristics - see below 
+#
+
+sim.multipathogen<-function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1, nSeeds.2, 
+                            rho.1, rho.2, inf.path.1.h, inf.path.1.g, inf.path.2.h, inf.path.2.g, 
+                            alpha.as.1, alpha.as.2, lli.1, lli.2, pathogen.1, pathogen.2, contact.reduction,
+                            t.stop, t.seed, bc.1,bc.2, reinf, typeIC, het.vac, t.imm.lim){
   
   n <- network.size(HH.network)
   hh.id<- HH.network %v% "hh_id"

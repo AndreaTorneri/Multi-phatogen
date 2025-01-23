@@ -1,79 +1,147 @@
-#Input parameters from csv
+# Input parameters from csv
 args <- commandArgs(trailingOnly = TRUE)
-out = args[1] #working directory
+# working directory
+out = args[1] 
 cat(",out=",out)
-cores = as.numeric(args[2]) #number of cores to run in parallel
+# number of cores to run in parallel
+cores = as.numeric(args[2]) 
 cat(",cores=",cores)
-t2 = as.numeric(args[3]) #time at which pathogen 2 is introduced in the population
+# time at which pathogen 2 is introduced in the population
+t2 = as.numeric(args[3]) 
 cat(",t2=",t2)
-sigma12 = as.numeric(args[4]) # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing)
+# short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing)
+sigma12 = as.numeric(args[4]) 
 cat(",sigma12=",sigma12)
-sigma21 = as.numeric(args[5]) # short-term interaction parameter: acquiring 1 while having 2 (if >1 cooperative effect - if <1 competing)
+# short-term interaction parameter: acquiring 1 while having 2 (if >1 cooperative effect - if <1 competing)
+sigma21 = as.numeric(args[5]) 
 cat(",sigma21=",sigma21)
-prop.immune = as.numeric(args[6]) # proportion of immune cases (not used at the moment)
+# proportion of immune cases (not used at the moment)
+prop.immune = as.numeric(args[6]) 
 cat(",prop.immune=",prop.immune)
-nSeeds.1= as.numeric(args[7]) # number of initial cases for path 1
+# number of initial cases for path 1
+nSeeds.1= as.numeric(args[7]) 
 cat(",nSeeds.1=",nSeeds.1)
-nSeeds.2= as.numeric(args[8]) # number of initial cases for path 2
+# number of initial cases for path 2
+nSeeds.2= as.numeric(args[8]) 
 cat(",nSeeds.2=",nSeeds.2)
-rho.1= as.numeric(args[9]) # probability of being symptomatic for path 1
+# probability of being symptomatic for path 1
+rho.1= as.numeric(args[9]) 
 cat(",rho.1=",rho.1)
-rho.2= as.numeric(args[10]) # probability of being symptomatic for path 2
+# probability of being symptomatic for path 2
+rho.2= as.numeric(args[10]) 
 cat(",rho.2=",rho.2)
-alpha.as.1= as.numeric(args[11]) # relative infectiousness of asymptomatic cases (pathogen1)
+# relative infectiousness of asymptomatic cases (pathogen1)
+alpha.as.1= as.numeric(args[11]) 
 cat(",alpha.as.1=",alpha.as.1)
-alpha.as.2= as.numeric(args[12]) # relative infectiousness of asymptomatic cases (pathogen2)
+# relative infectiousness of asymptomatic cases (pathogen2)
+alpha.as.2= as.numeric(args[12]) 
 cat(",alpha.as.2=",alpha.as.2)
-netw = as.character(args[13]) # type of household network considered - Synthetic or ERGM
+# type of household network considered - Synthetic or ERGM
+netw = as.character(args[13]) 
 cat(",netw=",netw)
-n.vertex = as.numeric(args[14]) # number of vertexes 
+# number of vertexes 
+n.vertex = as.numeric(args[14]) 
 cat(",n.vertex=",n.vertex)
-n.networks = as.numeric(args[15]) # number of simulated networks
+# number of simulated networks
+n.networks = as.numeric(args[15]) 
 cat(",n.networks=",n.networks)
-R.1= as.numeric(args[16]) # Reproduction number path 1 (household R*)
+# Reproduction number path 1 (household R*)
+R.1= as.numeric(args[16]) 
 cat(",R.1=",R.1)
-R.2= as.numeric(args[17]) # Reproduction number path 2 (household R*)
+# Reproduction number path 2 (household R*)
+R.2= as.numeric(args[17]) 
 cat(",R.2=",R.2)
-ratio.qhqg= as.numeric(args[18]) # ratio transmission probability given household contact over  global contacts
+# ratio transmission probability given household contact over  global contacts
+ratio.qhqg= as.numeric(args[18]) 
 cat(",ratio.qhqg=",ratio.qhqg)
-lli.1= as.numeric(args[19]) # long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1 
+# long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1 
+lli.1= as.numeric(args[19]) 
 cat(",lli.1=",lli.1)
-lli.2= as.numeric(args[20]) # long-term interaction parameter: acquiring 1 while having experienced (and recovered from) 2 
+# long-term interaction parameter: acquiring 1 while having experienced (and recovered from) 2
+lli.2= as.numeric(args[20])  
 cat(",lli.2=",lli.2)
-pathogen.1= as.character(args[21]) # character variable identifying pathogen 1
+# character variable identifying pathogen 1
+pathogen.1= as.character(args[21]) 
 cat(",pathogen.1=",pathogen.1)
-pathogen.2= as.character(args[22]) # character variable identifying pathogen 2
+# character variable identifying pathogen 2
+pathogen.2= as.character(args[22]) 
 cat(",pathogen.2=",pathogen.2)
-contact.reduction= as.numeric(args[23]) # parameter multiplying the household contact rate after home isolation
+# parameter multiplying the household contact rate after home isolation
+contact.reduction= as.numeric(args[23]) 
 cat(",contact.reduction=",contact.reduction)
-t.stop= as.numeric(args[24]) # time at which simulations stop
+# time at which simulations stop
+t.stop= as.numeric(args[24]) 
 cat(",t.stop=",t.stop)
-t.seed= as.numeric(args[25]) # time of additional seeding
+# time of additional seeding
+t.seed= as.numeric(args[25]) 
 cat(",t.seed=",t.seed)
-bc.1= as.numeric(args[26]) # proportion of individuals changing behavior (home isolation) after being infected with pathogen 1
+# proportion of individuals changing behavior (home isolation) after being infected with pathogen 1
+bc.1= as.numeric(args[26]) 
 cat(",bc.1=",bc.1)
-bc.2= as.numeric(args[27]) # proportion of individuals changing behavior (home isolation) after being infected with pathogen 2
+# proportion of individuals changing behavior (home isolation) after being infected with pathogen 2
+bc.2= as.numeric(args[27]) 
 cat(",bc.2=",bc.2)
-reinf= as.numeric(args[28]) # Boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
+# Boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
+reinf= as.numeric(args[28]) 
 cat(",reinf=",reinf)
-typeIC= as.numeric(args[29]) # ID for different type of waning of immunity
+# ID for different type of waning of immunity
+typeIC= as.numeric(args[29]) 
 cat(",typeIC=",typeIC)
-contact.reduction.TP= as.numeric(args[30]) # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
+# contact reduction value set to identify transmission rates (household and global) linked to a specific R*
+contact.reduction.TP= as.numeric(args[30]) 
 cat(",contact.reduction.TP=",contact.reduction.TP)
-bc.1.TP= as.numeric(args[31]) # behavior change value (for pathogen 1) set to identify transmission rates (household and global) linked to a specific R*
+# behavior change value (for pathogen 1) set to identify transmission rates (household and global) linked to a specific R*
+bc.1.TP= as.numeric(args[31]) 
 cat(",bc.1.TP=",bc.1.TP)
-bc.2.TP= as.numeric(args[32]) # behavior change value (for pathogen 2) set to identify transmission rates (household and global) linked to a specific R*
+# behavior change value (for pathogen 2) set to identify transmission rates (household and global) linked to a specific R*
+bc.2.TP= as.numeric(args[32]) 
 cat(",bc.2.TP=",bc.2.TP)
-het.vac= as.numeric(args[33]) # Boolean for heterologous effects (1 yes 0 no) - Not used currently
+# Boolean for heterologous effects (1 yes 0 no) - Not used currently
+het.vac= as.numeric(args[33]) 
 cat(",het.vac=",het.vac)
-t.imm.lim= as.numeric(args[34]) # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
+# parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
+t.imm.lim= as.numeric(args[34]) 
 cat(",t.imm.lim=",t.imm.lim)
-dec.gc=as.numeric(args[35]) # Decrease in the  number of global contact rates compared to baseline
+# Decrease in the  number of global contact rates compared to baseline
+dec.gc=as.numeric(args[35]) 
 cat(",dec.gc=",dec.gc)
 
+### For testing purposes, use this set of parameters:
+t2 = 0 # time at which pathogen 2 is introduced in the population          
+sigma12 = 1 # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing)                      
+sigma21 = 1 # short-term interaction parameter: acquiring 1 while having 2 (if >1 cooperative effect - if <1 competing) 
+prop.immune = 0 # proportion of immune cases (not used at the moment)
+nSeeds.1 = 20 # number of initial cases for path 1
+nSeeds.2 = 20 # number of initial cases for path 2
+rho.1 = 0.69 # probability of being symptomatic for path 1
+rho.2 = 0.67 # probability of being symptomatic for path 2
+alpha.as.1 = 0.5 # relative infectiousness of asymptomatic cases (pathogen1)
+alpha.as.2 = 0.33 # relative infectiousness of asymptomatic cases (pathogen2)
+netw = "Synth" # type of household network considered - Synthetic or ERGM
+n.vertex = 100 # number of vertices 
+n.networks = 1 # number of simulated networks
+R.1 = 3.3 # reproduction number path 1 (household R*)
+R.2 = 1.3 # reproduction number path 2 (household R*)
+ratio.qhqg = 8.27 # ratio transmission probability given household contact over global contacts
+lli.1 = 1 # long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1 
+lli.2 = 1 # long-term interaction parameter: acquiring 1 while having experienced (and recovered from) 2
+pathogen.1 = "COVID-19" # character variable identifying pathogen 1
+pathogen.2 = "FLU-A" # character variable identifying pathogen 2
+contact.reduction = 1 # parameter multiplying the household contact rate after home isolation
+t.stop = 365 # time at which simulations stop
+t.seed = 1000 # time of additional seeding
+bc.1 = 0 # proportion of individuals changing behavior (home isolation) after being infected with pathogen 1
+bc.2 = 0 # proportion of individuals changing behavior (home isolation) after being infected with pathogen 2
+reinf = 0 # boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
+typeIC = 1  # ID for different type of waning of immunity
+contact.reduction.TP = 1 # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
+bc.1.TP = 0 # behavior change value (for pathogen 1) set to identify transmission rates (household and global) linked to a specific R*
+bc.2.TP = 0 # behavior change value (for pathogen 2) set to identify transmission rates (household and global) linked to a specific R*
+het.vac = 1 # boolean for heterologous effects (1 yes 0 no) - Not used currently
+t.imm.lim = 10 # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
+dec.gc = 1 # decrease in the  number of global contact rates compared to baseline
 
-
-#Input parameters - fixed
+### Load necessary packages
 library(ergm)
 library(RGeode)
 
@@ -81,10 +149,6 @@ library(RGeode)
 #For now considered only Synthetic networks
 # To note, the type of network together with other characteristics (e.g., R*), will give you the value of the transmission parameters for global and local contacts
 # this values can be computed with another Rscript present in the repo - mainTransmParams.
-
-
-
-
 
 if (netw=="ERGM"){
   load("sim_basis_complete_n_1000.RData")
@@ -98,14 +162,24 @@ if (netw=="ERGM"){
   inf.path.2.h<-inf.path.h
   inf.path.2.g<-inf.path.g
 }
+
 if (netw=="Synth"){
-  name.n<-paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
+  # load the corresponding network
+  name.n <- paste("HH_Networks","_nVertex",n.vertex,"_nNetw",n.networks,".RData",sep = "")
+  setwd("G:/My Drive/PhD/IBM Multipathogen/R-Code")
   load(name.n)
-  pathogen.TP<-pathogen.1
- if (pathogen.1=="DELTA" | pathogen.1=="OMICRON"){ pathogen.TP<-"COVID-19" }
- if (pathogen.1=="XP" | pathogen.1=="XA"){ pathogen.TP<-"XS" }
   
-  name.s<-paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
+  # set pathogen.1
+  pathogen.TP <- pathogen.1
+  if(pathogen.1 == "DELTA" | pathogen.1=="OMICRON"){
+    pathogen.TP <- "COVID-19"
+  }
+  if(pathogen.1 == "XP" | pathogen.1 == "XA"){
+    pathogen.TP <- "XS" 
+  }
+  
+  # load the corresponding 
+  name.s <- paste("TP_Synth_nVertex",n.vertex,"_nNetw",n.networks, "_R",R.1,"_ratioqhqg",ratio.qhqg , "_rho",rho.1,"_alpha",alpha.as.1,"_pathogen",pathogen.TP,"_cdec",contact.reduction.TP,"_comp",bc.1.TP,".RData",sep = "")
   load(name.s)
   inf.path.1.h<-inf.path.h
   inf.path.1.g<-inf.path.g
