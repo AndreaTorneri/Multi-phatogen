@@ -55,7 +55,7 @@ cat(",pathogen=",pathogen)
 ctc.dec= as.numeric(args[11]) 
 cat(",ctc.dec=",ctc.dec)
 
-# 
+# Behavior change value set to identify transmission rates (household and global) linked to a specific R*
 compl= as.numeric(args[12]) 
 cat(",compl=",compl)
 

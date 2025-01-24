@@ -105,16 +105,16 @@ VE.COVID<- function() {
 ### depending on infectious history                            ###
 ##################################################################
 
-LLImmlev.basic <- function(status.matrix.v2, infectee, lli, current.time, typeIC,
+LLImmlev.basic <- function(status.matrix.v2, infectee, long.int, current.time, typeIC,
                            t.imm.lim, pathogen1, pathogen2){ #pathogen.v1 is the infection the infectee might catch
   value <- 1
   if(status.matrix.v2$infected[infectee] == -1){
-    #t.sinc.inf<-current.time-(status.matrix.v2$Recovery[infectee]+infectious.period.length(pathogen = pathogen2))
-    t.sinc.inf <- current.time - (status.matrix.v2$time.of.infection[infectee] 
+    #t.sinc.inf<-current.time-(status.matrix.v2$time.recovery[infectee]+infectious.period.length(pathogen = pathogen2))
+    t.sinc.inf <- current.time - (status.matrix.v2$time.infection[infectee] 
                                   + infectious.period.length(pathogen = pathogen2)) # here we are assuming a constant IPL
     if (t.sinc.inf<t.imm.lim){
       if (typeIC==1){
-        value<-lli
+        value<-long.int
       }
       if (typeIC==2){
         value<-(t.sinc.inf/t.imm.lim)
@@ -133,7 +133,7 @@ LLImmlev.basic <- function(status.matrix.v2, infectee, lli, current.time, typeIC
       }
       if (typeIC==5){
 #        if (pathogen1=="COVID-19"){
-          value<-lli
+          value<-long.int
 #        }else{
 #          if (t.sinc.inf<10){
 #           value<-(t.sinc.inf/10)
@@ -158,16 +158,16 @@ LLImmlev.basic <- function(status.matrix.v2, infectee, lli, current.time, typeIC
 #Computing Rt - started but haven't look at this anymore
 # Rt
 comp.RT<-function(status.matrix,individual,Rt){
-  infectees<-which(status.matrix$infector==individual)
+  infectees<-which(status.matrix$infected.by==individual)
   Rt.temp<-0
   if (length(infectees)>0){
     for (i1 in 1:length(infectees)){
-      if (status.matrix$time.of.infection[infectees[i1]]>status.matrix$time.of.infection[individual]){
+      if (status.matrix$time.infection[infectees[i1]]>status.matrix$time.infection[individual]){
         Rt.temp<-Rt.temp+1
       }
     }
   }
-  Rt<-rbind(Rt,c(status.matrix$time.of.infection[individual],Rt.temp))
+  Rt<-rbind(Rt,c(status.matrix$time.infection[individual],Rt.temp))
   return(Rt)
 }
 
@@ -177,17 +177,17 @@ comp.RT<-function(status.matrix,individual,Rt){
 ###                                                                                          
 ### Input parameters:                                                                       
 ### t2:                   time at which pathogen 2 is introduced in the population          
-### sigma12:              short-term interaction parameter: acquiring 2 while having 1      
+### sigma[1]:              short-term interaction parameter: acquiring 2 while having 1      
 ###                       (if >1 cooperative effect - if <1 competing)                      
 ### sigma21:              short-term interaction parameter: acquiring 1 while having 2      
 ###                       (if >1 cooperative effect - if <1 competing) 
 ### prop.immune:          proportion of immune cases (not used at the moment)
-### nSeeds.1:             number of initial cases for path 1
-### nSeeds.2:             number of initial cases for path 2
-### rho.1:                probability of being symptomatic for path 1
-### rho.2:                probability of being symptomatic for path 2
-### alpha.as.1:           relative infectiousness of asymptomatic cases (pathogen1)
-### alpha.as.2:           relative infectiousness of asymptomatic cases (pathogen2)
+### n.seeds.1:             number of initial cases for path 1
+### n.seeds.2:             number of initial cases for path 2
+### rho[1]:                probability of being symptomatic for path 1
+### rho[2]:                probability of being symptomatic for path 2
+### alpha.as[1]:           relative infectiousness of asymptomatic cases (pathogen1)
+### alpha.as[2]:           relative infectiousness of asymptomatic cases (pathogen2)
 ### netw:                 type of household network considered - Synthetic or ERGM
 ### n.vertex:             number of vertexes 
 ### n.networks:           number of simulated networks
@@ -195,33 +195,33 @@ comp.RT<-function(status.matrix,individual,Rt){
 ### R.2:                  reproduction number path 2 (household R*)
 ### ratio.qhqg:           ratio transmission probability given household contact 
 ###                       over global contacts
-### lli.1:                long-term interaction parameter: acquiring 2 while having  
+### long.int[1]:                long-term interaction parameter: acquiring 2 while having  
 ###                       experienced (and recovered from) 1 
-### lli.2:                long-term interaction parameter: acquiring 1 while having  
+### long.int[2]:                long-term interaction parameter: acquiring 1 while having  
 ###                       experienced (and recovered from) 2
-### pathogen.1:           character variable identifying pathogen 1
-### pathogen.2:           character variable identifying pathogen 2
+### pathogen[1]:           character variable identifying pathogen 1
+### pathogen[2]:           character variable identifying pathogen 2
 ### contact.reduction:    parameter multiplying the household contact rate after home 
 ###                       isolation
 ### t.stop:               time at which simulations stop
 ### t.seed:               time of additional seeding
-### bc.1:                 proportion of individuals changing behavior (home isolation) 
+### behavior.change.1:                 proportion of individuals changing behavior (home isolation) 
 ###                       after being infected with pathogen 1
-### bc.2:                 proportion of individuals changing behavior (home isolation) 
+### behavior.change.2:                 proportion of individuals changing behavior (home isolation) 
 ###                       after being infected with pathogen 2
-### reinf:                boolean identifying whether someone can be re-infected with 
+### reinfection:                boolean identifying whether someone can be re-infected with 
 ###                       the same pathogen (1 yes, 0 no)
 ### typeIC:               ID for different type of waning of immunity
 ### contact.reduction.TP: contact reduction value set to identify transmission rates 
 ###                       (household and global) linked to a specific R*
-### bc.1.TP:              behavior change value (for pathogen 1) set to identify transmission 
+### behavior.change.1.TP:              behavior change value (for pathogen 1) set to identify transmission 
 ###                       rates (household and global) linked to a specific R*
-### bc.2.TP:              behavior change value (for pathogen 2) set to identify transmission 
+### behavior.change.2.TP:              behavior change value (for pathogen 2) set to identify transmission 
 ###                       rates (household and global) linked to a specific R*
 ### het.vac:              boolean for heterologous effects (1 yes 0 no) - Not used currently
 ### t.imm.lim:            parameter to define the length of immunity that have the same overall 
 ###                       "effect" (area underneath the curve)
-### dec.gc:               decrease in the  number of global contact rates compared to baseline
+### decrease.gc:               decrease in the  number of global contact rates compared to baseline
 
 ### Output parameters:
 ### time events: three-column matrix identifying one of the following events(second column):
@@ -235,147 +235,142 @@ comp.RT<-function(status.matrix,individual,Rt){
 ###                                  infection related characteristics 
 ###############################################################################################
 
-sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.immune, nSeeds.1, nSeeds.2, 
-                              rho.1, rho.2, inf.path.1.h, inf.path.1.g, inf.path.2.h, inf.path.2.g, 
-                              alpha.as.1, alpha.as.2, lli.1, lli.2, pathogen.1, pathogen.2, contact.reduction,
-                              t.stop, t.seed, bc.1, bc.2, reinf, typeIC, het.vac, t.imm.lim){
+sim.multipathogen <- function(HH.network, t2, lambda.g, sigma, prop.immune, n.seeds, 
+                              rho, inf.path.h, inf.path.g, 
+                              alpha.as, long.int, pathogen, contact.reduction,
+                              t.stop, t.seed, behavior.change, reinfection, typeIC, het.vac, t.imm.lim){
   
   n <- network.size(HH.network)
-  hh.id<- HH.network %v% "hh_id"
+  hh.id <- HH.network %v% "hh_id"
   hh.size<- HH.network %v% "hh_size"
   
-  status.matrix.1<- data.frame(infected          = rep(0,n),  # 1
-                              time.of.infection  = NA,        # 2
-                              infector           = NA,        # 3
-                              severity           = 0,         # 4 1 Symptomatic 2 Asymptomatic
-                              TimeSymptomOnset   = Inf,       # 5
-                              Immunity           = 0,         # 0 no immunity, 1 vaccinated
-                              Recovery           = Inf)
   
-  status.matrix.2 <-status.matrix.1
-  recovery.vector.1<-rep(Inf,n) #vector giving the recovery times
-  recovery.vector.2<-rep(Inf,n) #vector giving the recovery times
+  ### Create data structures to keep track of the results
+  status.matrix <- data.frame(infected = rep(FALSE,n),
+                              time.infection = NA,
+                              infected.by = NA,
+                              severity = 0, # 1 symptomatic, 2 asymptomatic
+                              time.symptom.onset = Inf,
+                              immunity = 0, # 0 no immunity, 1 vaccinated
+                              time.recovery = Inf)
+  status = list(status.matrix, status.matrix)
   
-  #type of the events that can happen in this simulator
-  events<-data.frame("NextCtc"=Inf, "HomeQuarantine"=Inf, "Recovery"=Inf, "NewPathogen"=Inf, "NewSeeding1"=Inf, "NewSeeding2"=Inf )
-  events$NewPathogen<-t2
-  events$NewSeeding1<-t.seed
-  events$NewSeeding2<-t2+t.seed
+  time.recovery.vector.1 <- time.recovery.vector.2 <- rep(Inf,n) #vector giving the time.recovery times
 
-  infectives<-rep(0,n) # vector that indicates who is infectious at the current time: 1 infectious 0 non infectious
-  current.time<-0
-  index.contact.within<-rep(0,n) # vector that selects the individuals that have to propose a new social contact(local) - 1 yes 0 no
-  index.contact.between<-rep(0,n) # vector that selects the individuals that have to propose a new social contact(global) - 1 yes 0 no
-  time.events<-matrix(NA,1,3)
+  # dataframe containing the next time of each possible event types
+  events <- data.frame(contact = Inf, 
+                       home.quarantine = Inf, 
+                       recovery = Inf, 
+                       new.pathogen = t2, 
+                       new.seeding.1 = t.seed,
+                       new.seeding.2 = t2 + t.seed)
+  # vector indicating who is infectious at the current time: 1 infectious 0 non infectious
+  infectives <- rep(FALSE,n) 
+  # vector that selects the individuals that have to propose a new social contact(local) - 1 yes 0 no
+  index.contact.h <- rep(FALSE,n) 
+  # vector that selects the individuals that have to propose a new social contact(global) - 1 yes 0 no
+  index.contact.g <- rep(FALSE,n) 
+  # ?
+  time.events = data.frame(time = NA,
+                           type = NA,
+                           id = NA)  
+  # Set the current time
+  current.time <- 0
   
-  #transmission parameter dataframe: each line is an individual, the first colum is the ID, the second and third the transmisssion parameter given  household or global contacts for pathogen 1, and fourth and fifth for pathogen 2
+  # transmission parameter dataframe: each line is an individual, the first column is the ID, the second and third the transmisssion parameter given  household or global contacts for pathogen 1, and fourth and fifth for pathogen 2
   # 6th, 7th columns the contact rates for within and between household contacts, and last a vector checking whether a person is susceptible
-  transmission.parameters<-data.frame("id"=1:n,"q1h"=rep(NA,n),"q1g"=rep(NA,n),"q2h"=rep(NA,n),"q2g"=rep(NA,n), "contact_rate_within"=rep(NA,n),"contact_rate_between"=lambda.g, "susceptibility"=rep(1,n))   #matrix containing the proposed time of the next contact (first colum) and the contact individual (second column)
-  for (j in 1:n){
-    transmission.parameters$contact_rate_within[j]<-length(get.neighborhood(HH.network,j))
-  }
+  transmission.parameters <- data.frame(id = 1:n, 
+                                        q.1.h = NA, 
+                                        q.1.g = NA, 
+                                        q.2.h = NA, 
+                                        q.2.g = NA, 
+                                        contact.rate.h = sapply(1:n, function(j) length(get.neighborhood(HH.network, j))),
+                                        contact.rate.g = lambda.g, 
+                                        susceptibility = 1)  
   
   #Proportion of immune - To be adapted
   
   # if (prop.immune>0){
-  #   if (pathogen.1=="DELTA" & pathogen.2=="OMICRON"){
+  #   if (pathogen[1]=="DELTA" & pathogen[2]=="OMICRON"){
   #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.1$Immunity[immuned.individuals]<-1
-  #     status.matrix.2$Immunity<-status.matrix.1$Immunity
+  #     status.matrix.1$immunity[immuned.individuals]<-1
+  #     status.matrix.2$immunity<-status.matrix.1$immunity
   #   }else{
   #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.1$Immunity[immuned.individuals]<-1
+  #     status.matrix.1$immunity[immuned.individuals]<-1
   #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.2$Immunity[immuned.individuals]<-1
+  #     status.matrix.2$immunity[immuned.individuals]<-1
   #   }
   # }
   
   # individuals can home isolate when they show symptoms - if so, they stay in iso till the end of the infectious period (for sake of simplicity)
-  homequarantine.day.1<-rep(Inf,n) #when individual affected by pathogen 1 home isolate
-  homequarantine.day.2<-rep(Inf,n) #when individual affected by pathogen 2 home isolate
-  homequarantine<-rep(0,n) #if inidivuals are in home isolation yes 1 or not 0
-  stop.quarantine<-rep(Inf,n)
   
-  contact.time.within<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (second colum) and the contact individual (third column) for within household contacts
-  contact.time.between<-data.frame("id"=1:n,"pr.ctc"=rep(NA,n),"pr.infectee"=rep(NA,n))   #matrix containing the proposed time of the next contact (secon colum) and the contact individual (third column) for between household contacts
+  home.quarantine = data.frame(id = 1:n,
+                          quarantine = FALSE,
+                          start = Inf,
+                          end = Inf)
+  home.quarantine = list(home.quarantine, home.quarantine)
   
-  # first infected: randomly chosen in the population (among the susceptibles) - here we assume that epidemics always start in household of size 2 - this is a ranom choice that decreases stochasticity
-  potential.seeds<-which(hh.size==2)
-  first.cases<-sample(potential.seeds[which(status.matrix.1[potential.seeds,1]==0)],nSeeds.1)
+  # matrix containing the proposed time of the next contact (second column) and the contact individual (third column) for within household contacts
   
-  # adapt status matrix for a case that is infected/seeded
-  for (j in first.cases){
-    first<-j
-    status.matrix.1$infected[first] <- 1 
-    status.matrix.1$time.of.infection[first] <- 0
-    status.matrix.1$Recovery[first]<-current.time+infectious.period.length(pathogen = pathogen.1)
-   # if (runif(1)<rho.1){ #if symptomatic #index cases are always symptomatic individuals
-      transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
-      transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
-      status.matrix.1$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.1)
-      if(runif(1)<bc.1){
-      homequarantine.day.1[first]<-status.matrix.1$TimeSymptomOnset[first]
-      }
-      status.matrix.1$severity[first]<-1
-      time.events<-rbind(time.events,c(current.time,1.1,first))
-    #}
-    #else{
-    #  transmission.parameters$q1h[first]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
-    #  transmission.parameters$q1g[first]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
-    #  status.matrix.1$severity[first]<-2
-    #  time.events<-rbind(time.events,c(current.time,1.2,first))
-    #}
-    infectives[first]<-1
-    contact.time.within$pr.ctc[first]<-ifelse(transmission.parameters$contact_rate_within[first]!=0,rexp(1,transmission.parameters$contact_rate_within[first])+current.time,Inf)       # I generate the next interarrival time for individual i
-    contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
+  next.contact = list(h = data.frame(id = 1:n, 
+                                     time.next.contact = Inf, 
+                                     person.time.next.contact = NA),
+                      g = data.frame(id = 1:n, 
+                                     time.next.contact = Inf, 
+                                     person.time.next.contact = NA))
+  
+  ##################################################################
+  ### STEP 1
+  ### Introduce the first infections
+  ### The individuals are randomly chosen in the population (among susceptibles).
+  ### We assume that epidemics always start in household of size 2 (this is a random choice that decreases stochasticity).
+  ### We assume that index cases are always symptomatic.
+  first.cases.1 <- identify.initial.cases(pathogen[1])
+  
+  for(j in first.cases.1){
+    initial.infection(id = j, path = pathogen[1])
   }
   
-  proposed.individual<-0
-  temp.contact.time<-0
-  indiv.prop.ctc<-0
-  recovered<-0
-  err<-0
-  Rt1<-matrix(data = NA, nrow = 1, ncol = 2)
-  Rt2<-matrix(data = NA, nrow = 1, ncol = 2)
+  ### ? 
+  proposed.individual <- 0
+  temp.contact.time <- 0
+  indiv.prop.ctc <- 0
+  recovered <- 0
+  err <- 0
+  Rt1 <- matrix(data = NA, nrow = 1, ncol = 2)
+  Rt2 <- matrix(data = NA, nrow = 1, ncol = 2)
+  ### ?
   
+  ##################################################################
+  ### STEP 2
+  ### Run the epidemic  
+  ### Continue the epidemic as long as there are infected individuals or pathogen 2 still has to be introduced and as long
+  ### as t.stop has not been reached.
 
-  while((sum(infectives)>0 & current.time<t.stop) | current.time<t2){ #while there are still infectives, we are within the t.stop
-    #Phase 1: individuals that has to, propose a new social contac
-    for (i in which(index.contact.within==1) ){ # for all the individuals that has to propose a global contact
-      contact.time.within$pr.ctc[i]<-ifelse(transmission.parameters$contact_rate_within[i]!=0,rexp(1,transmission.parameters$contact_rate_within[i])+current.time,Inf)# I generate the next interarrival time for individual i
-      index.contact.within[i]<-0
-    }
-    for (i in which(index.contact.between==1) ){ # for all the individuals that has to propose a global contact
-     contact.time.between$pr.ctc[i]<-rexp(1,transmission.parameters$contact_rate_between[i])+current.time# I generate the next interarrival time for individual i
-      index.contact.between[i]<-0
-    }
+  #while((sum(infectives)>0 & current.time<t.stop) | current.time<t2){ #while there are still infectives, we are within the t.stop
+  while((sum(status[[1]]$infected + status[[2]]$infected) > 0 & current.time < t.stop) | current.time < t2){
     
-    contact.time.overall<-c(contact.time.within$pr.ctc, contact.time.between$pr.ctc) #overall contact times - local+global    
-    recovery.vector.overall<-c(status.matrix.1$Recovery ,status.matrix.2$Recovery) #recovery times - for pathogen 1 and 2
-    homequarantine.day.overall<-c(homequarantine.day.1,homequarantine.day.2) # home isolation day - for pathogen 1 and 2
-
-    #Phase 2: identify the next event: select the minimum time among the events that can occur
+    ### Phase 1: individuals that has to, propose a new social contact
+    generate.next.contact()
     
-    ifelse(length(which(is.na(contact.time.overall)==FALSE))>0,events$NextCtc<-min(contact.time.overall, na.rm = T),events$NextCtc<-Inf) # among all the proposed social contact between houeholds we select the minimum
-    ifelse(length(which(!is.infinite(homequarantine.day.overall)))>0,events$HomeQuarantine<-min(homequarantine.day.overall),events$HomeQuarantine<-Inf ) #minimum quarantine pathogen 1
-    ifelse(length(which(is.na(recovery.vector.overall)==FALSE))>0,events$Recovery<-min(recovery.vector.overall, na.rm = T),events$Recovery<-Inf) # among all the proposed social contact between houeholds we select the minimum
+    ###  Phase 2: identify the next event: select the minimum time among the events that can occur
+    next.event = identify.next.event()
     
-    next.evts<-colnames(events)[which(min(events)==events)] # if more than one event is occuring at a specific time, just sample one
-    if (length(next.evts)>1){
-      next.evts<-sample(colnames(events)[which(min(events)==events)],1)
-    }
+    ### PHASE 3: the event happens
     
-    if (next.evts=="NextCtc"){
-      current.time<-events$NextCtc
+    
+    if (next.event=="contact"){
+      current.time<-events$contact
       if (length(min(contact.time.overall, na.rm = T))>1){ #when two contacts happen at the same time select one of the two
         selected.ctc<-sample(which(contact.time.overall==current.time),1) 
         if (selected.ctc!=n & selected.ctc!=2*n){
-          infector<- selected.ctc %% n
+          infected.by<- selected.ctc %% n
         }else{
-          infector<- n
+          infected.by<- n
         }
         if (selected.ctc<=n){
-          infectee.pool<-get.neighborhood(HH.network,infector)
+          infectee.pool<-get.neighborhood(HH.network,infected.by)
           if (length(infectee.pool)>1){
             infectee<-sample(infectee.pool,1) #pick a random individual in the class
           }
@@ -383,24 +378,24 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
             infectee<-infectee.pool #pick a random individual in the class
           }
           if(length(infectee.pool)==0){
-            infectee<-infector #just a trick to have acceptance rate 0 (infector is not susceptible)
+            infectee<-infected.by #just a trick to have acceptance rate 0 (infected.by is not susceptible)
           }
-          index.contact.within[infector]<-1
-          contact.time.within$pr.ctc[infector]<-NA
+          index.contact.h[infected.by]<-1
+          next.contact.h$time.next.contact[infected.by]<-NA
           ctc<-"hh"
         }else{
-          infector<-which(contact.time.between$pr.ctc == events$NextCtc) 
-          hh.members.temp<-which(hh.id==hh.id[infector])
+          infected.by<-which(next.contact.g$time.next.contact == events$contact) 
+          hh.members.temp<-which(hh.id==hh.id[infected.by])
           infectee.pool<- setdiff(1:n,hh.members.temp) #individuals not in the same class
           infectee<-sample(infectee.pool,1) #pick a random individual not in the class (and not a teacher)
-          index.contact.between[infector]<-1
-          contact.time.between$pr.ctc[infector]<-NA
+          index.contact.g[infected.by]<-1
+          next.contact.g$time.next.contact[infected.by]<-NA
           ctc<-"g"
         }
       }else{
-        if (length(which(events$NextCtc==contact.time.within$pr.ctc))>0){ #if it is a within contact
-          infector<-which(contact.time.within$pr.ctc ==events$NextCtc)
-          infectee.pool<-get.neighborhood(HH.network,infector) # the pool of susceptible is the household
+        if (length(which(events$contact==next.contact.h$time.next.contact))>0){ #if it is a within contact
+          infected.by<-which(next.contact.h$time.next.contact ==events$contact)
+          infectee.pool<-get.neighborhood(HH.network,infected.by) # the pool of susceptible is the household
           if (length(infectee.pool)>1){
             infectee<-sample(infectee.pool,1) #pick a random individual in the class
           }
@@ -408,18 +403,18 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
             infectee<-infectee.pool #pick a random individual in the class
           }
           if(length(infectee.pool)==0){
-            infectee<-infector #just a trick to have acceptance rate 0 (infector is not susceptible)
+            infectee<-infected.by #just a trick to have acceptance rate 0 (infected.by is not susceptible)
           }
-          index.contact.within[infector]<-1
-          contact.time.within$pr.ctc[infector]<-NA
+          index.contact.h[infected.by]<-1
+          next.contact.h$time.next.contact[infected.by]<-NA
           ctc<-"hh"
         }else{
-          infector<-which(contact.time.between$pr.ctc == events$NextCtc) 
-          hh.members.temp<-which(hh.id==hh.id[infector])
+          infected.by<-which(next.contact.g$time.next.contact == events$contact) 
+          hh.members.temp<-which(hh.id==hh.id[infected.by])
           infectee.pool<- setdiff(1:n,hh.members.temp) #individuals not in the same class
           infectee<-sample(infectee.pool,1) #pick a random individual not in the class (and not a teacher)
-          index.contact.between[infector]<-1
-          contact.time.between$pr.ctc[infector]<-NA
+          index.contact.g[infected.by]<-1
+          next.contact.g$time.next.contact[infected.by]<-NA
           ctc<-"g"
         }
       }
@@ -427,90 +422,90 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
       
       
       #Infection with pathogen 1
-      if (status.matrix.1$infected[infector]==1 & status.matrix.1$infected[infectee]==0){
+      if (status.matrix.1$infected[infected.by]== TRUE & status.matrix.1$infected[infectee]== FALSE){
         # compute short interaction terms for pathogen.1 (having pathogen 2)
-        if (status.matrix.2$infected[infectee]==1){
-          short.inter<-sigma12
+        if (status.matrix.2$infected[infectee]==TRUE){
+          short.inter<-sigma[1]
         }else{
           short.inter<-1
         }
         # compute long-term interactions (i.e., the potential infectee already experienced the other infection, or that inefction)
-        long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.2,infectee = infectee, lli = lli.2, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen.1, pathogen2=pathogen.2 )
+        long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.2,infectee = infectee, long.int = long.int[2], current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen[1], pathogen2=pathogen[2] )
         # select the transmission probability related to global or local contacts
-        ifelse(ctc=="g",q<-transmission.parameters$q1g[infector],q<-transmission.parameters$q1h[infector])
+        ifelse(ctc=="g",q<-transmission.parameters$q.1.g[infected.by],q<-transmission.parameters$q.1.h[infected.by])
         #Acceptance rate is the probability that there will be the infection. This is composed by q,short and long term interaction, and the infectiousness measure that describe how likely is that it will happen in that moment
-        acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.of.infection[infector] ,pathogen = pathogen.1)*short.inter*long.inter*q
-        if ((ctc=="g" & homequarantine[infectee]==1) | status.matrix.1$infected[infectee]==1){acc.rate.1<-0} # if the contacted person is in home quarantine there is no contact 
+        acc.rate.1<-InfMeasure(t= current.time- status.matrix.1$time.infection[infected.by] ,pathogen = pathogen[1])*short.inter*long.inter*q
+        if ((ctc=="g" & home.quarantine[infectee]==1) | status.matrix.1$infected[infectee]==TRUE){acc.rate.1<-0} # if the contacted person is in home quarantine there is no contact 
         if (acc.rate.1>1){err<-err+1} #keep track that the acc.rate does not exceed 1 - since it is a prob value this would not make much sense
         if (runif(1)<acc.rate.1){ # if infection, adapt the status matrix
-          status.matrix.1$infected[infectee] <- 1 
-          status.matrix.1$time.of.infection[infectee] <- current.time
-          status.matrix.1$infector[infectee] <- infector
-          status.matrix.1$Recovery[infectee]<-current.time+infectious.period.length(pathogen=pathogen.1)
-          if (runif(1)<rho.1){ #if symptomatic
-            transmission.parameters$q1h[infectee]<-inf.path.1.h #A single q parameter for everyone
-            transmission.parameters$q1g[infectee]<-inf.path.1.g #A single q parameter for everyone
-            status.matrix.1$TimeSymptomOnset[infectee]<-current.time+incubation.period(pathogen=pathogen.1)
-            if (runif(1)<bc.1){
-              homequarantine.day.1[infectee]<-status.matrix.1$TimeSymptomOnset[infectee]
+          status.matrix.1$infected[infectee] <- TRUE
+          status.matrix.1$time.infection[infectee] <- current.time
+          status.matrix.1$infected.by[infectee] <- infected.by
+          status.matrix.1$time.recovery[infectee]<-current.time+infectious.period.length(pathogen=pathogen[1])
+          if (runif(1)<rho[1]){ #if symptomatic
+            transmission.parameters$q.1.h[infectee]<-inf.h[1] #A single q parameter for everyone
+            transmission.parameters$q.1.g[infectee]<-inf.g[1] #A single q parameter for everyone
+            status.matrix.1$time.symptom.onset[infectee]<-current.time+incubation.period(pathogen=pathogen[1])
+            if (runif(1)<behavior.change.1){
+              home.quarantine.start.1[infectee]<-status.matrix.1$time.symptom.onset[infectee]
             }
             status.matrix.1$severity[infectee]<-1
             time.events<-rbind(time.events,c(current.time,1.1,infectee))
           }else{
-            transmission.parameters$q1g[infectee]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
-            transmission.parameters$q1h[infectee]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
+            transmission.parameters$q.1.g[infectee]<-inf.g[1]*alpha.as[1] #A single q parameter for everyone
+            transmission.parameters$q.1.h[infectee]<-inf.h[1]*alpha.as[1] #A single q parameter for everyone
             status.matrix.1$severity[infectee]<-2
             time.events<-rbind(time.events,c(current.time,1.2,infectee))
           }
           if (infectives[infectee]==0){
             infectives[infectee]<-1
-            contact.time.within$pr.ctc[infectee]<-ifelse(transmission.parameters$contact_rate_within[infectee]!=0,rexp(1,transmission.parameters$contact_rate_within[infectee])+current.time,Inf)       # I generate the next interarrival time for individual i
-            if (homequarantine[infectee]==0){
-              contact.time.between$pr.ctc[infectee]<-rexp(1,transmission.parameters$contact_rate_between[infectee])+current.time # I generate the next interarrival time for individual i
+            next.contact.h$time.next.contact[infectee]<-ifelse(transmission.parameters$contact.rate.h[infectee]!=0,rexp(1,transmission.parameters$contact.rate.h[infectee])+current.time,Inf)       # I generate the next interarrival time for individual i
+            if (home.quarantine[infectee]==0){
+              next.contact.g$time.next.contact[infectee]<-rexp(1,transmission.parameters$contact.rate.g[infectee])+current.time # I generate the next interarrival time for individual i
             }
           }
         }
         
       }
 
-     #Infection with pathogen 2 - similar to above. To note: if the infector is infected with both, both these probability will be computed and potentially both infections can be transmitted
-      if (status.matrix.2$infected[infector]==1 & status.matrix.2$infected[infectee]==0){
-        if (status.matrix.1$infected[infectee]==1){
+     #Infection with pathogen 2 - similar to above. To note: if the infected.by is infected with both, both these probability will be computed and potentially both infections can be transmitted
+      if (status.matrix.2$infected[infected.by]== TRUE & status.matrix.2$infected[infectee]==FALSE){
+        if (status.matrix.1$infected[infectee]==TRUE){
           short.inter<-sigma21
         }else{
           short.inter<-1
         }
-          long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.1,infectee = infectee, lli = lli.1, current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen.2, pathogen2=pathogen.1)
+          long.inter<-LLImmlev.basic(status.matrix.v2 = status.matrix.1,infectee = infectee, long.int = long.int[1], current.time = current.time,typeIC = typeIC, t.imm.lim = t.imm.lim, pathogen1 = pathogen[2], pathogen2=pathogen[1])
           
-        ifelse(ctc=="g",q<-transmission.parameters$q2g[infector],q<-transmission.parameters$q2h[infector])
-        acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.of.infection[infector]),pathogen = pathogen.2)*short.inter*long.inter*q
-        if ((ctc=="g" & homequarantine[infectee]==1)){acc.rate.2<-0}
+        ifelse(ctc=="g",q<-transmission.parameters$q.2.g[infected.by],q<-transmission.parameters$q.2.h[infected.by])
+        acc.rate.2<-InfMeasure(t=(current.time-status.matrix.2$time.infection[infected.by]),pathogen = pathogen[2])*short.inter*long.inter*q
+        if ((ctc=="g" & home.quarantine[infectee]==1)){acc.rate.2<-0}
         if (acc.rate.2>1){err<-err+1}
         if (runif(1)<acc.rate.2){
-          status.matrix.2$infected[infectee] <- 1 
-          status.matrix.2$time.of.infection[infectee] <- current.time
-          status.matrix.2$infector[infectee] <- infector
-          status.matrix.2$Recovery[infectee]<-current.time+infectious.period.length(pathogen=pathogen.2)
-          if (runif(1)<rho.2){ #if symptomatic
-            transmission.parameters$q2h[infectee]<-inf.path.2.h #A single q parameter for everyone
-            transmission.parameters$q2g[infectee]<-inf.path.2.g #A single q parameter for everyone
-            status.matrix.2$TimeSymptomOnset[infectee]<-current.time+incubation.period(pathogen=pathogen.2)
-            if (runif(1)<bc.2){
-              homequarantine.day.2[infectee]<-status.matrix.2$TimeSymptomOnset[infectee]
+          status.matrix.2$infected[infectee] <- TRUE 
+          status.matrix.2$time.infection[infectee] <- current.time
+          status.matrix.2$infected.by[infectee] <- infected.by
+          status.matrix.2$time.recovery[infectee]<-current.time+infectious.period.length(pathogen=pathogen[2])
+          if (runif(1)<rho[2]){ #if symptomatic
+            transmission.parameters$q.2.h[infectee]<-inf.h[2] #A single q parameter for everyone
+            transmission.parameters$q.2.g[infectee]<-inf.g[2] #A single q parameter for everyone
+            status.matrix.2$time.symptom.onset[infectee]<-current.time+incubation.period(pathogen=pathogen[2])
+            if (runif(1)<behavior.change.2){
+              home.quarantine.start.2[infectee]<-status.matrix.2$time.symptom.onset[infectee]
             }
             status.matrix.2$severity[infectee]<-1
             time.events<-rbind(time.events,c(current.time,2.1,infectee))
           }else{
-            transmission.parameters$q2g[infectee]<-inf.path.2.g*alpha.as.2 #A single q parameter for everyone
-            transmission.parameters$q2h[infectee]<-inf.path.2.h*alpha.as.2 #A single q parameter for everyone
+            transmission.parameters$q.2.g[infectee]<-inf.g[2]*alpha.as[2] #A single q parameter for everyone
+            transmission.parameters$q.2.h[infectee]<-inf.h[2]*alpha.as[2] #A single q parameter for everyone
             status.matrix.2$severity[infectee]<-2
             time.events<-rbind(time.events,c(current.time,2.2,infectee))
           }
           if (infectives[infectee]==0){
             infectives[infectee]<-1
-            contact.time.within$pr.ctc[infectee]<-ifelse(transmission.parameters$contact_rate_within[infectee]!=0,rexp(1,transmission.parameters$contact_rate_within[infectee])+current.time,Inf)       # I generate the next interarrival time for individual i
-            if (homequarantine[infectee]==0){
-              contact.time.between$pr.ctc[infectee]<-rexp(1,transmission.parameters$contact_rate_between[infectee])+current.time # I generate the next interarrival time for individual i
+            next.contact.h$time.next.contact[infectee]<-ifelse(transmission.parameters$contact.rate.h[infectee]!=0,rexp(1,transmission.parameters$contact.rate.h[infectee])+current.time,Inf)       # I generate the next interarrival time for individual i
+            if (home.quarantine[infectee]==0){
+              next.contact.g$time.next.contact[infectee]<-rexp(1,transmission.parameters$contact.rate.g[infectee])+current.time # I generate the next interarrival time for individual i
             }
           }
         }
@@ -518,80 +513,80 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
       }
     }
     
-    if (next.evts=="HomeQuarantine"){ #next event is home isolation
-      current.time<-events$HomeQuarantine
-      quarantined.individuals<-which(homequarantine.day.overall==current.time)
+    if (next.event=="home.quarantine"){ #next event is home isolation
+      current.time<-events$home.quarantine
+      quarantined.individuals<-which(home.quarantine.start.overall==current.time)
       for (k in quarantined.individuals){ # we need to understand whether is an individual sick by pathogen 1 or 2
         if (k != n & k!= 2*n) {
           temp.ind<- k %% n          
         }else{
           if (k==n){
-            homequarantine.day.1[n]<-Inf
-            stop.quarantine[n]<-status.matrix.1$Recovery[n] # home isolated till recovery
+            home.quarantine.start.1[n]<-Inf
+            stop.quarantine[n]<-status.matrix.1$time.recovery[n] # home isolated till time.recovery
           }else{
-            homequarantine.day.2[n]<-Inf
-            stop.quarantine[n]<-status.matrix.2$Recovery[n]
+            home.quarantine.start.2[n]<-Inf
+            stop.quarantine[n]<-status.matrix.2$time.recovery[n]
           }
           temp.ind<-n
         }
         if (k>n){
-          homequarantine.day.2[temp.ind]<-Inf
-          stop.quarantine[temp.ind]<-status.matrix.2$Recovery[temp.ind]
+          home.quarantine.start.2[temp.ind]<-Inf
+          stop.quarantine[temp.ind]<-status.matrix.2$time.recovery[temp.ind]
         }
         if (k<n){
-          homequarantine.day.1[temp.ind]<-Inf
-          stop.quarantine[temp.ind]<-status.matrix.1$Recovery[temp.ind]
+          home.quarantine.start.1[temp.ind]<-Inf
+          stop.quarantine[temp.ind]<-status.matrix.1$time.recovery[temp.ind]
         }
-        if (homequarantine[temp.ind]==1){ #individual is already in quarantine for the other disease
-          stop.quarantine[temp.ind]<-max(status.matrix.2$Recovery[temp.ind],status.matrix.1$Recovery[temp.ind])
+        if (home.quarantine[temp.ind]==1){ #individual is already in quarantine for the other disease
+          stop.quarantine[temp.ind]<-max(status.matrix.2$time.recovery[temp.ind],status.matrix.1$time.recovery[temp.ind])
         }
-        homequarantine[temp.ind]<-1
-        contact.time.between$pr.ctc[temp.ind]<-NA
-        contact.time.within$pr.ctc[temp.ind]<-NA
-        index.contact.between[temp.ind]<-0
-        index.contact.within[temp.ind]<-1
-        transmission.parameters$contact_rate_within[temp.ind]<-transmission.parameters$contact_rate_within[temp.ind]*contact.reduction
+        home.quarantine[temp.ind]<-1
+        next.contact.g$time.next.contact[temp.ind]<-NA
+        next.contact.h$time.next.contact[temp.ind]<-NA
+        index.contact.g[temp.ind]<-0
+        index.contact.h[temp.ind]<-1
+        transmission.parameters$contact.rate.h[temp.ind]<-transmission.parameters$contact.rate.h[temp.ind]*contact.reduction
       }
     }
     
-    if (next.evts=="Recovery"){ #recovery from infection
-      current.time<-events$Recovery
-      temp.recovered<-which(recovery.vector.overall==events$Recovery)
+    if (next.event=="time.recovery"){ #time.recovery from infection
+      current.time<-events$recovery
+      temp.recovered<-which(time.recovery.vector.overall==events$recovery)
       for (recovered in temp.recovered){
         if (recovered!= n & recovered!=n*2){ # whether recovering from pathogen 1 or 2
           if (recovered > n){
             recovered<- recovered %% n
             Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
-            status.matrix.2$infected[recovered]<--1
-            status.matrix.2$Recovery[recovered]<-Inf
-            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
+            status.matrix.2$infected[recovered]<-- TRUE
+            status.matrix.2$time.recovery[recovered]<-Inf
+            transmission.parameters$contact.rate.h[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-2,recovered))
-            if (status.matrix.1$infected[recovered]!=1){
+            if (status.matrix.1$infected[recovered]!=TRUE){
               infectives[recovered]<-0
-              contact.time.between$pr.ctc[recovered]<-NA #be sure to reomove all the contacts that these person will make after recovery (if recovery comes before nextcontact)
-              contact.time.within$pr.ctc[recovered]<-NA 
-              index.contact.within[recovered]<-0 #this person is not making any other contact (this will happen only if infected agai)
-              index.contact.between[recovered]<-0
+              next.contact.g$time.next.contact[recovered]<-NA #be sure to reomove all the contacts that these person will make after time.recovery (if time.recovery comes before nextcontact)
+              next.contact.h$time.next.contact[recovered]<-NA 
+              index.contact.h[recovered]<-0 #this person is not making any other contact (this will happen only if infected agai)
+              index.contact.g[recovered]<-0
             }else{
-              if (homequarantine[recovered]==0){ #remove from home isolation - so he/she can be reached by global contacts
-                index.contact.between[recovered]<-1
+              if (home.quarantine[recovered]==0){ #remove from home isolation - so he/she can be reached by global contacts
+                index.contact.g[recovered]<-1
               }
             }
           }else{
             Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
-            status.matrix.1$infected[recovered]<--1
-            status.matrix.1$Recovery[recovered]<-Inf
-            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
+            status.matrix.1$infected[recovered]<--TRUE
+            status.matrix.1$time.recovery[recovered]<-Inf
+            transmission.parameters$contact.rate.h[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-1,recovered))
-            if (status.matrix.2$infected[recovered]!=1){
+            if (status.matrix.2$infected[recovered]!=TRUE){
               infectives[recovered]<-0
-              contact.time.between$pr.ctc[recovered]<-NA
-              contact.time.within$pr.ctc[recovered]<-NA
-              index.contact.within[recovered]<-0
-              index.contact.between[recovered]<-0
+              next.contact.g$time.next.contact[recovered]<-NA
+              next.contact.h$time.next.contact[recovered]<-NA
+              index.contact.h[recovered]<-0
+              index.contact.g[recovered]<-0
             }else{
-              if (homequarantine[recovered]==0){
-                index.contact.between[recovered]<-1
+              if (home.quarantine[recovered]==0){
+                index.contact.g[recovered]<-1
               }
             }
           }
@@ -599,154 +594,139 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
           if (recovered == 2*n){
             recovered<- n
             Rt2<-comp.RT(status.matrix = status.matrix.2,individual = recovered,Rt=Rt2)
-            status.matrix.2$infected[recovered]<--1
-            status.matrix.2$Recovery[recovered]<-Inf
-            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
+            status.matrix.2$infected[recovered]<--TRUE
+            status.matrix.2$time.recovery[recovered]<-Inf
+            transmission.parameters$contact.rate.h[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-2,recovered))
-            if (status.matrix.1$infected[recovered]!=1){
+            if (status.matrix.1$infected[recovered]!=TRUE){
               infectives[recovered]<-0
-              contact.time.between$pr.ctc[recovered]<-NA
-              contact.time.within$pr.ctc[recovered]<-NA
-              index.contact.within[recovered]<-0
-              index.contact.between[recovered]<-0
+              next.contact.g$time.next.contact[recovered]<-NA
+              next.contact.h$time.next.contact[recovered]<-NA
+              index.contact.h[recovered]<-0
+              index.contact.g[recovered]<-0
             }else{
-              if (homequarantine[recovered]==0){
-                index.contact.between[recovered]<-1
+              if (home.quarantine[recovered]==0){
+                index.contact.g[recovered]<-1
               }
             }
           }else{
             Rt1<-comp.RT(status.matrix = status.matrix.1,individual = recovered,Rt=Rt1)
-            status.matrix.1$infected[recovered]<--1
-            status.matrix.1$Recovery[recovered]<-Inf
-            transmission.parameters$contact_rate_within[recovered]<-length(get.neighborhood(HH.network,recovered))
+            status.matrix.1$infected[recovered]<--TRUE
+            status.matrix.1$time.recovery[recovered]<-Inf
+            transmission.parameters$contact.rate.h[recovered]<-length(get.neighborhood(HH.network,recovered))
             time.events<-rbind(time.events,c(current.time,-1,recovered))
-            if (status.matrix.2$infected[recovered]!=1){
+            if (status.matrix.2$infected[recovered]!=TRUE){
               infectives[recovered]<-0
-              contact.time.between$pr.ctc[recovered]<-NA
-              contact.time.within$pr.ctc[recovered]<-NA
-              index.contact.within[recovered]<-0
-              index.contact.between[recovered]<-0
+              next.contact.g$time.next.contact[recovered]<-NA
+              next.contact.h$time.next.contact[recovered]<-NA
+              index.contact.h[recovered]<-0
+              index.contact.g[recovered]<-0
             }else{
-              if (homequarantine[recovered]==0){
-                index.contact.between[recovered]<-1
+              if (home.quarantine[recovered]==0){
+                index.contact.g[recovered]<-1
               }
             }
           }
         }
         if (stop.quarantine[recovered]==current.time){
-          homequarantine[recovered]<-0
+          home.quarantine[recovered]<-0
           stop.quarantine[recovered]<-Inf
         }
       }
     }
     
-    if (next.evts=="NewPathogen"){ # Seeding pathogen 2
-      current.time<-events$NewPathogen
-      events$NewPathogen<-Inf
-      first.cases<-sample(1:n,nSeeds.2)
-      for (j in first.cases){
-        first<-j
-        status.matrix.2$infected[first] <- 1 
-        status.matrix.2$time.of.infection[first] <- current.time
-        status.matrix.2$Recovery[first]<-current.time+infectious.period.length(pathogen=pathogen.2)
-        if (runif(1)<rho.2){ #if symptomatic
-          transmission.parameters$q2h[first]<-inf.path.2.h #A single q parameter for everyone
-          transmission.parameters$q2g[first]<-inf.path.2.g #A single q parameter for everyone
-          status.matrix.2$severity[first]<-1
-          status.matrix.2$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          if (runif(1)<bc.2){
-            homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
-          }
-          time.events<-rbind(time.events,c(current.time,2.1,first))
-        }else{
-          transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.2 #A single q parameter for everyone
-          transmission.parameters$q2g[first]<-inf.path.2.g*alpha.as.2 #A single q parameter for everyone
-          status.matrix.2$severity[first]<-2
-          time.events<-rbind(time.events,c(current.time,2.2,first))
-        }
-        if (infectives[first]==0){
-          infectives[first]<-1
-          contact.time.within$pr.ctc[first]<-ifelse(transmission.parameters$contact_rate_within[first]!=0,rexp(1,transmission.parameters$contact_rate_within[first])+current.time,Inf)       # I generate the next interarrival time for individual i
-          if (homequarantine[first]==0){
-            contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
-          }
-        }
+    if(next.event == "new.pathogen"){ 
+      # update the current time: 
+      current.time <- events$new.pathogen
+      # identify the individuals to be infected
+      first.cases.2 <- identify.initial.cases(pathogen[2])
+      # infect thpse individuals
+      for(j in first.cases.2){
+        initial.infection(id = j, path = pathogen[2])
       }
+      # the event has been introduced, the time needs to be set to Inf. 
+      events$new.pathogen <- Inf
     }
     
-    if (next.evts=="NewSeeding1"){
-      current.time<-events$NewSeeding1
-      events$NewSeeding1<-current.time+t.seed
-      not.infected<-which(status.matrix.1$infected!=1)
-      if (nSeeds.1<length(not.infected)){
-      first.cases<-sample(not.infected,nSeeds.1)
+    
+    
+    
+    if(next.event == "new.seeding.1"){
+      current.time <- events$new.seeding.1
+      events$new.seeding.1<-current.time+t.seed
+      not.infected<-which(status.matrix.1$infected!=TRUE)
+      if (n.seeds.1<length(not.infected)){
+      first.cases<-sample(not.infected,n.seeds.1)
       for (j in first.cases){
         first<-j
-        status.matrix.1$infected[first] <- 1 
-        status.matrix.1$time.of.infection[first] <- current.time
-        status.matrix.1$Recovery[first]<-current.time+infectious.period.length(pathogen=pathogen.1)
-        if (runif(1)<rho.1){ #if symptomatic
-          transmission.parameters$q1h[first]<-inf.path.1.h #A single q parameter for everyone
-          transmission.parameters$q1g[first]<-inf.path.1.g #A single q parameter for everyone
+        status.matrix.1$infected[first] <- TRUE
+        status.matrix.1$time.infection[first] <- current.time
+        status.matrix.1$time.recovery[first]<-current.time+infectious.period.length(pathogen=pathogen[1])
+        if (runif(1)<rho[1]){ #if symptomatic
+          transmission.parameters$q.1.h[first]<-inf.h[1] #A single q parameter for everyone
+          transmission.parameters$q.1.g[first]<-inf.g[1] #A single q parameter for everyone
           status.matrix.1$severity[first]<-1
-          status.matrix.1$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          if (runif(1)<bc.1){
-            homequarantine.day.1[first]<-status.matrix.1$TimeSymptomOnset[first]
+          status.matrix.1$time.symptom.onset[first]<-current.time+incubation.period(pathogen=pathogen[2])
+          if (runif(1)<behavior.change.1){
+            home.quarantine.start.1[first]<-status.matrix.1$time.symptom.onset[first]
           }
           time.events<-rbind(time.events,c(current.time,1.1,first))
         }else{
-          transmission.parameters$q1h[first]<-inf.path.1.h*alpha.as.1 #A single q parameter for everyone
-          transmission.parameters$q1g[first]<-inf.path.1.g*alpha.as.1 #A single q parameter for everyone
+          transmission.parameters$q.1.h[first]<-inf.h[1]*alpha.as[1] #A single q parameter for everyone
+          transmission.parameters$q.1.g[first]<-inf.g[1]*alpha.as[1] #A single q parameter for everyone
           status.matrix.1$severity[first]<-2
           time.events<-rbind(time.events,c(current.time,1.2,first))
         }
         if (infectives[first]==0){
           infectives[first]<-1
-          contact.time.within$pr.ctc[first]<-ifelse(transmission.parameters$contact_rate_within[first]!=0,rexp(1,transmission.parameters$contact_rate_within[first])+current.time,Inf)       # I generate the next interarrival time for individual i
-          if (homequarantine[first]==0){
-            contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
+          next.contact.h$time.next.contact[first]<-ifelse(transmission.parameters$contact.rate.h[first]!=0,rexp(1,transmission.parameters$contact.rate.h[first])+current.time,Inf)       # I generate the next interarrival time for individual i
+          if (home.quarantine[first]==0){
+            next.contact.g$time.next.contact[first]<-rexp(1,transmission.parameters$contact.rate.g[first])+current.time # I generate the next interarrival time for individual i
           }
         }
       }
       }
     }
     
-    if (next.evts=="NewSeeding2"){
-      current.time<-events$NewSeeding1
-      events$NewSeeding2<-current.time+t.seed
-      not.infected<-which(status.matrix.2$infected!=1)
-      if (nSeeds.2<length(not.infected)){
-      first.cases<-sample(not.infected,nSeeds.2)
+    if (next.event=="new.seeding.2"){
+      current.time<-events$new.seeding.1
+      events$new.seeding.2<-current.time+t.seed
+      not.infected<-which(status.matrix.2$infected!=TRUE)
+      if (n.seeds.2<length(not.infected)){
+      first.cases<-sample(not.infected,n.seeds.2)
       for (j in first.cases){
         first<-j
-        status.matrix.2$infected[first] <- 1 
-        status.matrix.2$time.of.infection[first] <- current.time
-        status.matrix.2$Recovery[first]<-current.time+infectious.period.length(pathogen=pathogen.2)
-        if (runif(1)<rho.2){ #if symptomatic
-          transmission.parameters$q2h[first]<-inf.path.2.h #A single q parameter for everyone
-          transmission.parameters$q2g[first]<-inf.path.2.g #A single q parameter for everyone
+        status.matrix.2$infected[first] <- TRUE 
+        status.matrix.2$time.infection[first] <- current.time
+        status.matrix.2$time.recovery[first]<-current.time+infectious.period.length(pathogen=pathogen[2])
+        if (runif(1)<rho[2]){ #if symptomatic
+          transmission.parameters$q.2.h[first]<-inf.h[2] #A single q parameter for everyone
+          transmission.parameters$q.2.g[first]<-inf.g[2] #A single q parameter for everyone
           status.matrix.2$severity[first]<-1
-          status.matrix.2$TimeSymptomOnset[first]<-current.time+incubation.period(pathogen=pathogen.2)
-          if (runif(1)<bc.2){
-            homequarantine.day.2[first]<-status.matrix.2$TimeSymptomOnset[first]
+          status.matrix.2$time.symptom.onset[first]<-current.time+incubation.period(pathogen=pathogen[2])
+          if (runif(1)<behavior.change.2){
+            home.quarantine.start.2[first]<-status.matrix.2$time.symptom.onset[first]
           }
           time.events<-rbind(time.events,c(current.time,2.1,first))
         }else{
-          transmission.parameters$q2h[first]<-inf.path.2.h*alpha.as.2 #A single q parameter for everyone
-          transmission.parameters$q2g[first]<-inf.path.2.g*alpha.as.2 #A single q parameter for everyone
+          transmission.parameters$q.2.h[first]<-inf.h[2]*alpha.as[2] #A single q parameter for everyone
+          transmission.parameters$q.2.g[first]<-inf.g[2]*alpha.as[2] #A single q parameter for everyone
           status.matrix.2$severity[first]<-2
           time.events<-rbind(time.events,c(current.time,2.2,first))
         }
         if (infectives[first]==0){
           infectives[first]<-1
-          contact.time.within$pr.ctc[first]<-ifelse(transmission.parameters$contact_rate_within[first]!=0,rexp(1,transmission.parameters$contact_rate_within[first])+current.time,Inf)       # I generate the next interarrival time for individual i
-          if (homequarantine[first]==0){
-            contact.time.between$pr.ctc[first]<-rexp(1,transmission.parameters$contact_rate_between[first])+current.time # I generate the next interarrival time for individual i
+          next.contact.h$time.next.contact[first]<-ifelse(transmission.parameters$contact.rate.h[first]!=0,rexp(1,transmission.parameters$contact.rate.h[first])+current.time,Inf)       # I generate the next interarrival time for individual i
+          if (home.quarantine[first]==0){
+            next.contact.g$time.next.contact[first]<-rexp(1,transmission.parameters$contact.rate.g[first])+current.time # I generate the next interarrival time for individual i
           }
         }
       }
       }
     }
+    
+    
+    
   }
   
   #When also the other pathogen is present.
@@ -756,14 +736,14 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
   
   # compute some summary measures that will be given as output
   
-  C1<-nSeeds.1
-  Y1<-nSeeds.1
+  C1<-n.seeds.1
+  Y1<-n.seeds.1
   if (t2>0){
   C2<-0
   Y2<-0
   }else{
-  C2<-nSeeds.2
-  Y2<-nSeeds.2
+  C2<-n.seeds.2
+  Y2<-n.seeds.2
   }
   last.day<-round(max(time.events[,1]))
   
@@ -788,7 +768,106 @@ sim.multipathogen <- function(HH.network, t2, lambda.g, sigma21, sigma12, prop.i
   return(list(time.events=time.events, status.matrix.1=status.matrix.1, status.matrix.2=status.matrix.2,epi.details=epi.details, FinalSize=FinalSize, PeakIncidence=PeakIncidence, PeakPrevalence=PeakPrevalence,Rt1=Rt1,Rt2=Rt2))
 }
 
+##########################################################################
+### This function choses the initial infections for a certain pathogen ###
+##########################################################################
 
+identify.initial.cases = function(path){
+  p <- ifelse(path == pathogen[1], 1, 2)
+  potential.seeds <- which(hh.size == 2)
+  first.cases <<- sample(potential.seeds[which(status[[p]][potential.seeds, "infected"] == FALSE)], n.seeds[p])
+  return(first.cases)
+}
+
+#########################################################################
+### This function does what has to happen during an event "infection" ###
+#########################################################################
+
+initial.infection = function(id, path){
+  # index for the pathogen
+  p = ifelse(path == pathogen[1], 1, 2)
+  # update the status
+  status[[p]]$infected[id] <<- TRUE
+  status[[p]]$time.infection[id] <<- current.time
+  status[[p]]$time.recovery[id] <<- current.time + infectious.period.length(pathogen = pathogen[p])
+  if(runif(1) < rho[p]){ # if the individual is symptomatic
+    if(p == 1){
+      transmission.parameters$q.1.h[id] <<- inf.h[1]
+      transmission.parameters$q.1.g[id] <<- inf.g[1]
+    }else{
+      transmission.parameters$q.2.h[id] <<- inf.h[2]
+      transmission.parameters$q.2.g[id] <<- inf.g[2]
+    }
+    status[[p]]$severity[id] = 1
+    status[[p]]$time.symptom.onset[id] <<- current.time+incubation.period(pathogen=pathogen[p])
+    if(runif(1) < behavior.change[p]){
+      home.quarantine[[p]]$start[id] <<- status[[p]]$time.symptom.onset[id]
+    }
+    time.events <<- rbind(time.events, c(current.time, "symptomaitc infection", id))
+  }else{
+    if(p == 1){
+      transmission.parameters$q.1.h[id] <<- inf.h[1] * alpha.as[1]
+      transmission.parameters$q.1.g[id] <<- inf.g[1] * alpha.as[1]
+    }else{
+      transmission.parameters$q.2.h[id] <<- inf.h[2] * alpha.as[2]
+      transmission.parameters$q.2.g[id] <<- inf.g[2] * alpha.as[2]
+    }
+    status[[p]]$severity[id] = 2
+    time.events <<- rbind(time.events, c(current.time, "asymptomaitc infection", id))
+    
+  }
+  # generate the time of the next household contact
+  next.contact$h$time.next.contact[id] <<- ifelse(transmission.parameters$contact.rate.h[id] != 0, # check whether there are any household members
+                                                 rexp(1, transmission.parameters$contact.rate.h[id]) + current.time,
+                                                 Inf)
+  # if the individual is not in home quarantine, generate the time of the next global contact
+  if(home.quarantine[[1]]$quarantine[id] == FALSE & home.quarantine[[2]]$quarantine[id] == FALSE){
+    next.contact$g$time.next.contact[id] <<- rexp(1, transmission.parameters$contact.rate.g[id]) + current.time
+  }
+  infectives[id] <<- TRUE
+}
+
+#################################################
+### This function generates the next contacts ###
+#################################################
+
+generate.next.contact = function(){
+  # For each individual that has to propose a household contact, generate the time of the next contact
+  for(j in which(index.contact.h == TRUE)){ 
+    next.contact$h$time.next.contact[j] <<- ifelse(transmission.parameters$contact.rate.h[j] != 0, # check whether there are any household members
+                                                   rexp(1, transmission.parameters$contact.rate.h[j]) + current.time,
+                                                   Inf)
+    # this individual no longer has to propose a new contact
+    index.contact.h[j] <<- FALSE
+  }
+  
+  # For each individual that has to propose a global contact, generate the time of the next contact
+  for(j in which(index.contact.g == TRUE)){
+    next.contact$g$time.next.contact[j] <<- rexp(1, transmission.parameters$contact.rate.g[j]) + current.time
+    # this individual no longer has to propose a new contact
+    index.contact.g[j] <<- FALSE
+  }
+}
+
+###############################################
+### This function identifies the next event ###
+###############################################
+
+identify.next.event = function(){
+  # identify the next contact among all household and global contacts
+  events$contact <<- min(c(next.contact$h$time.next.contact, next.contact$g$time.next.contact), na.rm = TRUE)
+  # identify the next home.quarantine time for both pathogens
+  events$home.quarantine <<- min(c(home.quarantine[[1]]$start, home.quarantine[[2]]$start), na.rm = TRUE)
+  # identify the next recovery time for both pathogens
+  events$recovery <<- min(c(status[[1]]$time.recovery, status[[2]]$time.recovery), na.rm = TRUE)
+  
+  # select the next event(s). If more than one event: sample one at random
+  next.event <- colnames(events)[which(min(events) == events)]
+  if (length(next.event) > 1){
+    next.event <- sample(next.events ,1)
+  }
+  return(next.event)
+}
 
 
 
