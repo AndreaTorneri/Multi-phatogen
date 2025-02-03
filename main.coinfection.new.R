@@ -12,33 +12,33 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 # working directory
-out = args[1] 
+out <<- args[1] 
 cat(",out=", out)
 
 # number of cores to run in parallel
-cores = as.numeric(args[2]) 
+cores <<- as.numeric(args[2]) 
 cat(",cores=", cores)
 
 # time at which pathogen 2 is introduced in the population
-t2 = as.numeric(args[3]) 
+t2 <<- as.numeric(args[3]) 
 cat(",t2=", t2)
 
 # short-term interaction parameter: acquiring the other disease while having the one (if >1 cooperative effect - if <1 competing)
-sigma = NULL
-sigma[1] = as.numeric(args[4]) 
+sigma <<- NULL
+sigma[1] <<- as.numeric(args[4]) 
 cat(",sigma12=", sigma[1])
-sigma[2] = as.numeric(args[5]) 
+sigma[2] <<- as.numeric(args[5]) 
 cat(",sigma21=", sigma[2])
 
 # proportion of immune cases (not used at the moment)
-prop.immune = as.numeric(args[6]) 
+prop.immune <<- as.numeric(args[6]) 
 cat(",prop.immune=", prop.immune)
 
 # number of initial cases
-n.seeds = NULL
-n.seeds[1] = as.numeric(args[7]) 
+n.seeds <<- NULL
+n.seeds[1] <<- as.numeric(args[7]) 
 cat(",nSeeds.1=", n.seeds[1])
-n.seeds[2] = as.numeric(args[8]) 
+n.seeds[2] <<- as.numeric(args[8]) 
 cat(",nSeeds.2=", n.seeds[2])
 
 # probability of being symptomatic
@@ -146,7 +146,7 @@ cat(",dec.gc=", decrease.gc)
 ### TESTING SCENARIO ###
 ########################
 
-t2 = 0 # time at which pathogen 2 is introduced in the population          
+t2 <- 0 # time at which pathogen 2 is introduced in the population          
 sigma = c(1, 1) # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing) 
 prop.immune = 0 # proportion of immune cases (not used at the moment)
 n.seeds = c(2, 2) # number of initial cases for path 1 and 2
@@ -162,7 +162,7 @@ pathogen = c("COVID-19", "FLU-A")
 contact.reduction = 1 # parameter multiplying the household contact rate after home isolation
 t.stop = 365 # time at which simulations stop
 t.seed = 1000 # time of additional seeding
-behavior.change = c(0, 0) # proportion of individuals changing behavior (home isolation) after being infected
+behavior.change = c(0.5, 0.25) # proportion of individuals changing behavior (home isolation) after being infected
 reinfection = 0 # boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
 typeIC = 1  # ID for different type of waning of immunity
 contact.reduction.TP = 1 # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
@@ -249,26 +249,13 @@ for (i in 1:n.sim){
   print(paste0("simulation ", i))
   # select a network at random
   temp.HH.netw <- HH.networks[[sample(1:length(HH.networks), 1)]]
-  epi.outbreak[[i]] <- sim.multipathogen(HH.network = temp.HH.netw, 
-                                         t2 = t2, 
-                                         lambda.g = lambda.g, 
-                                         sigma = sigma, 
-                                         prop.immune = prop.immune, 
-                                         n.seeds = n.seeds,
-                                         rho = rho, 
-                                         inf.path.h = inf.h, 
-                                         inf.path.g = inf.g,
-                                         alpha.as = alpha.as,
-                                         long.int = long.int, 
-                                         pathogen = pathogen,
-                                         contact.reduction = contact.reduction, 
-                                         t.stop = t.stop, 
-                                         t.seed = t.seed, 
-                                         behavior.change = behavior.change, 
-                                         reinfection=reinfection, 
-                                         typeIC = typeIC, 
-                                         het.vac = het.vac, 
-                                         t.imm.lim = t.imm.lim)
+  epi.outbreak[[1]] <- sim.multipathogen(HH.network = temp.HH.netw, t2 = t2, t.seed = t.seed)#, t2 = t2, lambda.g = lambda.g, 
+                                         #prop.immune = prop.immune, sigma = sigma,
+                                         #n.seeds = n.seeds, rho = rho, inf.path.h = inf.h, inf.path.g = inf.g,
+                                         #alpha.as = alpha.as, long.int = long.int, pathogen = pathogen, 
+                                         #contact.reduction = contact.reduction, t.stop = t.stop, 
+                                         #t.seed = t.seed, behavior.change = behavior.change,reinfection=reinfection, 
+                                         #typeIC = typeIC, het.vac = het.vac, t.imm.lim = t.imm.lim)
 }
 
 scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen[1],"_&_",pathogen[2],sep ="")
