@@ -13,36 +13,29 @@
 ### t2:                   time at which pathogen 2 is introduced in the population          
 ### sigma[1]:             short-term interaction parameter: acquiring 2 while having 1      
 ###                       (if >1 cooperative effect - if <1 competing)                      
-### sigma21:              short-term interaction parameter: acquiring 1 while having 2      
+### sigma[2]:             short-term interaction parameter: acquiring 1 while having 2      
 ###                       (if >1 cooperative effect - if <1 competing) 
 ### prop.immune:          proportion of immune cases (not used at the moment)
-### n.seeds.1:            number of initial cases for path 1
-### n.seeds.2:            number of initial cases for path 2
-### rho[1]:               probability of being symptomatic for path 1
-### rho[2]:               probability of being symptomatic for path 2
-### alpha.as[1]:          relative infectiousness of asymptomatic cases (pathogen1)
-### alpha.as[2]:          relative infectiousness of asymptomatic cases (pathogen2)
+### n.seeds:              number of initial cases
+### rho:                  probability of being symptomatic
+### alpha.as:             relative infectiousness of asymptomatic cases
 ### netw:                 type of household network considered - Synthetic or ERGM
 ### n.vertex:             number of vertexes 
 ### n.networks:           number of simulated networks
-### R.1:                  reproduction number path 1 (household R*)
-### R.2:                  reproduction number path 2 (household R*)
+### R:                    reproduction number (household R*)
 ### ratio.qhqg:           ratio transmission probability given household contact 
 ###                       over global contacts
 ### long.int[1]:          long-term interaction parameter: acquiring 2 while having  
 ###                       experienced (and recovered from) 1 
 ### long.int[2]:          long-term interaction parameter: acquiring 1 while having  
 ###                       experienced (and recovered from) 2
-### pathogen[1]:          character variable identifying pathogen 1
-### pathogen[2]:          character variable identifying pathogen 2
+### pathogen:             character variable identifying pathogen
 ### contact.reduction:    parameter multiplying the household contact rate after home 
 ###                       isolation
 ### t.stop:               time at which simulations stop
 ### t.seed:               time of additional seeding
-### behavior.change.1:    proportion of individuals changing behavior (home isolation) 
-###                       after being infected with pathogen 1
-### behavior.change.2:    proportion of individuals changing behavior (home isolation) 
-###                       after being infected with pathogen 2
+### behavior.change:      proportion of individuals changing behavior (home isolation) 
+###                       after being infected
 ### reinfection:          boolean identifying whether someone can be re-infected with 
 ###                       the same pathogen (1 yes, 0 no)
 ### typeIC:               ID for different type of waning of immunity
@@ -55,7 +48,7 @@
 ### het.vac:              boolean for heterologous effects (1 yes 0 no) - Not used currently
 ### t.imm.lim:            parameter to define the length of immunity that have the same overall 
 ###                       "effect" (area underneath the curve)
-### decrease.gc:          decrease in the  number of global contact rates compared to baseline
+### decrease.gc:          decrease in the number of global contact rates compared to baseline
 
 ### Output parameters:
 ### time events: three-column matrix identifying one of the following events(second column):
@@ -69,30 +62,32 @@
 ###                                  infection related characteristics 
 ###############################################################################################
 
-sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, prop.immune, n.seeds, rho, 
+sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
+                              lambda.g = lambda.g){ #t2, lambda.g, sigma, prop.immune, n.seeds, rho, 
                               #inf.path.h, inf.path.g, alpha.as, long.int, pathogen, 
                               #contact.reduction,t.stop, t.seed, behavior.change, reinfection, 
                               #typeIC, het.vac, t.imm.lim){
 #sim.multipathogen <- function(HH.network){
-
-  #print("intitalize simulation")
   
-  ######################################## STEP 1 ######################################## 
-  # Create auxiliary objects 
-  ########################################################################################
+  #########################################################################################  
+  ################################# Preparation - STEP 1  #################################
+  ### Create auxiliary objects 
+  #########################################################################################
+  #########################################################################################
   
   netw.size <- network.size(HH.network)
   hh.id <- HH.network %v% "hh_id"
   hh.size <- HH.network %v% "hh_size"
   
-  # status keeps track of the current status of rach individual. There is one table for each pathogen.
+  # status keeps track of the current status of each individual. There is one table for each pathogen.
   status <- data.table(infected = rep(FALSE,netw.size),
-                       recovered = rep(FALSE,netw.size),
                        time.infection = as.numeric(NA),
                        infected.by = as.numeric(NA),
                        severity = 0, # 1 symptomatic, 2 asymptomatic
                        time.symptom.onset = Inf,
-                       immunity = 0, # 0 no immunity, 1 vaccinated
+                       vaccinated = FALSE,
+                       time.vaccination = NA,
+                       recovered = rep(FALSE,netw.size),
                        time.recovery = Inf)
   status <- list(status, status)
   
@@ -102,12 +97,13 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
                        recovery = as.numeric(Inf),  # Wrap in list() to make it a list column
                        new.pathogen = t2,
                        new.seeding.1 = t.seed,
-                       new.seeding.2 = t2 + t.seed)
+                       new.seeding.2 = t2 + t.seed,
+                       vaccination = Inf)
   
   # table containing a logbook of all events during the simulation
   time.events <- setDT(data.frame(time = NA,
                            type = NA,
-                           id = NA))  
+                           id = NA))
   
   # transmission.parameters contains the transmission parameters for each individual for household
   # and global contacts, depending on their status.
@@ -135,32 +131,43 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
                                      time.next.contact = Inf, 
                                      infectee.next.contact = NA)))
   
-  #Proportion of immune - To be adapted
-  # if (prop.immune>0){
-  #   if (pathogen[1]=="DELTA" & pathogen[2]=="OMICRON"){
-  #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.1$immunity[immuned.individuals]<-1
-  #     status.matrix.2$immunity<-status.matrix.1$immunity
-  #   }else{
-  #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.1$immunity[immuned.individuals]<-1
-  #     immuned.individuals<-sample(1:n,round(prop.immune*n))
-  #     status.matrix.2$immunity[immuned.individuals]<-1
-  #   }
-  # }
+  next.vaccination <- setDT(data.frame(id = 1:netw.size, 
+                                       time.vaccination = Inf))
+  next.vaccination <- list(next.vaccination, next.vaccination)
   
   current.time <- 0
   
-  ######################################## STEP 2 ######################################## 
-  # Introduce the first infections 
-  ########################################################################################
+  #########################################################################################  
+  ################################# Preparation - STEP 2  #################################
+  ### Initial Immunization.
+  ### The individuals are randomly chosen in the population.
+  #########################################################################################
+  #########################################################################################
   
-  ### The individuals are randomly chosen in the population (among susceptibles).
+  for(p in 1:length(pathogen)){
+    # determine the individuals that can be vaccinated (at the moment, the entire population)
+    population <- c(1:length(hh.size))
+    # determine the number of individuals to be initially vaccinated
+    n.initial.vaccinations <- round((prop.vaccinated[p]*length(population)),0)
+    # sample random individuals from the population
+    initial.vaccinations <- sample(population, n.initial.vaccinations)
+    #for each of these, vaccinate them
+    for(i in initial.vaccinations){
+      status[[p]]$vaccinated[i] <- TRUE
+      status[[p]]$time.vaccination[i] <- current.time
+    }
+  }
+  
+  #########################################################################################
+  ################################# Preparation - STEP 3  #################################
+  ### Introduce the first infections 
+  ### The individuals are randomly chosen in the population.
   ### We assume that epidemics always start in household of size 2 
   ### (this is a random choice that decreases stochasticity).
-
-  #print(paste0(current.time, ": Introducing the first pathogen"))
+  #########################################################################################
+  #########################################################################################
   
+
   first.cases.1 <- identify.initial.cases(pathogen[1], hh.size, status)
   for(j in first.cases.1){
     infection(infectee = j, path = 1, infector = 0, 
@@ -174,31 +181,70 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
   #Rt2 <- matrix(data = NA, nrow = 1, ncol = 2)
   ### ?
   
-  ##################################################################
-  ### STEP 2
-  ### Run the epidemic  
-  ### Continue the epidemic as long as there are infected individuals or pathogen 2 still has to be introduced and as long
-  ### as t.stop has not been reached.
-
-  #while((sum(infectives)>0 & current.time<t.stop) | current.time<t2){ #while there are still infectives, we are within the t.stop
-  while((sum(status[[1]]$infected + status[[2]]$infected) > 0 & current.time < t.stop) | current.time < t2){
+  generate.vaccination.times(env = environment())
+  
+  
+  #########################################################################################
+  ##################################### RUN EPIDEMIC ##################################### 
+  ### Continue the epidemic as long as there are infected individuals or as long as 
+  ### the second pathogen has not been introduced. Stop the epidemic when t.stop is 
+  ### reached. 
+  ########################################################################################
+  #########################################################################################
+  
+  
+  while((sum(status[[1]]$infected + status[[2]]$infected) > 0 & current.time < t.stop) | (current.time < t2 & current.time < t.stop)){
     print(current.time)
-    #print(paste0("Generate contacts and identify next events"))
     
-    ### Phase 1: individuals that has to, propose a new social contact
+    #######################################################################
+    ### Phase 1: individuals that have to, propose a new social contact 
+    #######################################################################
+    
     generate.next.contact(env = environment())
     
-    ###  Phase 2: identify the next event: select the minimum time among the events that can occur
+    
+    
+    
+    #######################################################################
+    ###  Phase 2: identify the next event 
+    #######################################################################
+    
     next.event <- identify.next.event(env = environment())
-    #print(next.contact$g, nrows = 101)
+
+
     
-    #print(paste0("Next event: ", next.event))
+    #######################################################################
+    ### PHASE 3: execute the next event 
+    #######################################################################
     
+    ###########################
+    ### EVENT = VACCINATION ###
+    ###########################
     
-    ### PHASE 3: the event happens
+    if(next.event == "vaccination"){
+      # determine the pathogen for which we need vaccination. 
+      for(p in 1:length(pathogen)){
+        if(length(which(next.vaccination[[p]]$time.vaccination == current.time)) > 0){
+          pat = p
+        }
+      }
+      # determine the patient which needs to be vaccinated
+      vaccination.patient = which(next.vaccination[[pat]]$time.vaccination == current.time)
+      
+      # update the status matrix
+      status[[pat]]$vaccinated[vaccination.patient] <- TRUE
+      status[[pat]]$time.vaccination[vaccination.patient] <- current.time
+      # update the event matrix
+      time.events <- rbind(time.events, list(current.time, paste0("vaccination ", pat), vaccination.patient))
+    }
+    
+    #######################
+    ### EVENT = CONTACT ###
+    #######################
+    
     if(next.event == "contact"){
       current.time <- events$contact
-      #print(paste0("The next event is a contact at time ", round(current.time, 4)))
+
       ### STEP 1: select a contact and a contactee
       contacts <- list.next.contacts(env = environment())
       # if more than two contacts, sample one at random
@@ -206,10 +252,7 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
       
       ### STEP 2: "make" the contact
       if(selected.contact$type == "h"){ # for a household contact
-        #print(paste0(selected.contact$id, " is making a household contact."))
-        
         infectee.pool <- get.neighborhood(HH.network, selected.contact$id)
-        
         # if multiple possibilities, choose one at random
         infectee <- ifelse(length(infectee.pool) != 0, 
                            infectee.pool[sample(length(infectee.pool),1)],
@@ -223,22 +266,15 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
         next.contact$g$time.next.contact[selected.contact$id] <- Inf
       }
       
-      #print(paste0("infectee pool: ", paste(infectee.pool, collapse = ", ")))
-      #print(paste0("infectee: ", infectee))
-      #print(paste0(round(current.time, 3), ": makes contact ", selected.contact$type))
-
-      
       ### STEP 3: Infection
       # for each pathogen
       for(p1 in 1:length(pathogen)){
         # p2 is the indicator for the other pathogen
-        p2 = setdiff(c(1:length(pathogen)), p1)
-        # check if the infector is infected with disease p1
+        p2 <- setdiff(c(1:length(pathogen)), p1)
+        # check if the infector is infected with pathogen p1
         if(status[[p1]]$infected[selected.contact$id] == TRUE){
-          #print(paste0("Infector is infected with ", pathogen[p1]))
-          # if infectee is not infected with p1, then compute short interaction
+          # check if infectee is not infected with p1 
           if(status[[p1]]$infected[selected.contact$infectee.next.contact] == FALSE){
-            #print(paste0("The infectee is not infected with pathogen ", pathogen[p1]))
             # if infectee is infected with the other disease, compute short term interaction
             short.inter <- ifelse(status[[p2]]$infected[selected.contact$infectee.next.contact] == TRUE,
                                   sigma[p1],
@@ -247,7 +283,8 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
             long.inter <- LLImmlev.basic(path.1 = p1,
                                          path.2 = p2,
                                          infectee = selected.contact$infectee.next.contact,
-                                         t.imm.lim = t.imm.lim, env = environment())
+                                         env = environment(),
+                                         t.imm.lim = t.imm.lim)
             # select the transmission probability related to global or local contacts
             q <- ifelse(selected.contact$type == "g",
                         transmission.parameters[[paste0("q.", p1, ".g")]][selected.contact$id],
@@ -260,30 +297,28 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
                                 & home.quarantine[[p1]]$quarantine[selected.contact$infectee.next.contact] == TRUE) 
                                | status[[p1]]$infected[selected.contact$infectee.next.contact] == TRUE,
                                0,
+                               # t = how long the infectee has been infected
                                InfMeasure(t = current.time - status[[p1]]$time.infection[selected.contact$id],
-                                          path = p1) * short.inter * long.inter * q)
-            #print(paste0("acceptance rate: ", acc.rate))
+                                          path = p1) * short.inter * long.inter * q * VaccineEffectiveness(t = current.time - status[[p1]]$time.vaccination, env = env(), path = p1))
             if(acc.rate > 1){err <- err + 1}
-            
             random <- runif(1)
-            #print(paste0("random = ", random))
             if(random < acc.rate){
-              #print("Infection!!!!")
               infection(infectee = selected.contact$infectee.next.contact,
                         path = p1, current.time = current.time, rho = rho,
                         infector = selected.contact$id, behavior.change = behavior.change,
                         env = environment(), inf.h = inf.h, inf.g = inf.g)
             }else{
               #print("Contact but no infection.")
-              time.events <- rbind(time.events, list(current.time, paste0("unsuccesful contact type ", selected.contact$type), selected.contact$id))
+              #time.events <- rbind(time.events, list(current.time, paste0("unsuccesful contact type ", selected.contact$type), selected.contact$id))
             }
-          }else{
-            #print(paste0("infectee ", selected.contact$infectee.next.contact," is already infected with disease ", p1))
-            #time.events <- rbind(time.events, list(current.time, paste0("unsuccesful contact type ", selected.contact$type), selected.contact$id))
           }
         }
       }
     }
+    
+    ##########################
+    ### EVENT = QUARANTINE ###
+    ##########################
     
     if(next.event=="home.quarantine"){ 
       current.time <- events$home.quarantine
@@ -302,6 +337,10 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
       }
     }
     
+    ########################
+    ### EVENT = RECOVERY ###
+    ########################
+    
     if(next.event == "recovery"){ 
       # update the current time: 
       current.time <- events$recovery
@@ -314,7 +353,7 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
           status[[p]][r, infected := FALSE]
           status[[p]][r, recovered := TRUE]
           status[[p]][r, time.recovery := Inf]
-          time.events <- rbind(time.events, list(current.time, paste0("recovery from ", pathogen[p]), r))
+          time.events <- rbind(time.events, list(current.time, paste0("recovery from ", p, pathogen[p]), r))
           # come out of home quarantine
           home.quarantine[[p]][r, quarantine := FALSE]
           home.quarantine[[p]][r, start := Inf]
@@ -329,6 +368,10 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
         }
       }
     }
+    
+    ############################
+    ### EVENT = NEW PATHOGEN ###
+    ############################
     
     if(next.event == "new.pathogen"){ 
       # update the current time: 
@@ -346,6 +389,10 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
       # the event has been introduced, the time needs to be set to Inf. 
       events[, new.pathogen := Inf]
     }
+    
+    ###########################
+    ### EVENT = NEW SEEDING ###
+    ###########################
     
     if(next.event == "new.seeding.1"){
       # update the current time: 
@@ -389,39 +436,90 @@ sim.multipathogen <- function(HH.network, t2, t.seed){ #t2, lambda.g, sigma, pro
     }
   }
   
-  time.events <- na.omit(time.events) # delete the first empty row from data frame
+  #########################################################################################
+  ################################# STEP 4  #################################
+  ### Process the results 
+  #########################################################################################
+  #########################################################################################
   
-  # compute some summary measures that will be given as output
-  #C1 <- n.seeds.1
-  #Y1 <- n.seeds.1
-  #if(t2 > 0){
-  #  C2 <- 0
-  #  Y2 <- 0
-  #}else{
-  #  C2 <- n.seeds.2
-  #  Y2 <- n.seeds.2
-  #}
-  #last.day <- round(max(time.events$time))
+  # delete the first empty row from data frame
+  time.events <- na.omit(time.events) 
   
-  #for (i in 1:last.day){
-  #  temp.time <- setdiff(which(time.events[,1] > i), which(time.events[,1] > i+1))
-  #  temp.inf.1<-c(which(time.events[temp.time,2]==1.1),which(time.events[temp.time,2]==1.2))
-  #  temp.inf.2<-c(which(time.events[temp.time,2]==2.1),which(time.events[temp.time,2]==2.2))
-  #  temp.time.1<-setdiff(1:length(time.events[,1]),which(time.events[,1]>i+1))
-  #  C1<- c(C1,length((which(time.events[temp.time.1,2]==1.1)))+length((which(time.events[temp.time.1,2]==1.2)))-length((which(time.events[temp.time.1,2]==-1))))
-  #  C2<- c(C2,length((which(time.events[temp.time.1,2]==2.1)))+length((which(time.events[temp.time.1,2]==2.2)))-length((which(time.events[temp.time.1,2]==-2))))
-  #  Y1<- c(Y1,length(temp.inf.1))
-  #  Y2<-c(Y2,length(temp.inf.2))
-  #}
+  # compute summary measures that will be given as output
+  current.infections.1 <- n.seeds[1]
+  new.infections.1 <- n.seeds[1]
+  if(t2 > 0){
+    current.infections.2 <- new.infections.2 <- 0
+  }else{
+    current.infections.2 <- new.infections.2 <- n.seeds[2]
+  }
   
-  #Fs1<-length(which(time.events[,2]==1.1))+length(which(time.events[,2]==1.2))
-  #Fs2<-length(which(time.events[,2]==2.1))+length(which(time.events[,2]==2.2))
+  last.day <- round(max(time.events$time))
   
-  #epi.details<-data.frame("Days"=0:last.day, "Incidence1"=Y1,"Incidence2"=Y2, "Prevalence1"=C1,"Prevalence2"=C2)
-  #FinalSize<-data.frame("FinalSize1"=Fs1,"FinalSize2"=Fs2)
-  #PeakIncidence<-data.frame("PeakIncidence1"=max(epi.details$Incidence1),"TimePeakIncidence1"=which(epi.details$Incidence1==max(epi.details$Incidence1))[1],"PeakIncidence2"=max(epi.details$Incidence2),"TimePeakIncidence2"=which(epi.details$Incidence2==max(epi.details$Incidence2))[1] )
-  #PeakPrevalence<-data.frame("PeakPrevalence1"=max(epi.details$Prevalence1),"TimePeakPrevalence1"=which(epi.details$Prevalence1==max(epi.details$Prevalence1))[1],"PeakPrevalence2"=max(epi.details$Prevalence2),"TimePeakPrevalence2"=which(epi.details$Prevalence2==max(epi.details$Prevalence2))[1] )
-  #return(list(time.events=time.events, status.matrix.1=status.matrix.1, status.matrix.2=status.matrix.2,epi.details=epi.details, FinalSize=FinalSize, PeakIncidence=PeakIncidence, PeakPrevalence=PeakPrevalence,Rt1=Rt1,Rt2=Rt2))
+  # daily data:
+  daily.events <- time.events
+  daily.events$time <- floor(daily.events$time)
+  daily.events <- daily.events %>% 
+    group_by(time, type) %>% 
+    summarise(n = n())
+  
+  for (i in 1:last.day){
+    print(i)
+    # identify entries of time.events that happen on day i
+    temp.time <- setdiff(which(time.events$time > i), which(time.events[,1] > i+1))
+    # identify infections with disease 1
+    temp.inf.1 <- c(which(time.events[temp.time,]$type == "symptomatic infection 1"), which(time.events[temp.time]$type == "asymptomatic infection 1"))
+    # identify infections with disease 2
+    temp.inf.2 <- c(which(time.events[temp.time]$type == "symptomatic infection 2"), which(time.events[temp.time]$type == "asymptomatic infection 1"))
+    
+    # identify rows of data frame corresponding to those up until day i included
+    temp.time <- setdiff(1:length(time.events$time), which(time.events$time>i+1))
+    temp.current.infections.1 <- length((which(time.events[temp.time]$type == "symptomatic infection 1"))) + 
+      length((which(time.events[temp.time]$type== "asymptomatic infection  1"))) - 
+      length((which(time.events[temp.time]$type == "recovery from 1COVID-19")))
+    
+    temp.current.infections.2 <- length((which(time.events[temp.time]$type == "symptomatic infection 2"))) + 
+      length((which(time.events[temp.time]$type== "asymptomatic infection  2"))) - 
+      length((which(time.events[temp.time]$type == "recovery from 2FLU-A")))
+
+    current.infections.1 <- c(current.infections.1, temp.current.infections.1)
+    current.infections.2 <- c(current.infections.2, temp.current.infections.2)
+
+    new.infections.1 <- c(new.infections.1,length(temp.inf.1))
+    new.infections.2 <- c(new.infections.2,length(temp.inf.2))
+  }
+  
+  final.size.1 <- length(which(time.events$type=="symptomatic infection 1")) + length(which(time.events$type=="asymptomatic infection  1"))
+  final.size.2 <- length(which(time.events$type=="symptomatic infection 2")) + length(which(time.events$type=="asymptomatic infection  2"))
+  
+  epi.details <- data.frame(Days = 0:last.day, 
+                            Incidence.1 = new.infections.1,
+                            Incidence.2 = new.infections.2, 
+                            Prevalence.1 = current.infections.1,
+                            Prevalence.2 = current.infections.2)
+  
+  FinalSize <- data.frame(FinalSize1 = final.size.1, 
+                          FinalSize2 = final.size.1)
+  PeakIncidence <- data.frame(PeakIncidence.1 = max(epi.details$Incidence.1),
+                              TimePeakIncidence.1 = which(epi.details$Incidence.1 == max(epi.details$Incidence.1))[1],
+                              PeakIncidence.2 = max(epi.details$Incidence.2),
+                              TimePeakIncidence2 = which(epi.details$Incidence.2==max(epi.details$Incidence.2))[1])
+  
+  PeakPrevalence <- data.frame(PeakPrevalence.1 = max(epi.details$Prevalence.1),
+                               TimePeakPrevalence.1 = which(epi.details$Prevalence.1 == max(epi.details$Prevalence.1))[1],
+                               PeakPrevalence.2 = max(epi.details$Prevalence.2),
+                               TimePeakPrevalence.2 = which(epi.details$Prevalence.2 == max(epi.details$Prevalence.2))[1])
+  
+  return(list(time.events = time.events, 
+              status.matrix.1 = status[1], 
+              status.matrix.2 = status[2],
+              epi.details = epi.details, 
+              FinalSize = FinalSize, 
+              PeakIncidence = PeakIncidence, 
+              PeakPrevalence = PeakPrevalence#,
+              #Rt1 = Rt1,
+              #Rt2 = Rt2
+              ))
 }
 
 #####################################################################
@@ -495,24 +593,28 @@ InfMeasure <- function(t, path){
 ### This function defines the vaccine effectiveness over time ###
 #################################################################
 
-VaccineEffectiveness <- function(t,typeIC){
-  #Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
-  if (typeIC==1){
+VaccineEffectiveness <- function(t,typeIC,path){
+  if(typeIC == 0){
+      return((1-vaccine.efficacy[path]))
+  }
+  # Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
+  if (typeIC == 1){
     return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887))
   }
-  if (typeIC==2){
+  if (typeIC == 2){
     return(4698.209*dgamma(t,shape = 2.026, scale = 32.904))
   }
-  if (typeIC==3){
+  if (typeIC == 3){
     return(7568.209*dlnorm(t,meanlog = 4.599, sdlog = 1.118))
   }
+  
 } 
 
 VE.flu<-function(){
   return((1-0.7))
 }
 
-VE.COVID<- function() {
+VE.COVID<- function(){
   return(1-0.88)
 }
 
@@ -623,7 +725,7 @@ infection <- function(infectee, path, infector, current.time, rho, inf.h, inf.g,
       home.quarantine_copy[infectee, end := status_copy[infectee, time.recovery]]
       #print(home.quarantine_copy[infectee])
     }
-    env$time.events <- rbind(env$time.events, list(current.time, paste0("symptomatic infection with ", pathogen[p]), infectee))
+    env$time.events <- rbind(env$time.events, list(current.time, paste0("symptomatic infection ", p), infectee))
     #print(time.events)
   }else{
     #print("asymptomatic infection")
@@ -635,7 +737,7 @@ infection <- function(infectee, path, infector, current.time, rho, inf.h, inf.g,
     status_copy[infectee, severity := 2]
     #print(status_copy[infectee])
     
-    env$time.events <- rbind(env$time.events, list(current.time, paste0("asymptomatic infection with ", pathogen[p]), infectee))
+    env$time.events <- rbind(env$time.events, list(current.time, paste0("asymptomatic infection  ", p), infectee))
     #print(time.events)
   }
   env$status[[p]] <- status_copy
@@ -664,6 +766,25 @@ generate.next.contact = function(env){
   }
 }
 
+generate.vaccination.times = function(env){
+  for(p in 1:length(pathogen)){
+    non.vaccinated <- which(env$status[[p]]$vaccinated == FALSE)
+    number.of.vaccinated <- sum(env$status[[p]]$vaccinated == TRUE)
+    
+    ### uniform distribution of vaccination times with fixed coverage
+    sample <- sample(non.vaccinated, round((vaccination.coverage[p] * netw.size)-number.of.vaccinated, 0))
+    #for(i in sample){
+    #  env$next.vaccination[[p]]$time.vaccination[i] <- runif(1, current.time, t.stop)
+    #}
+    ### exponential distribution of vaccination times with rate corresponding to
+    ### result in about the vaccination coverage before time t.stop
+    lambda <- (-log(1-vaccination.coverage[p]))/(t.stop)
+    for(i in non.vaccinated){
+      env$next.vaccination[[p]]$time.vaccination[i] <- rexp(1, lambda)
+    }
+  }
+}
+
 ###############################################
 ### This function identifies the next event ###
 ###############################################
@@ -680,6 +801,10 @@ identify.next.event = function(env){
   # identify the next recovery time for both pathogens
   temp3 <- min(c(env$status[[1]]$time.recovery, env$status[[2]]$time.recovery), na.rm = TRUE)
   env$events[, recovery := temp3]
+  
+  # identify the next vaccination
+  temp4 <- min(c(next.vaccination[[1]]$time.vaccination, next.vaccination[[2]]$time.vaccination), na.rm = TRUE)
+  events[, vaccination := temp4]
   
   # select the next event(s). If more than one event: sample one at random
   next.event <- sample(names(env$events)[which.min(env$events)], 1)

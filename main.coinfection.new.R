@@ -87,9 +87,9 @@ cat(",lli.2=", long.int[2])
 # character variable identifying
 pathogen = NULL
 pathogen[1] = as.character(args[21]) 
-cat(",pathogen.1=", pathogen[1])
+cat(",pathogen1=", pathogen[1])
 pathogen[2] = as.character(args[22]) 
-cat(",pathogen.2=", pathogen[2])
+cat(",pathogen2=", pathogen[2])
 
 # parameter multiplying the household contact rate after home isolation
 contact.reduction = as.numeric(args[23]) 
@@ -141,35 +141,42 @@ cat(",t.imm.lim=", t.imm.lim)
 decrease.gc =as.numeric(args[35]) 
 cat(",dec.gc=", decrease.gc)
 
+vaccine.efficacy <- as.numeric(args[36]) # TO DO
+cat(",vaccine.efficacy=", vaccine.efficacy)
+
+
 
 ########################
 ### TESTING SCENARIO ###
 ########################
 
 t2 <- 0 # time at which pathogen 2 is introduced in the population          
-sigma = c(1, 1) # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing) 
-prop.immune = 0 # proportion of immune cases (not used at the moment)
-n.seeds = c(2, 2) # number of initial cases for path 1 and 2
-rho = c(0.69, 0.67) # probability of being symptomatic
-alpha.as = c(0.5, 0.33) # relative infectiousness of asymptomatic cases
-netw = "Synth" # type of household network considered - Synthetic or ERGM
-n.vertex = 100 # number of vertices 
-n.networks = 1 # number of simulated networks
-R = c(3.3, 1.3) # reproduction number
-ratio.qhqg = 8.27 # ratio transmission probability given household contact over global contacts
-long.int = c(1, 1) # long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1
-pathogen = c("COVID-19", "FLU-A")
-contact.reduction = 1 # parameter multiplying the household contact rate after home isolation
-t.stop = 365 # time at which simulations stop
-t.seed = 1000 # time of additional seeding
-behavior.change = c(0.5, 0.25) # proportion of individuals changing behavior (home isolation) after being infected
-reinfection = 0 # boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
-typeIC = 1  # ID for different type of waning of immunity
-contact.reduction.TP = 1 # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
-behavior.change.TP = c(0, 0) # behavior change value set to identify transmission rates (household and global) linked to a specific R*
-het.vac = 1 # boolean for heterologous effects (1 yes 0 no) - Not used currently
-t.imm.lim = 10 # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
-decrease.gc = 1 # decrease in the  number of global contact rates compared to baseline
+sigma <- c(1, 1) # short-term interaction parameter: acquiring 2 while having 1 (if >1 cooperative effect - if <1 competing) 
+prop.immune <- 0 # proportion of immune cases (not used at the moment)
+n.seeds <- c(2, 2) # number of initial cases for path 1 and 2
+rho <- c(0.69, 0.67) # probability of being symptomatic
+alpha.as <- c(0.5, 0.33) # relative infectiousness of asymptomatic cases
+netw <- "Synth" # type of household network considered - Synthetic or ERGM
+n.vertex <- 100 # number of vertices 
+n.networks <- 1 # number of simulated networks
+R <- c(3.3, 1.3) # reproduction number
+ratio.qhqg <- 8.27 # ratio transmission probability given household contact over global contacts
+long.int <- c(1, 1) # long-term interaction parameter: acquiring 2 while having experienced (and recovered from) 1
+pathogen <- c("COVID-19", "FLU-A")
+contact.reduction <- 1 # parameter multiplying the household contact rate after home isolation
+t.stop <- 365 # time at which simulations stop
+t.seed <- 1000 # time of additional seeding
+behavior.change <- c(0.5, 0.25) # proportion of individuals changing behavior (home isolation) after being infected
+reinfection <- 0 # boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
+typeIC <- 1  # ID for different type of waning of immunity
+contact.reduction.TP <- 1 # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
+behavior.change.TP <- c(0, 0) # behavior change value set to identify transmission rates (household and global) linked to a specific R*
+het.vac <- 1 # boolean for heterologous effects (1 yes 0 no) - Not used currently
+t.imm.lim <- 10 # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
+decrease.gc <- 1 # decrease in the  number of global contact rates compared to baseline
+vaccine.efficacy <- c(0.4, 0.7) # efficacy of the vaccine
+vaccination.coverage <- c(0.8, 0.8) # the probability of being vaccinated
+prop.vaccinated <- c(0.05, 0) # the proportion of the population vaccinated at the start of the simulation
 
 ###################################################
 ### Load networks, set necessary parameters and ###
@@ -180,18 +187,19 @@ library(ergm)
 library(RGeode)
 library(dplyr)
 library(tidyverse)
+library(data.table)
 
 # Two type of household networks can be loaded (ERGM (data-driven) - Synthetic (household size representative but random mixing))
 # For now considered only Synthetic networks
 # To note, the type of network together with other characteristics (e.g., R*), will give you the value of the transmission parameters for global and local contacts
 # this values can be computed with another Rscript present in the repo - mainTransmParams.
 
-if (netw=="ERGM"){
+if(netw == "ERGM"){
   # load the corresponding network
   load("sim_basis_complete_n_1000.RData")
-  HH.networks<-HH_sim
+  HH.networks <- HH_sim
   # load and store transmission parameters for each pathogen 
-  inf.h = inf.g = NULL
+  inf.h <- inf.g <- NULL
   for(p in 1:length(pathogen)){
     name.s <- paste("TransParam_ERGMNetworks_nVertex", n.vertex, "_nNetw", n.networks, "_R", R[p],
                     "_ratioqhqg", ratio.qhqg, "_rho", rho[1], "_alpha", alpha.as[p], ".RData", sep = "")
@@ -208,7 +216,7 @@ if(netw == "Synth"){
   load(name.n)
   
   # load and store transmission parameters for each pathogen 
-  inf.h = inf.g = NULL
+  inf.h <- inf.g <- NULL
   for(p in 1:length(pathogen)){
     pathogen.TP <- pathogen[p]
     if(pathogen[p] == "DELTA" | pathogen[p] == "OMICRON"){pathogen.TP <- "COVID-19"}
@@ -227,7 +235,7 @@ lambda.g <- 8.29 * decrease.gc
 
 
 # Compute the reproduction number related to the selected network. 
-source("function.multipathogen.new.R")
+source("C:/Users/LUCP13441/Documents/GitHub/Multi-phatogen/function.multipathogen.new.R")
 n.sim <- 100
 epi.outbreak <- list()
 n.seed <- 1062021
@@ -240,16 +248,16 @@ nm <- paste0("t2: ", t2, ", sigma12: ", sigma[1], ", sigma21: ", sigma[2], ", qh
 print(nm)
 
 
-
 ######################
 ### SIMULATION IBM ###
 ######################
 
-for (i in 1:n.sim){
+for(i in 1:n.sim){
   print(paste0("simulation ", i))
   # select a network at random
   temp.HH.netw <- HH.networks[[sample(1:length(HH.networks), 1)]]
-  epi.outbreak[[1]] <- sim.multipathogen(HH.network = temp.HH.netw, t2 = t2, t.seed = t.seed)#, t2 = t2, lambda.g = lambda.g, 
+  epi.outbreak[[1]] <- sim.multipathogen(HH.network = temp.HH.netw, t2 = t2, t.seed = t.seed,
+                                         lambda.g = lambda.g)#, t2 = t2, lambda.g = lambda.g, 
                                          #prop.immune = prop.immune, sigma = sigma,
                                          #n.seeds = n.seeds, rho = rho, inf.path.h = inf.h, inf.path.g = inf.g,
                                          #alpha.as = alpha.as, long.int = long.int, pathogen = pathogen, 
@@ -258,9 +266,9 @@ for (i in 1:n.sim){
                                          #typeIC = typeIC, het.vac = het.vac, t.imm.lim = t.imm.lim)
 }
 
-scen<-paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen[1],"_&_",pathogen[2],sep ="")
+scen <- paste(netw,"_nVertex",n.vertex,"_nNetw",n.networks,pathogen[1],"_&_",pathogen[2],sep ="")
 
-name<-paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_qhqg",ratio.qhqg, "_t2",t2,"_sigma12_",sigma[1],"_sigma21_",sigma[2],"_alpha1",alpha.as[1],"_alpha2",alpha.as[2],"_rho1",rho[1],"_rho2",rho[2],"_lli1",long.int[1],"_lli2",long.int[2],"_Net",netw,"_CtcRed",contact.reduction,"_PImm",prop.immune,"_tSeed",t.seed, "_bc1",behavior.change.1,"_bc2",behavior.change.2,".RData", sep = "")
+name <- paste("MP_",scen,"_R1",R.1,"_R2",R.2,"_qhqg",ratio.qhqg, "_t2",t2,"_sigma12_",sigma[1],"_sigma21_",sigma[2],"_alpha1",alpha.as[1],"_alpha2",alpha.as[2],"_rho1",rho[1],"_rho2",rho[2],"_lli1",long.int[1],"_lli2",long.int[2],"_Net",netw,"_CtcRed",contact.reduction,"_PImm",prop.immune,"_tSeed",t.seed, "_bc1",behavior.change.1,"_bc2",behavior.change.2,".RData", sep = "")
 setwd(out)
 save(epi.outbreak, file = name)
 
