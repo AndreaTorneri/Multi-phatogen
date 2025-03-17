@@ -168,7 +168,7 @@ t.stop <- 365 # time at which simulations stop
 t.seed <- 1000 # time of additional seeding
 behavior.change <- c(0.5, 0.25) # proportion of individuals changing behavior (home isolation) after being infected
 reinfection <- 0 # boolean identifying whether someone can be re-infected with the same pathogen (1 yes, 0 no)
-typeIC <- 1  # ID for different type of waning of immunity
+typeIC <- 0  # ID for different type of waning of immunity
 contact.reduction.TP <- 1 # contact reduction value set to identify transmission rates (household and global) linked to a specific R*
 behavior.change.TP <- c(0, 0) # behavior change value set to identify transmission rates (household and global) linked to a specific R*
 het.vac <- 1 # boolean for heterologous effects (1 yes 0 no) - Not used currently
@@ -236,7 +236,7 @@ lambda.g <- 8.29 * decrease.gc
 
 # Compute the reproduction number related to the selected network. 
 source("C:/Users/LUCP13441/Documents/GitHub/Multi-phatogen/function.multipathogen.new.R")
-n.sim <- 100
+n.sim <- 1
 epi.outbreak <- list()
 n.seed <- 1062021
 set.seed(n.seed)

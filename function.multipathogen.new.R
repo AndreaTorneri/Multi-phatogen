@@ -222,20 +222,23 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
     ###########################
     
     if(next.event == "vaccination"){
+      
+      current.time <- events$vaccination
+      
       # determine the pathogen for which we need vaccination. 
       for(p in 1:length(pathogen)){
-        if(length(which(next.vaccination[[p]]$time.vaccination == current.time)) > 0){
-          pat = p
+        if(current.time %in% next.vaccination[[p]]$time.vaccination){
+          # determine the patient which needs to be vaccinated
+          vaccination.patient = which(next.vaccination[[p]]$time.vaccination == current.time)
+          
+          # update the status matrix
+          status[[p]]$vaccinated[vaccination.patient] <- TRUE
+          status[[p]]$time.vaccination[vaccination.patient] <- current.time
+          next.vaccination[[p]]$time.vaccination[vaccination.patient] <- Inf
+          # update the event matrix
+          time.events <- rbind(time.events, list(current.time, paste0("vaccination ", p), vaccination.patient))
         }
       }
-      # determine the patient which needs to be vaccinated
-      vaccination.patient = which(next.vaccination[[pat]]$time.vaccination == current.time)
-      
-      # update the status matrix
-      status[[pat]]$vaccinated[vaccination.patient] <- TRUE
-      status[[pat]]$time.vaccination[vaccination.patient] <- current.time
-      # update the event matrix
-      time.events <- rbind(time.events, list(current.time, paste0("vaccination ", pat), vaccination.patient))
     }
     
     #######################
@@ -299,7 +302,7 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
                                0,
                                # t = how long the infectee has been infected
                                InfMeasure(t = current.time - status[[p1]]$time.infection[selected.contact$id],
-                                          path = p1) * short.inter * long.inter * q * VaccineEffectiveness(t = current.time - status[[p1]]$time.vaccination, env = env(), path = p1))
+                                          path = p1) * short.inter * long.inter * q * VaccineEffectiveness(t = current.time - status[[p1]]$time.vaccination, path = p1, typeIC = typeIC))
             if(acc.rate > 1){err <- err + 1}
             random <- runif(1)
             if(random < acc.rate){
@@ -772,7 +775,7 @@ generate.vaccination.times = function(env){
     number.of.vaccinated <- sum(env$status[[p]]$vaccinated == TRUE)
     
     ### uniform distribution of vaccination times with fixed coverage
-    sample <- sample(non.vaccinated, round((vaccination.coverage[p] * netw.size)-number.of.vaccinated, 0))
+    sample <- sample(non.vaccinated, round((vaccination.coverage[p] * env$netw.size)-number.of.vaccinated, 0))
     #for(i in sample){
     #  env$next.vaccination[[p]]$time.vaccination[i] <- runif(1, current.time, t.stop)
     #}
@@ -803,8 +806,8 @@ identify.next.event = function(env){
   env$events[, recovery := temp3]
   
   # identify the next vaccination
-  temp4 <- min(c(next.vaccination[[1]]$time.vaccination, next.vaccination[[2]]$time.vaccination), na.rm = TRUE)
-  events[, vaccination := temp4]
+  temp4 <- min(c(env$next.vaccination[[1]]$time.vaccination, env$next.vaccination[[2]]$time.vaccination), na.rm = TRUE)
+  env$events[, vaccination := temp4]
   
   # select the next event(s). If more than one event: sample one at random
   next.event <- sample(names(env$events)[which.min(env$events)], 1)
