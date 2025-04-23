@@ -86,7 +86,7 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
                        severity = 0, # 1 symptomatic, 2 asymptomatic
                        time.symptom.onset = Inf,
                        vaccinated = FALSE,
-                       time.vaccination = NA,
+                       time.vaccination = -Inf,
                        recovered = rep(FALSE,netw.size),
                        time.recovery = Inf)
   status <- list(status, status)
@@ -154,7 +154,7 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
     #for each of these, vaccinate them
     for(i in initial.vaccinations){
       status[[p]]$vaccinated[i] <- TRUE
-      status[[p]]$time.vaccination[i] <- current.time
+      status[[p]]$time.vaccination[i] <- current.time    # to be changed!!!
     }
   }
   
@@ -248,12 +248,12 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
     if(next.event == "contact"){
       current.time <- events$contact
 
-      ### STEP 1: select a contact and a contactee
+      ### STEP 1: select the contact that has to happen
       contacts <- list.next.contacts(env = environment())
       # if more than two contacts, sample one at random
       selected.contact <- contacts[sample(nrow(contacts),1),]
       
-      ### STEP 2: "make" the contact
+      ### STEP 2: select an infectee and set the time for the next contact for the infector to Inf
       if(selected.contact$type == "h"){ # for a household contact
         infectee.pool <- get.neighborhood(HH.network, selected.contact$id)
         # if multiple possibilities, choose one at random
@@ -276,13 +276,14 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
         p2 <- setdiff(c(1:length(pathogen)), p1)
         # check if the infector is infected with pathogen p1
         if(status[[p1]]$infected[selected.contact$id] == TRUE){
-          # check if infectee is not infected with p1 
-          if(status[[p1]]$infected[selected.contact$infectee.next.contact] == FALSE){
+          # contact happens only if infectee is not already infected with p1 and has not been in the past
+          if(status[[p1]]$infected[selected.contact$infectee.next.contact] == FALSE & 
+             status[[p1]]$recovered[selected.contact$infectee.next.contact] == FALSE){
             # if infectee is infected with the other disease, compute short term interaction
             short.inter <- ifelse(status[[p2]]$infected[selected.contact$infectee.next.contact] == TRUE,
                                   sigma[p1],
                                   1)
-            # compute long-term interactions (i.e., the potential infectee already experienced the other infection, or that inefction)
+            # compute long-term interactions (i.e., the potential infectee already experienced the other infection)
             long.inter <- LLImmlev.basic(path.1 = p1,
                                          path.2 = p2,
                                          infectee = selected.contact$infectee.next.contact,
@@ -293,16 +294,17 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
                         transmission.parameters[[paste0("q.", p1, ".g")]][selected.contact$id],
                         transmission.parameters[[paste0("q.", p1, ".h")]][selected.contact$id])
             # Acceptance rate is the probability that infection will follow from contact 
-            # This is composed by q, short and long term interaction, and the infectiousness measure that describe how 
-            # likely is that it will happen in that moment
-            # if the acceptance rate is larger than 1, keep track of that. 
+            # This is composed by q, short and long term interaction, vaccination factor and the infectiousness 
+            # measure that describe how likely is that it will happen in that moment.
+            # If the acceptance rate is larger than 1, keep track of that. 
+            # If it is a global contact and the infectee is in home quarantine, the acceptance rate is 0. 
             acc.rate <- ifelse((selected.contact$type == "g" 
                                 & home.quarantine[[p1]]$quarantine[selected.contact$infectee.next.contact] == TRUE) 
                                | status[[p1]]$infected[selected.contact$infectee.next.contact] == TRUE,
                                0,
                                # t = how long the infectee has been infected
                                InfMeasure(t = current.time - status[[p1]]$time.infection[selected.contact$id],
-                                          path = p1) * short.inter * long.inter * q * VaccineEffectiveness(t = current.time - status[[p1]]$time.vaccination, path = p1, typeIC = typeIC))
+                                          path = p1) * short.inter * long.inter * q * (1 - VaccineEffectiveness(t = current.time - status[[p1]]$time.vaccination, path = p1, typeIC = typeIC)))
             if(acc.rate > 1){err <- err + 1}
             random <- runif(1)
             if(random < acc.rate){
@@ -502,7 +504,7 @@ sim.multipathogen <- function(HH.network, t2 = t2, t.seed = t.seed,
                             Prevalence.2 = current.infections.2)
   
   FinalSize <- data.frame(FinalSize1 = final.size.1, 
-                          FinalSize2 = final.size.1)
+                          FinalSize2 = final.size.2)
   PeakIncidence <- data.frame(PeakIncidence.1 = max(epi.details$Incidence.1),
                               TimePeakIncidence.1 = which(epi.details$Incidence.1 == max(epi.details$Incidence.1))[1],
                               PeakIncidence.2 = max(epi.details$Incidence.2),
@@ -596,21 +598,25 @@ InfMeasure <- function(t, path){
 ### This function defines the vaccine effectiveness over time ###
 #################################################################
 
-VaccineEffectiveness <- function(t,typeIC,path){
-  if(typeIC == 0){
-      return((1-vaccine.efficacy[path]))
-  }
-  # Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
-  if (typeIC == 1){
-    return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887))
-  }
-  if (typeIC == 2){
-    return(4698.209*dgamma(t,shape = 2.026, scale = 32.904))
-  }
-  if (typeIC == 3){
-    return(7568.209*dlnorm(t,meanlog = 4.599, sdlog = 1.118))
+VaccineEffectiveness <- function(t, typeIC, path){
+  if(pathogen[path] == "FLU-A"){
+    return(94.748176 * dgamma(t, shape = 1.038451, scale = 129.382569))
   }
   
+  if(pathogen[path] == "COVID-19"){
+    # Curve approximating symptomatic infection Omicron Qatar Chemateilly et al. 2022 
+    return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887)/100)
+    
+    #if (typeIC == 1){
+    #  return(6104.4743*dlnorm(t,meanlog = 4.3125, sdlog = 0.9887)) 
+    #}
+    #if (typeIC == 2){
+    #  return(4698.209*dgamma(t,shape = 2.026, scale = 32.904))
+    #}
+    #if (typeIC == 3){
+    #  return(7568.209*dlnorm(t,meanlog = 4.599, sdlog = 1.118))
+    #}
+  }
 } 
 
 VE.flu<-function(){
@@ -630,7 +636,8 @@ VE.COVID<- function(){
 LLImmlev.basic <- function(path.1,
                            path.2,
                            infectee, 
-                           t.imm.lim, env){ #pathogen.v1 is the infection the infectee might catch
+                           t.imm.lim, 
+                           env){ #pathogen.v1 is the infection the infectee might catch
   
   value <- 1
   if(env$status[[path.2]]$recovered[infectee] == TRUE){
@@ -638,8 +645,11 @@ LLImmlev.basic <- function(path.1,
     t.since.infection <- env$current.time - (env$status[[path.2]]$time.infection[infectee] 
                                          + infectious.period.length(pathogen[path.2]))
     if(t.since.infection < t.imm.lim){ # if the infection was recent enough
+      if(typeIC == 0){
+        value <- long.int[path.2]
+      }
       if(typeIC == 1){
-        value <- long.int[path.1]
+        value <- long.int[path.2]
       }
       if(typeIC == 2){
         value <- (t.since.infection/t.imm.lim)
@@ -651,7 +661,7 @@ LLImmlev.basic <- function(path.1,
         value <- 2.5 - t.since.infection/10
       }
       if(typeIC == 5){
-        value <- long.int[path.1]
+        value <- long.int[path.2]
       }
       if(typeIC == 6){
         value <- 3 - t.since.infection/5

@@ -141,8 +141,8 @@ cat(",t.imm.lim=", t.imm.lim)
 decrease.gc =as.numeric(args[35]) 
 cat(",dec.gc=", decrease.gc)
 
-vaccine.efficacy <- as.numeric(args[36]) # TO DO
-cat(",vaccine.efficacy=", vaccine.efficacy)
+vaccine.effectiveness <- as.numeric(args[36]) # TO DO
+cat(",vaccine.effectiveness=", vaccine.effectiveness)
 
 
 
@@ -174,9 +174,8 @@ behavior.change.TP <- c(0, 0) # behavior change value set to identify transmissi
 het.vac <- 1 # boolean for heterologous effects (1 yes 0 no) - Not used currently
 t.imm.lim <- 10 # parameter to define the length of immunity that have the same overall "effect" (area underneath the curve)
 decrease.gc <- 1 # decrease in the  number of global contact rates compared to baseline
-vaccine.efficacy <- c(0.4, 0.7) # efficacy of the vaccine
 vaccination.coverage <- c(0.8, 0.8) # the probability of being vaccinated
-prop.vaccinated <- c(0.05, 0) # the proportion of the population vaccinated at the start of the simulation
+prop.vaccinated <- c(0, 0) # the proportion of the population vaccinated at the start of the simulation
 
 ###################################################
 ### Load networks, set necessary parameters and ###
@@ -236,7 +235,7 @@ lambda.g <- 8.29 * decrease.gc
 
 # Compute the reproduction number related to the selected network. 
 source("C:/Users/LUCP13441/Documents/GitHub/Multi-phatogen/function.multipathogen.new.R")
-n.sim <- 1
+n.sim <- 3
 epi.outbreak <- list()
 n.seed <- 1062021
 set.seed(n.seed)
@@ -256,7 +255,7 @@ for(i in 1:n.sim){
   print(paste0("simulation ", i))
   # select a network at random
   temp.HH.netw <- HH.networks[[sample(1:length(HH.networks), 1)]]
-  epi.outbreak[[1]] <- sim.multipathogen(HH.network = temp.HH.netw, t2 = t2, t.seed = t.seed,
+  epi.outbreak[[i]] <- sim.multipathogen(HH.network = temp.HH.netw, t2 = t2, t.seed = t.seed,
                                          lambda.g = lambda.g)#, t2 = t2, lambda.g = lambda.g, 
                                          #prop.immune = prop.immune, sigma = sigma,
                                          #n.seeds = n.seeds, rho = rho, inf.path.h = inf.h, inf.path.g = inf.g,
